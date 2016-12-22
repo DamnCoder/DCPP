@@ -18,86 +18,61 @@ namespace CMakeConfigure
 			".inl",
 		};
 
-		static string utilitiesFolder = "../";
-		static string projectFolder = "../../project";
+		static readonly string utilitiesFolder = "../";
+		static readonly string projectFolder = "../../project";
 
-		static string srcFolder = "src";
-		static string includeFolder = "include";
+		static readonly string srcFolder = "src";
+		static readonly string includeFolder = "include";
 
-		static readonly string CMAKELIST_TEMPLATE_FILENAME = "CMakeLists_Template.txt";
+		static readonly string SHARED_LIB = "SHARED_LIB";
+		static readonly string STATIC_LIB = "STATIC_LIB";
+
+		static readonly string STATICLIB_TEMPLATE_FILENAME = "CMakeLists_StaticLib_Template.txt";
+		static readonly string SHAREDLIB_TEMPLATE_FILENAME = "CMakeLists_SharedLib_Template.txt";
+		static readonly string EXECUTABLE_TEMPLATE_FILENAME = "CMakeLists_Executable_Template.txt";
+
 		static readonly string CMAKELIST_OUTPUT_FILENAME = "CMakeLists.txt";
+
+		static string PRJ_NAME_KEY = "#[PROJECT_NAME]";
+		static string BUILD_TYPE_KEY = "#[BUILD_TYPE]";
 
 		static string PRJ_INCLUDE_KEY = "#[PRJ_INCLUDE]";
 		static string PRJ_SOURCES_KEY = "#[PRJ_SOURCE_FILES]";
 		static string PRJ_HEADERS_KEY = "#[PRJ_HEADER_FILES]";
 
-		private static void AddWhereKeys(List<string> cmakeLineList, Dictionary<string, List<string>> newLinesTable)
-		{
-			for (int i = 0; i < cmakeLineList.Count; ++i) 
-			{
-				var line = cmakeLineList [i];
-
-				if(newLinesTable.ContainsKey(line))
-				{
-					List<string> newLineList = newLinesTable[line];
-					int addedPathIndex = i;
-					foreach (var newLine in newLineList)
-					{
-						cmakeLineList.Insert(++addedPathIndex, newLine);
-					}
-				}
-			}
-		}
-
-		public static List<string> CreateSetMultiline(string keyName, List<string> paths)
-		{
-			List<string> setLines = new List<string>();
-			
-			setLines.Add("SET("+keyName);
-			foreach(string path in paths)
-			{
-				setLines.Add("\t"+path);
-			}
-			setLines.Add(")");
-
-			return setLines;
-		}
-
-		public static List<string> CreateMultipleIncludeDirectories(List<string> paths)
-		{
-			List<string> includeLines = new List<string>();
-
-			foreach(string path in paths)
-			{
-				includeLines.Add(CreateInclude(path));
-			}
-			return includeLines;
-		}
-
-		public static string CreateSet(string keyName, string value)
-		{
-			return "SET("+keyName+" "+value+")";
-		}
-
-		public static string CreateProject(string projectName)
-		{
-			return "PROJECT("+projectName+")";
-		}
-
-		public static string CreateInclude(string path)
-		{
-			return "INCLUDE_DIRECTORIES("+path+")";
-		}
-
 		public static void Main (string[] args)
 		{
-			string[] cmakeTemplateLines = File.ReadAllLines(Path.Combine(utilitiesFolder, CMAKELIST_TEMPLATE_FILENAME));
+			if(args.Length < 3)
+			{
+				Console.WriteLine("CORRECT USE: mono CMakeConfigure.exe <template_type> <project_name> <build_type>");
+				return;
+			}
+
+			string templateType = args[0];
+			string projectName = args[1];
+			string buildType = args[2];
+
+			string CMAKE_TEMPLATE_FILENAME = EXECUTABLE_TEMPLATE_FILENAME;
+
+			if (templateType == SHARED_LIB)
+			{
+				CMAKE_TEMPLATE_FILENAME = SHAREDLIB_TEMPLATE_FILENAME;
+			}
+			else if (templateType == STATIC_LIB)
+			{
+				CMAKE_TEMPLATE_FILENAME = STATICLIB_TEMPLATE_FILENAME;
+			}
+
+			string[] cmakeTemplateLines = File.ReadAllLines(Path.Combine(utilitiesFolder, CMAKE_TEMPLATE_FILENAME));
 
 			// This is going to be the final CMakeLists.txt lines
 			List<string> cmakeLineList = new List<string>(cmakeTemplateLines);
 
 			// Table with all the lines to add for each key in the template
 			Dictionary<string, List<string>> newLinesTable = new Dictionary<string, List<string>> ();
+
+			newLinesTable.Add(PRJ_NAME_KEY, new List<string>() { CMakeHelper.CreateProject(projectName) });
+			newLinesTable.Add(BUILD_TYPE_KEY, new List<string>() { CMakeHelper.CreateSet("CMAKE_BUILD_TYPE", buildType) });
 
 
 			// This list will contain the paths to sources and includes, it will be reused for both
@@ -107,25 +82,30 @@ namespace CMakeConfigure
 			string completeIncludePath = Path.GetFullPath(Path.Combine(projectFolder, includeFolder));
 			pathList.Add(includeFolder);
 			PathsHelp.GetAllDirectoryPaths(completeIncludePath, completeIncludePath, pathList);
-			newLinesTable.Add(PRJ_INCLUDE_KEY, CreateMultipleIncludeDirectories(pathList));
+			newLinesTable.Add(PRJ_INCLUDE_KEY, CMakeHelper.CreateMultipleIncludeDirectories(pathList));
 
 			pathList.Clear();
 
 			// Header files
 			PathsHelp.GetAllFilesPaths(completeIncludePath, completeIncludePath, includeFileExtensions, pathList);
-			newLinesTable.Add(PRJ_HEADERS_KEY, CreateSetMultiline("HEADERS", pathList));
+			newLinesTable.Add(PRJ_HEADERS_KEY, CMakeHelper.CreateSetMultiline("HEADERS", pathList));
 
 			pathList.Clear();
 
 			// Source files
 			string completSrcPath = Path.GetFullPath(Path.Combine(projectFolder, srcFolder));
 			PathsHelp.GetAllFilesPaths(completSrcPath, completSrcPath, srcfileExtensions, pathList);
-			newLinesTable.Add(PRJ_SOURCES_KEY, CreateSetMultiline("SOURCES", pathList));
+			newLinesTable.Add(PRJ_SOURCES_KEY, CMakeHelper.CreateSetMultiline("SOURCES", pathList));
 
 			// Add the new lines where the keys are in the template
-			AddWhereKeys(cmakeLineList, newLinesTable);
+			CMakeHelper.AddWhereKeys(cmakeLineList, newLinesTable);
 
-			File.WriteAllLines(Path.Combine(projectFolder, CMAKELIST_OUTPUT_FILENAME), cmakeLineList.ToArray());
+			string outputPath = Path.Combine(projectFolder, CMAKELIST_OUTPUT_FILENAME);
+			File.WriteAllLines(outputPath, cmakeLineList.ToArray());
+
+			string fullOutputPath = Path.GetFullPath(outputPath);
+			Console.WriteLine("CMakeLists.txt generated succesfully "+fullOutputPath);
+			
 		}
 	}
 }
