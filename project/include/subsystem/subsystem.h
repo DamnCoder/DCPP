@@ -9,15 +9,14 @@
 #ifndef Subsystem_hpp
 #define Subsystem_hpp
 
-#include <typeinfo>
+#include "types/rtti.h"
 
 namespace dc
 {
     class ISubsystem
     {
-    public:
-    	virtual const std::type_info& Type() const { return typeid(this); }
-
+		RTTI_BASE_DECLARATIONS(ISubsystem)
+		
     public:
         ISubsystem() {}
         virtual ~ISubsystem() {}

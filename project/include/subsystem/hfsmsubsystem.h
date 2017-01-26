@@ -17,12 +17,11 @@ namespace dc
 {
 	class CHFSMSubsystem: public IRunnableSubsystem
 	{
+		RTTI_DECLARATIONS(CHFSMSubsystem, IRunnableSubsystem)
 	public:
 		static const int ROOT_STATE = 0;
 
 	public:
-		const std::type_info& Type() const override { return typeid(CHFSMSubsystem); }
-
 		void SetInitState(const int initState)
 		{
 			m_initState = initState;

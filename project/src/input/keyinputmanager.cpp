@@ -6,68 +6,186 @@
  */
 
 #include "input/keyinputmanager.h"
+#include "deletehelp.h"
 #include <algorithm>
 
 namespace dc
 {
-	void CKeyInputManager::RegisterEvent(const EKeyState keyState, const TAction& action)
+	/* Print modifier info */
+	void PrintModifiers(const Uint16 mod)
 	{
-		m_stateActionsMap[keyState].push_front(TActionFunctor(action));
-	}
-
-	void CKeyInputManager::DeregisterEvent(const EKeyState keyState, const TAction& action)
-	{
-		TActionList actionList = FindActionList(keyState);
-		RemoveAction(actionList, action);
-	}
-
-	void CKeyInputManager::RegisterEvent(const EKeyState keyState, const EKeyCode keyCode, const TAction& action)
-	{
-		m_stateCodeActionsMap[keyState][keyCode].push_front(TActionFunctor(action));
-	}
-
-	void CKeyInputManager::DeregisterEvent(const EKeyState keyState, const EKeyCode keyCode, const TAction& action)
-	{
-		TActionList actionList = FindActionList(keyState, keyCode);
-		RemoveAction(actionList, action);
-	}
-
-	const CKeyInputManager::TActionList CKeyInputManager::FindActionList(const EKeyState keyState) const
-	{
-		TStateActionMap::const_iterator it = m_stateActionsMap.find(keyState);
-
-		if (it != m_stateActionsMap.end())
+		printf( "Modifers: " );
+		
+		/* If there are none then say so and return */
+		if( mod == KMOD_NONE )
 		{
-			return it->second;
+			printf( "None\n" );
+			return;
 		}
-		return TActionList();
+		
+		/* Check for the presence of each SDLMod value */
+		/* This looks messy, but there really isn't    */
+		/* a clearer way.                              */
+		if( mod & KMOD_NUM ) printf( "NUMLOCK " );
+		if( mod & KMOD_CAPS ) printf( "CAPSLOCK " );
+		if( mod & KMOD_LCTRL ) printf( "LCTRL " );
+		if( mod & KMOD_RCTRL ) printf( "RCTRL " );
+		if( mod & KMOD_RSHIFT ) printf( "RSHIFT " );
+		if( mod & KMOD_LSHIFT ) printf( "LSHIFT " );
+		if( mod & KMOD_RALT ) printf( "RALT " );
+		if( mod & KMOD_LALT ) printf( "LALT " );
+		if( mod & KMOD_CTRL ) printf( "CTRL " );
+		if( mod & KMOD_SHIFT ) printf( "SHIFT " );
+		if( mod & KMOD_ALT ) printf( "ALT " );
+		printf( "\n" );
 	}
-
-	const CKeyInputManager::TActionList CKeyInputManager::FindActionList(const EKeyState keyState, const EKeyCode keyCode) const
+	
+	void PrintKeyInfo(const SDL_KeyboardEvent& key)
 	{
-		TStateCodeActionMap::const_iterator stateCodeActionIt = m_stateCodeActionsMap.find(keyState);
-		if(stateCodeActionIt != m_stateCodeActionsMap.end())
+		SDL_Scancode scanCode = key.keysym.scancode;
+		SDL_Keycode keyCode = key.keysym.sym;
+		const char* keyName = SDL_GetKeyName( keyCode );
+		printf("Scancode: 0x%02X, Name: %s %u\n", scanCode, keyName, keyCode);
+		
+		PrintModifiers(key.keysym.mod);
+	}
+	
+	void CKeyInputManager::CheckEvent(const SDL_Event& event)
+	{
+		const SDL_KeyboardEvent& keyEvent = event.key;
+		
+		PrintKeyInfo(keyEvent);
+		
+		m_keyState = UpdateKeyState(keyEvent.state, m_keyState);
+		CheckKeyState(m_keyState, keyEvent);
+	}
+	
+	TKeySignal* CKeyInputManager::GetSignal(const EKeyState keyState)
+	{
+		return GetSignal(keyState, SDLK_UNKNOWN);
+	}
+	
+	TKeySignal* CKeyInputManager::GetSignal(const EKeyState keyState, const EKeyCode keyCode)
+	{
+		TStateCodeSignalMap::iterator itState = m_state2CodeMap.find(keyState);
+		TKeySignal* signal = 0;
+		
+		if(itState != m_state2CodeMap.end())
 		{
-			TCodeActionMap codeActionMap = stateCodeActionIt->second;
-			TCodeActionMap::iterator codeActionIt = codeActionMap.find(keyCode);
-			if(codeActionIt != codeActionMap.end())
+			TCodeSignalMap* code2SignalMap = &itState->second;
+			TCodeSignalMap::iterator itCodeSignal = code2SignalMap->find(keyCode);
+			
+			if(itCodeSignal != code2SignalMap->end())
 			{
-				return codeActionIt->second;
+				signal = itCodeSignal->second;
+			}
+			else
+			{
+				signal = new TKeySignal();
+				code2SignalMap->insert(std::make_pair(keyCode, signal));
 			}
 		}
-		return TActionList();
+		else
+		{
+			signal = new TKeySignal();
+			m_state2CodeMap[keyState][keyCode] = signal;
+		}
+		return signal;
+	}
+	
+	void CKeyInputManager::Register(const EKeyState keyState, const TAction& event)
+	{
+		GetSignal(keyState)->Connect(event);
+	}
+	
+	void CKeyInputManager::Register(const EKeyState keyState, const EKeyCode keyCode, const TAction& event)
+	{
+		GetSignal(keyState, keyCode)->Connect(event);
 	}
 
-	void CKeyInputManager::RemoveAction(TActionList& actionList, const TAction& action)
+	void CKeyInputManager::Deregister(const EKeyState keyState, const TAction& action)
 	{
-		const TActionList::iterator& end = actionList.end();
-		TActionList::iterator it = std::find(actionList.begin(), end, action);
+		Deregister(keyState, SDLK_UNKNOWN, action);
+	}
+	
+	void CKeyInputManager::Deregister(const EKeyState keyState, const EKeyCode keyCode, const TAction& action)
+	{
+		TStateCodeSignalMap::iterator itState2Code = m_state2CodeMap.find(keyState);
 
-		if (it != end)
+		if(itState2Code != m_state2CodeMap.end())
 		{
-			// Considering that deletion of callbacks is supposed to be made
-			// in state changes maybe the drawback is not that bad
-			actionList.remove(*it);
+			TCodeSignalMap* code2SignalMap = &itState2Code->second;
+			TCodeSignalMap::iterator itCode2Signal = code2SignalMap->find(keyCode);
+			
+			if(itCode2Signal != code2SignalMap->end())
+			{
+				TKeySignal* signal = itCode2Signal->second;
+				signal->Disconnect(action);
+				
+				if(signal->IsEmpty())
+				{
+					code2SignalMap->erase(keyCode);
+					
+					delete signal;
+					itCode2Signal->second = signal = 0;
+				}
+				
+				if(0 < code2SignalMap->size())
+				{
+					m_state2CodeMap.erase(itState2Code);
+				}
+			}
+		}
+	}
+	
+	const EKeyState CKeyInputManager::UpdateKeyState(const Uint8 state, const EKeyState previousState)
+	{
+		if(previousState == EKeyState::RELEASE && state == SDL_RELEASED)
+		{
+			return EKeyState::NONE;
+		}
+		
+		if(state == SDL_PRESSED)
+		{
+			if (previousState == EKeyState::NONE)
+			{
+				printf("PRESS\n");
+				return EKeyState::PRESS;
+			}
+			else if(previousState == EKeyState::PRESS || previousState == EKeyState::HOLD)
+			{
+				printf("HOLD\n");
+				return EKeyState::HOLD;
+			}
+		}
+		else if(state == SDL_RELEASED)
+		{
+			printf("RELEASE\n");
+			return EKeyState::RELEASE;
+		}
+		
+		return EKeyState::NONE;
+	}
+
+	void CKeyInputManager::CheckKeyState(const EKeyState keyState, const SDL_KeyboardEvent& keyEvent)
+	{
+		for(const auto& stateEntry : m_state2CodeMap)
+		{
+			if(stateEntry.first == keyState)
+			{
+				CheckKeyCode(stateEntry.second, keyEvent);
+			}
+		}
+	}
+
+	void CKeyInputManager::CheckKeyCode(const TCodeSignalMap& code2signalMap, const SDL_KeyboardEvent& keyEvent)
+	{
+		for(const auto& codeEntry : code2signalMap)
+		{
+			if(codeEntry.first == SDLK_UNKNOWN || codeEntry.first == keyEvent.keysym.sym)
+			{
+				codeEntry.second->Execute();
+			}
 		}
 	}
 }

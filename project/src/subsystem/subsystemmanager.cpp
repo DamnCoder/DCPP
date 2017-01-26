@@ -10,8 +10,6 @@
 
 #include "help/deletehelp.h"
 
-#include <cstdio>
-
 namespace dc
 {
 	void CSubsystemManager::Initialize()
@@ -44,16 +42,12 @@ namespace dc
     
     void CSubsystemManager::Add(ISubsystem* subsystem)
     {
-    	//TSubsystemMap::const_iterator it = m_subsystemMap.find(subsystem->Identifier());
     	m_subsystemList.push_back(subsystem);
     }
     
     void CSubsystemManager::Add(IRunnableSubsystem* runnableSubsystem)
     {
-    	printf("Adding subsystem as normal subsystem\n");
     	m_subsystemList.push_back(runnableSubsystem);
-
-        printf("Adding subsystem as runnable subsystem\n");
         m_runnableSubsystemList.push_back(runnableSubsystem);
     }
 }

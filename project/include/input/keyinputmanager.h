@@ -8,104 +8,81 @@
 #ifndef INPUT_KEYINPUTMANAGER_H_
 #define INPUT_KEYINPUTMANAGER_H_
 
-#include <unordered_map>
-#include <forward_list>
+#include <map>
+#include <SDL2/SDL_events.h>
 
 #include "inputdefs.h"
+#include "signals/signal.h"
 #include "help/callbacks.h"
 
 namespace dc
 {
+	using TKeySignal = CSignal<void(void)>;
+	
 	class CKeyInputManager
 	{
-	// ===========================================================
-	// Constant / Static fields / Enums / Typedefs
-	// ===========================================================
+		// ===========================================================
+		// Constant / Static fields / Enums / Typedefs
+		// ===========================================================
 	protected:
-		// I have decided to use a forward_list because I'm afraid of the cost of the deletion operations
-		// With this type of list we have an overhead on memory because of the links, but maybe
-		// is not that bad
-		typedef std::forward_list<TActionFunctor>				TActionList;
-		typedef std::unordered_map<EKeyCode, TActionList> 		TCodeActionMap;
+		using TCodeSignalMap = std::map<EKeyCode, TKeySignal*>;
+		using TStateCodeSignalMap = std::map<EKeyState, TCodeSignalMap>;
 
-		typedef std::unordered_map<EKeyState, TActionList, std::hash<int>> 		TStateActionMap;
-		typedef std::unordered_map<EKeyState, TCodeActionMap, std::hash<int>>	TStateCodeActionMap;
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
 
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
-
-	// ===========================================================
-	// Getter & Setter
-	// ===========================================================
-
-	// ===========================================================
-	// Constructors
-	// ===========================================================
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
 	public:
-		CKeyInputManager(){}
+		const bool HasSignals() const
+		{
+			return m_state2CodeMap.size();
+		}
+		
+		// Looks for a signal associated to the key state if it doesn't find it creates one and returns it
+		TKeySignal* GetSignal(const EKeyState keyState);
+		TKeySignal* GetSignal(const EKeyState keyState, const EKeyCode keyCode);
+		
+
+		// ===========================================================
+		// Constructors
+		// ===========================================================
+	public:
+		CKeyInputManager(): m_keyState(EKeyState::NONE){}
 		virtual ~CKeyInputManager(){}
 
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
-	// ===========================================================
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
 
-	// ===========================================================
-	// Methods
-	// ===========================================================
+		// ===========================================================
+		// Methods
+		// ===========================================================
 	public:
-		virtual void Initialize() = 0;
-		virtual void Run() = 0;
-		virtual void Terminate() = 0;
+		void CheckEvent(const SDL_Event& keyEvent);
 
-		void RegisterEvent(const EKeyState keyState, const TAction& action);
-		void DeregisterEvent(const EKeyState keyState, const TAction& action);
-
-		void RegisterEvent(const EKeyState keyState, const EKeyCode keyCode, const TAction& action);
-		void DeregisterEvent(const EKeyState keyState, const EKeyCode keyCode, const TAction& action);
+		void Register(const EKeyState keyState, const TAction& action);
+		void Register(const EKeyState keyState, const EKeyCode keyCode, const TAction& action);
+		
+		void Deregister(const EKeyState keyState, const TAction& action);
+		void Deregister(const EKeyState keyState, const EKeyCode keyCode, const TAction& action);
 
 	protected:
-		inline void DispatchActions(const EKeyState keyState);
-		inline void DispatchActions(const EKeyState keyState, const EKeyCode keyCode);
+		const EKeyState UpdateKeyState(const Uint8 state, const EKeyState previousState);
+		
+		void CheckKeyState(const EKeyState keyState, const SDL_KeyboardEvent& keyEvent);
+		
+		void CheckKeyCode(const TCodeSignalMap& code2signalMap, const SDL_KeyboardEvent& keyEvent);
 
-	private:
-		const TActionList FindActionList(const EKeyState keyState) const;
-		const TActionList FindActionList(const EKeyState keyState, const EKeyCode keyCode) const;
-
-		void RemoveAction(TActionList& actionList, const TAction& action);
-
-	// ===========================================================
-	// Fields
-	// ===========================================================
+		// ===========================================================
+		// Fields
+		// ===========================================================
 	protected:
-
-		TStateActionMap 	m_stateActionsMap;
-		TStateCodeActionMap	m_stateCodeActionsMap;
+		EKeyState			m_keyState;
+		TStateCodeSignalMap	m_state2CodeMap;
 	};
-
-	inline
-	void CKeyInputManager::DispatchActions(const EKeyState keyState)
-	{
-		TActionList actionList = m_stateActionsMap[keyState];
-		for(TActionFunctor action : actionList)
-		{
-			action();
-		}
-	}
-
-	inline
-	void CKeyInputManager::DispatchActions(const EKeyState keyState, const EKeyCode keyCode)
-	{
-		// State only actions
-		DispatchActions(keyState);
-
-		// Key code actions
-		TActionList actionList = FindActionList(keyState, keyCode);
-		for(TAction action : actionList)
-		{
-			action();
-		}
-	}
 }
 
 

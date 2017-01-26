@@ -10,8 +10,37 @@
 #include "input/inputmanagerfactory.h"
 #include "help/deletehelp.h"
 
+#include <SDL2/SDL_events.h>
+
 namespace dc
 {
+	const bool IsKeyboardEvent(Uint32 inputType)
+	{
+		return inputType == SDL_KEYDOWN || inputType == SDL_KEYUP;
+	}
+	
+	const bool IsMouseButtonEvent(Uint32 inputType)
+	{
+		return inputType == SDL_MOUSEBUTTONDOWN
+			|| inputType == SDL_MOUSEBUTTONUP;
+	}
+	
+	const bool IsMouseMotionEvent(Uint32 inputType)
+	{
+		return inputType == SDL_MOUSEMOTION;
+	}
+	
+	const bool IsMouseWheelEvent(Uint32 inputType)
+	{
+		return inputType == SDL_MOUSEWHEEL;
+	}
+	
+	const bool IsMouseEvent(Uint32 inputType)
+	{
+		return IsMouseButtonEvent(inputType)
+			|| IsMouseMotionEvent(inputType)
+			|| IsMouseWheelEvent(inputType);
+	}
 
 	CInputSubsystem::CInputSubsystem() :
 			IRunnableSubsystem(),
@@ -29,9 +58,25 @@ namespace dc
 
 	void CInputSubsystem::Run()
 	{
-		for(CKeyInputManager* inputManager : m_inputManagerList)
+		SDL_Event inputEvent;
+		while(SDL_PollEvent(&inputEvent))
 		{
-			inputManager->Run();
+			Uint32 inputType = inputEvent.type;
+			
+			if(IsKeyboardEvent(inputType))
+			{
+				if(mp_keyInputManager && mp_keyInputManager->HasSignals())
+				{
+					mp_keyInputManager->CheckEvent(inputEvent);
+				}
+			}
+			else if(IsMouseEvent(inputType))
+			{
+				if(mp_mouseInputManager && mp_mouseInputManager->HasSignals())
+				{
+					mp_mouseInputManager->CheckEvent(inputEvent);
+				}
+			}
 		}
 	}
 
@@ -39,7 +84,6 @@ namespace dc
 	{
 		for(CKeyInputManager* inputManager : m_inputManagerList)
 		{
-			inputManager->Terminate();
 			SafeDelete(inputManager);
 		}
 		m_inputManagerList.clear();
@@ -49,18 +93,25 @@ namespace dc
 		mp_touchInputManager = 0;
 		mp_swipeInputManager = 0;
 	}
-
-	void CInputSubsystem::Register(const EKeyState keyState, const TAction& action)
+	
+	CKeyInputManager* CInputSubsystem::CreateKeyInputManager()
 	{
 		if(!mp_keyInputManager)
 		{
-			mp_keyInputManager = CInputManagerFactory::CreateKeyInputManager(EInputType::SDL);
-			mp_keyInputManager->Initialize();
-
+			mp_keyInputManager = new CKeyInputManager();
+			
 			m_inputManagerList.push_back(mp_keyInputManager);
 		}
-
-		mp_keyInputManager->RegisterEvent(keyState, action);
+		return mp_keyInputManager;
+	}
+	
+	CMouseInputManager* CInputSubsystem::CreateMouseInputManager()
+	{
+		if(!mp_mouseInputManager)
+		{
+			mp_mouseInputManager = new CMouseInputManager();
+		}
+		return mp_mouseInputManager;
 	}
 
 } /* namespace dc */

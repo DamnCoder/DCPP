@@ -12,25 +12,22 @@ namespace dc
 {
 	void CApp::Run()
 	{
-		Create();
-
 		Initialize();
-
-		Configure();
-
-		do
-		{
-			m_subsystemManager.Run();
-		}
-		while(!m_terminationAsked);
-
+		RunSubsystems();
 		Terminate();
 	}
 
 	void CApp::Initialize()
 	{
 		printf("Initializing app\n");
+		// First creation stage, so other subsystems can be created
+		Create();
+		
+		// Second, initialization of the subsystems
 		m_subsystemManager.Initialize();
+		
+		// Third, configuration stage before start running them
+		Configure();
 	}
 
 	void CApp::Add(ISubsystem* subsystem)
@@ -41,6 +38,15 @@ namespace dc
 	void CApp::Add(IRunnableSubsystem* subsystem)
 	{
 		m_subsystemManager.Add(subsystem);
+	}
+	
+	void CApp::RunSubsystems()
+	{
+		do
+		{
+			m_subsystemManager.Run();
+		}
+		while(!m_terminationAsked);
 	}
 
 	void CApp::Terminate()

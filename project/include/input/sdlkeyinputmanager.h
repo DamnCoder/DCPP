@@ -8,24 +8,15 @@
 #ifndef INPUT_SDLKEYINPUTMANAGER_H_
 #define INPUT_SDLKEYINPUTMANAGER_H_
 
-#include <input/keyinputmanager.h>
-
 namespace dc
 {
 
-class CSDLKeyInputManager : public CKeyInputManager
+class CSDLKeyInputManager
 {
 public:
-	CSDLKeyInputManager():m_keyState(EKeyState::NONE){}
+	CSDLKeyInputManager(){}
 	~CSDLKeyInputManager(){}
 
-public:
-	void Initialize() override;
-	void Run() override;
-	void Terminate() override;
-
-private:
-	EKeyState m_keyState;
 };
 
 } /* namespace dc */

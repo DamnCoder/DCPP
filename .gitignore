@@ -5,3 +5,4 @@ utilities/Debug
 utilities/Release
 utilities/CMakeConfigure/CMakeConfigure/obj
 CMakeLists.txt
+externals

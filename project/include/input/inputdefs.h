@@ -8,7 +8,7 @@
 #ifndef INPUT_INPUTDEFS_H_
 #define INPUT_INPUTDEFS_H_
 
-#include <SDL2/SDL_keycode.h>
+#include <SDL2/SDL_events.h>
 
 namespace dc
 {
@@ -20,10 +20,14 @@ namespace dc
 		SWIPE,
 	};
 
-	// I will the prefix E (instead of T) to keep the naming similar
-	typedef SDL_Keycode EKeyCode;
+	// I will use the prefix E (instead of T) to keep the appearance that we are using enumerates
+	typedef Uint32		EInputEvent;
+	typedef SDL_Keycode	EKeyCode;
 
+	//typedef Uint32		EKeyState;
+	
 	//typedef int EKeyState;
+
 	enum EKeyState
 	{
 		NONE = 0,
@@ -31,10 +35,19 @@ namespace dc
 		HOLD,
 		RELEASE,
 	};
-
-
+	/*
+	enum EKeyCode
+	{
+		NONE = 0,
+	};
+	*/
+	
+	struct TKeyEvent
+	{
+		EKeyState	state;
+		Uint32		keyCode;
+		Uint16		keyModifier;
+	};
 }
-
-
 
 #endif /* INPUT_INPUTDEFS_H_ */

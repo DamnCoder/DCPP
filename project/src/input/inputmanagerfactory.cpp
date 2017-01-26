@@ -17,7 +17,7 @@ namespace dc
 		{
 			case EInputType::SDL:
 			{
-				return new CSDLKeyInputManager();
+				return 0;
 			}
 		}
 

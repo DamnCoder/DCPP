@@ -12,14 +12,17 @@
 
 #include "runnablesubsystem.h"
 #include "input/keyinputmanager.h"
+#include "input/mouseinputmanager.h"
 
 namespace dc
 {
 	class CInputSubsystem : public IRunnableSubsystem
 	{
+		RTTI_DECLARATIONS(CInputSubsystem, IRunnableSubsystem)
+		
 	public:
-		const std::type_info& Type() const override { return typeid(CInputSubsystem); }
-
+		CKeyInputManager* KeyInputManager() const { return mp_keyInputManager; }
+		
 	public:
 		CInputSubsystem();
 		virtual ~CInputSubsystem();
@@ -32,8 +35,8 @@ namespace dc
 		void Terminate() override;
 
 	public:
-		void Register(const EKeyState keyState, const TAction& action);
-		void Deregister(const EKeyState keyState, const TAction& action);
+		CKeyInputManager* CreateKeyInputManager();
+		CMouseInputManager* CreateMouseInputManager();
 
 	private:
 		std::vector<CKeyInputManager*> m_inputManagerList;
@@ -44,8 +47,9 @@ namespace dc
 		// thoughts...
 		// - How to check fast its existence?
 		// - How to iterate fast through the list?
-		CKeyInputManager* mp_keyInputManager;
-		CKeyInputManager* mp_mouseInputManager;
+		CKeyInputManager*	mp_keyInputManager;
+		CMouseInputManager*	mp_mouseInputManager;
+		
 		CKeyInputManager* mp_touchInputManager;
 		CKeyInputManager* mp_swipeInputManager;
 

@@ -18,27 +18,56 @@ namespace dc
     
     class CWindowSubsystem : public ISubsystem
     {
-    public:
-		const std::type_info& Type() const override { return typeid(CWindowSubsystem); }
+		RTTI_DECLARATIONS(CWindowSubsystem, ISubsystem)
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
+		
+		// ===========================================================
+		// Constant / Enums / Typedefs
+		// ===========================================================
+		
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
+	public:
+		const TDisplayInfo DisplayInfo() const { return m_displayInfo; }
+		
+		void DisplayInfo(const TDisplayInfo& displayInfo)
+		{
+			m_displayInfo = displayInfo;
+		}
 
-    public:
-    	void DisplayInfo(const TDisplayInfo& displayInfo)
-    	{
-    		m_displayInfo = displayInfo;
-    	}
-
+		// ===========================================================
+		// Constructors
+		// ===========================================================
     public:
         CWindowSubsystem () : ISubsystem(), mp_window(0) {}
-        CWindowSubsystem (const CWindowSubsystem& app) = delete;
+        CWindowSubsystem (const CWindowSubsystem& copy) = delete;
         
         virtual ~CWindowSubsystem() {}
-        
-    public:
-        void Initialize() override;
-        
-        void Terminate() override;
+		
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
+	public:
+		void Initialize() override;
+		
+		void Terminate() override;
+		
+		// ===========================================================
+		// Methods
+		// ===========================================================
+		
+		// ===========================================================
+		// Fields
+		// ===========================================================
 
-    public:
+	public:
         IWindow* 		mp_window;
         TDisplayInfo 	m_displayInfo;
     };

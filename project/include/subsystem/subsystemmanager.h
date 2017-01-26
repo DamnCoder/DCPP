@@ -18,12 +18,13 @@ namespace dc
 {
 	class CSubsystemManager : public IRunnableSubsystem
 	{
+		RTTI_DECLARATIONS(CSubsystemManager, IRunnableSubsystem)
 	public:
 		template <typename T>
 		T* GetSubsystem();
 
 	public:
-		CSubsystemManager(): IRunnableSubsystem() {}
+		CSubsystemManager() {}
 		~CSubsystemManager() {}
 
 	public:
@@ -50,15 +51,17 @@ namespace dc
 	inline
 	T* CSubsystemManager::GetSubsystem()
 	{
+		const auto identifier = T::TypeIdClass();
 		for (ISubsystem* subsystem : m_subsystemList)
 		{
-			//printf("Type searched %s Type looked %s\n", typeid(T).name(), typeid(subsystem).name());
+			//printf("Type searched %s Type looked %s\n", identifier.name(), typeid(subsystem).name());
 			//T* castedSubsystem = static_cast<T*>(subsystem);
-			printf("Type searched %s Type looked %s\n", typeid(T).name(), subsystem->Type().name());
-			if(subsystem->Type() == typeid(T))
+			//printf("Type searched %s Type looked %s\n", T::TypeName(), subsystem->InstanceName());
+			//printf("static id: %zu, instance id: %zu\n", T::TypeIdClass(), subsystem->TypeIdInstance());
+			
+			if(subsystem->Is(identifier))
 			{
-				printf("FOUND!\n");
-				return static_cast<T*>(subsystem);
+				return subsystem->DirectCast<T>();
 			}
 		}
 		return 0;

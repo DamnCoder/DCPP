@@ -62,4 +62,16 @@ std::string Data2string(const C& data)
 	return(flow.str());
 }
 
+const bool IsInString(const std::string& strString, const std::string& strSubString)
+{
+	
+	if(strString.length() <= 0 || strSubString.length() <= 0)
+		return false;
+	
+	// Si no se encuentra en la cadena, devolvera -1
+	const int index = (int)strString.find(strSubString);
+	
+	return (0 <= index && index < (int)strString.length());
+}
+
 #endif /*UTILITYS_H_*/

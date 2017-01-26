@@ -28,15 +28,20 @@ namespace dc
 	public:
 		virtual void Create() = 0;
 		virtual void Configure() = 0;
+		
+	protected:
+		virtual void Initialize();
+		virtual void Terminate();
+		
+	public:
 		void Run();
 
 	protected:
 		void Add(ISubsystem* subsystem);
 		void Add(IRunnableSubsystem* subsystem);
-
+		
 	private:
-		void Initialize();
-		void Terminate();
+		void RunSubsystems();
 
 	private:
 		CSubsystemManager 	m_subsystemManager;

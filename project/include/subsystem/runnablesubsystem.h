@@ -15,6 +15,7 @@ namespace dc
 {
     class IRunnableSubsystem : public ISubsystem
     {
+		RTTI_DECLARATIONS(IRunnableSubsystem, ISubsystem)
     public:
         IRunnableSubsystem() : ISubsystem() {}
         virtual ~IRunnableSubsystem() {}
