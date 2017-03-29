@@ -15,7 +15,7 @@
 
 namespace dc
 {
-    class GameObject;
+    class CGameObject;
     
     // Type redefinitions
 	using CompId = std::string;
@@ -23,27 +23,27 @@ namespace dc
     /*
      Component base class and interface
      */
-	class Component
+	class CComponent
     {
-		RTTI_BASE_DECLARATIONS(Component)
+		RTTI_BASE_DECLARATIONS(CComponent)
 	public:
-        Component(): mp_owner(0)
+        CComponent(): mp_owner(0)
         {}
         
-        virtual ~Component() {}
+        virtual ~CComponent() {}
         
     public:
         // Getters / Setters
-        GameObject* Owner() const { return mp_owner; }
+        CGameObject* Owner() const { return mp_owner; }
 
-        void SetOwner(GameObject* owner) { mp_owner = owner; }
+        void SetOwner(CGameObject* owner) { mp_owner = owner; }
         
     public:
         // Abstract interface
         virtual void Update() {}
         
     private:
-        GameObject*				mp_owner;
+        CGameObject*	mp_owner;
     };
 }
 

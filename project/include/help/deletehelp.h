@@ -110,7 +110,7 @@ namespace dc
     {
         void operator()(PointerType*& pointer) const
         {
-            safeDelete(pointer);
+            SafeDelete(pointer);
         }
     };
 

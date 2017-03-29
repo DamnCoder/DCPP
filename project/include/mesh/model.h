@@ -1,21 +1,18 @@
 //
-//  scene.h
+//  model.hpp
 //  DCPPTest
 //
-//  Created by Jorge López on 20/1/17.
+//  Created by Jorge López on 27/3/17.
 //
 //
 
-#ifndef scene_h
-#define scene_h
-
-#include <list>
-
-#include "component/gameobject.h"
+#ifndef model_hpp
+#define model_hpp
 
 namespace dc
 {
-	class CScene
+	
+	class CModel
 	{
 		// ===========================================================
 		// Static fields / methods
@@ -24,7 +21,6 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs
 		// ===========================================================
-		using GOList = std::list<CGameObject*>;
 		
 		// ===========================================================
 		// Inner and Anonymous Classes
@@ -33,18 +29,15 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
-	public:
-		const char*			Name()				const { return mp_name; }
-		const unsigned int	RootCount()			const { return m_goList.size(); }
-		const GOList&		GameObjectList()	const { return m_goList; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
-	public:
-		CScene(const char* name) : mp_name(name) {}
-		virtual ~CScene() {}
+		CModel()
+		{}
 		
+		~CModel()
+		{}
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
@@ -52,23 +45,12 @@ namespace dc
 		// ===========================================================
 		// Methods
 		// ===========================================================
-		void Add(CGameObject* gameObject)
-		{
-			m_goList.push_back(gameObject);
-		}
-		
-		void Remove(CGameObject* gameObject)
-		{
-			m_goList.remove(gameObject);
-		}
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
-	private:
-		const char*	mp_name;
-		GOList		m_goList;
 	};
+	
 }
 
-#endif /* scene_h */
+#endif /* model_hpp */

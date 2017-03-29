@@ -6,38 +6,42 @@
     <ProjectGuid>{16642C98-EC06-4E53-A61C-08462EA69F62}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>CMakeConfigure</RootNamespace>
-    <AssemblyName>CMakeConfigure</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\Debug</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Build</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AssemblyName>CMakeConfigureDebug</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Release</OutputPath>
+    <OutputPath>..\Build</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <AssemblyName>CMakeConfigure</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PathsHelp.cs" />
-    <Compile Include="ProjectConfig.cs" />
-    <Compile Include="CMakeHelper.cs" />
+    <Compile Include="Src\CMakeHelper.cs" />
+    <Compile Include="Src\PathsHelp.cs" />
+    <Compile Include="Src\Program.cs" />
+    <Compile Include="Src\ProjectConfig.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Src\" />
+  </ItemGroup>
 </Project>

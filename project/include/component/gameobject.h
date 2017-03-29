@@ -18,9 +18,9 @@
 namespace dc
 {
 	using GOID = std::string;
-    using TComponentList = std::forward_list<Component*>;
+    using TComponentList = std::forward_list<CComponent*>;
 	
-    class GameObject
+    class CGameObject
     {
 	private:
 		using TComponentsEntry = std::pair<unsigned int, TComponentList>;
@@ -30,29 +30,29 @@ namespace dc
 		const unsigned int ComponentsNum(const CompId& compId) const;
 		
     public:
-        GameObject(const GOID& id):
+        CGameObject(const GOID& id):
             m_id(id)
         {}
         
-        ~GameObject()
+        ~CGameObject()
         {}
 		
 	public:
 		/**
 		 * Adds a previously created component
 		 */
-		Component* AddComponent(Component* component);
+		CComponent* AddComponent(CComponent* component);
 		
 		/**
 		 * Removes the component from the GameObject and returns its ownership to the caller
 		 */
-		Component* RemoveComponent(const CompId& name);
-		Component* RemoveComponent(Component* component);
+		CComponent* RemoveComponent(const CompId& name);
+		CComponent* RemoveComponent(CComponent* component);
 		
 		/**
 		 * Removes the component from the GameObject and destroys it
 		 */
-		void DestroyComponent(Component* component);
+		void DestroyComponent(CComponent* component);
 		
 		/**
 		 * Creates a component and adds it to the GameObject
@@ -91,7 +91,7 @@ namespace dc
     };
 	
 	template<typename ComponentType>
-	ComponentType* GameObject::CreateComponent()
+	ComponentType* CGameObject::CreateComponent()
 	{
 		ComponentType* component = new ComponentType();
 		AddComponent(component);
@@ -99,9 +99,9 @@ namespace dc
 	}
 	
 	template<typename ComponentType>
-	void GameObject::DestroyComponent()
+	void CGameObject::DestroyComponent()
 	{
-		Component* component = RemoveComponent(ComponentType::TypeName());
+		CComponent* component = RemoveComponent(ComponentType::TypeName());
 		if(component)
 		{
 			delete component;
@@ -110,14 +110,14 @@ namespace dc
 	}
 	
 	template<typename ComponentType>
-	ComponentType* GameObject::GetComponent() const
+	ComponentType* CGameObject::GetComponent() const
 	{
-		Component* component = GetComponentsEntry<ComponentType>()->second.front();
-		return component->Component::template DirectCast<ComponentType>();
+		CComponent* component = GetComponentsEntry<ComponentType>()->second.front();
+		return component->CComponent::template DirectCast<ComponentType>();
 	}
 	
 	template<typename ComponentType>
-	std::vector<ComponentType*> GameObject::GetComponents() const
+	std::vector<ComponentType*> CGameObject::GetComponents() const
 	{
 		TComponentsEntry* componentsEntry = GetComponentsEntry<ComponentType>();
 		
@@ -125,7 +125,7 @@ namespace dc
 		std::vector<ComponentType*> castedComponentList(componentsCount);
 		
 		TComponentList& componentList = componentsEntry->second;
-		for(const Component* component : componentList)
+		for(const CComponent* component : componentList)
 		{
 			castedComponentList.push_back(component->DirectCast<ComponentType>());
 		}
@@ -134,7 +134,7 @@ namespace dc
 	}
 	
 	template<typename ComponentType>
-	const GameObject::TComponentsEntry* GameObject::GetComponentsEntry() const
+	const CGameObject::TComponentsEntry* CGameObject::GetComponentsEntry() const
 	{
 		return GetComponentsEntry(ComponentType::TypeName());
 	}

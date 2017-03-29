@@ -18,14 +18,15 @@ namespace CMakeConfigure
 			".inl",
 		};
 
-		static readonly string utilitiesFolder = "../";
-		static readonly string projectFolder = "../../project";
+		//static readonly string utilitiesFolder = "../";
+		//static readonly string projectFolder = "../../project";
 
+		//static readonly string codeFolder = "project";
 		static readonly string srcFolder = "src";
 		static readonly string includeFolder = "include";
 
-		static readonly string SHARED_LIB = "SHARED_LIB";
-		static readonly string STATIC_LIB = "STATIC_LIB";
+		static readonly string SHARED_LIB = "SHARED";
+		static readonly string STATIC_LIB = "STATIC";
 
 		static readonly string STATICLIB_TEMPLATE_FILENAME = "CMakeLists_StaticLib_Template.txt";
 		static readonly string SHAREDLIB_TEMPLATE_FILENAME = "CMakeLists_SharedLib_Template.txt";
@@ -42,15 +43,19 @@ namespace CMakeConfigure
 
 		public static void Main (string[] args)
 		{
-			if(args.Length < 3)
+			if(args.Length < 5)
 			{
-				Console.WriteLine("CORRECT USE: mono CMakeConfigure.exe <template_type> <project_name> <build_type>");
+				Console.WriteLine("CORRECT USE: mono CMakeConfigure.exe " +
+					"<templates_path> <output_path> " +
+					"<template_type> <project_name> <build_type>");
 				return;
 			}
 
-			string templateType = args[0];
-			string projectName = args[1];
-			string buildType = args[2];
+			string templatesPath = args[0];
+			string outputPath = args[1];
+			string templateType = args[2];
+			string projectName = args[3];
+			string buildType = args[4];
 
 			string CMAKE_TEMPLATE_FILENAME = EXECUTABLE_TEMPLATE_FILENAME;
 
@@ -63,7 +68,7 @@ namespace CMakeConfigure
 				CMAKE_TEMPLATE_FILENAME = STATICLIB_TEMPLATE_FILENAME;
 			}
 
-			string[] cmakeTemplateLines = File.ReadAllLines(Path.Combine(utilitiesFolder, CMAKE_TEMPLATE_FILENAME));
+			string[] cmakeTemplateLines = File.ReadAllLines(Path.Combine(templatesPath, CMAKE_TEMPLATE_FILENAME));
 
 			// This is going to be the final CMakeLists.txt lines
 			List<string> cmakeLineList = new List<string>(cmakeTemplateLines);
@@ -78,8 +83,13 @@ namespace CMakeConfigure
 			// This list will contain the paths to sources and includes, it will be reused for both
 			List<string> pathList = new List<string> ();
 
+			// Paths
+			//string outputhCodeFolder = Path.Combine(outputPath, codeFolder);
+			string rootIncludePath = Path.GetFullPath(outputPath);
+
 			// Project includes
-			string completeIncludePath = Path.GetFullPath(Path.Combine(projectFolder, includeFolder));
+			string completeIncludePath = Path.Combine(rootIncludePath, includeFolder);
+			//string codeIncludeFolder = Path.Combine(codeFolder, includeFolder);
 			pathList.Add(includeFolder);
 			PathsHelp.GetAllDirectoryPaths(completeIncludePath, completeIncludePath, pathList);
 			newLinesTable.Add(PRJ_INCLUDE_KEY, CMakeHelper.CreateMultipleIncludeDirectories(pathList));
@@ -93,15 +103,16 @@ namespace CMakeConfigure
 			pathList.Clear();
 
 			// Source files
-			string completSrcPath = Path.GetFullPath(Path.Combine(projectFolder, srcFolder));
+			//string codeSrcFolder = Path.Combine(codeFolder, srcFolder);
+			string completSrcPath = Path.Combine(rootIncludePath, srcFolder);
 			PathsHelp.GetAllFilesPaths(completSrcPath, completSrcPath, srcfileExtensions, pathList);
 			newLinesTable.Add(PRJ_SOURCES_KEY, CMakeHelper.CreateSetMultiline("SOURCES", pathList));
 
 			// Add the new lines where the keys are in the template
 			CMakeHelper.AddWhereKeys(cmakeLineList, newLinesTable);
 
-			string outputPath = Path.Combine(projectFolder, CMAKELIST_OUTPUT_FILENAME);
-			File.WriteAllLines(outputPath, cmakeLineList.ToArray());
+			string outputFilePath = Path.Combine(outputPath, CMAKELIST_OUTPUT_FILENAME);
+			File.WriteAllLines(outputFilePath, cmakeLineList.ToArray());
 
 			string fullOutputPath = Path.GetFullPath(outputPath);
 			Console.WriteLine("CMakeLists.txt generated succesfully "+fullOutputPath);

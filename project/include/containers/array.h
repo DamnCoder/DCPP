@@ -43,6 +43,15 @@ namespace dc
         {
             assert(0 < m_maxSize);
         };
+		
+		CArray(const CArray<T>& copy):
+			m_id(copy.m_id),
+			m_maxSize(copy.m_maxSize),
+			m_currentSize(0),
+			mp_data(new T[m_maxSize])
+		{
+			Append(copy.mp_data, copy.m_currentSize);
+		}
         
         ~CArray()
         {
@@ -52,7 +61,7 @@ namespace dc
         void Init(const int maxSize)
         {
             // We cannot initialize an array currently initialized
-            assert(0 < maxSize || mp_data == 0);
+            assert(0 < maxSize && mp_data == 0);
             m_maxSize = maxSize;
             m_currentSize = 0;
             mp_data = new T[maxSize];
@@ -60,17 +69,29 @@ namespace dc
         
     // Accesors
     public:
-        const unsigned int	Id()            const { return m_id; }
-        const unsigned int	MaxSize()       const { return m_maxSize; }
-        const unsigned int	CurrentSize()   const { return m_currentSize; }
-        const T*            Data()          const { return mp_data; }
-        const bool          IsValid()       const { return m_currentSize > 0; }
+		operator		T	*()			const { return mp_data; }
+        const unsigned int	Id()		const { return m_id; }
+        const unsigned int	MaxSize()	const { return m_maxSize; }
+        const unsigned int	Size()		const { return m_currentSize; }
+        const T*            Data()		const { return mp_data; }
+        const bool          IsValid()	const { return m_currentSize > 0; }
         
         void SetId(const unsigned int identifier) { m_id = identifier; }
-        
+		
+		inline const bool IsInsideLimits(const unsigned int i) const
+		{
+			return (0<=i && i<m_maxSize);
+		}
+		
+	private:
+		inline const bool IsOutOfBounds(const unsigned int length)
+		{
+			return (m_maxSize < length);
+		}
+		
     // Public interface
     public:
-        
+		
         T& operator[] (const unsigned int index)
         {
             return mp_data[index];
@@ -136,7 +157,7 @@ namespace dc
         void Merge(const CArray<T>& array)
         {
             Resize(array.MaxSize());
-            Append(array.Data(), array.CurrentSize());
+            Append(array.Data(), array.Size());
         }
         
         void Clear()
@@ -155,17 +176,6 @@ namespace dc
         unsigned int	m_currentSize;
         T*              mp_data;
         
-    private:
-        inline const bool IsInsideLimits(const unsigned int i) const
-        {
-            return (0<=i && i<m_maxSize);
-        }
-        
-        inline const bool IsOutOfBounds(const unsigned int length)
-        {
-            return (m_maxSize < length);
-        }
-    };
-	
+	};
 }
 #endif

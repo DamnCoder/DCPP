@@ -50,12 +50,13 @@ namespace dc
             uv1(uv1)
         {}
         
-        math::Vector3f  position;   // 12 bytes
-        math::Vector3f  normal;     // 12 bytes
-        math::Vector4f  color;      // 16 bytes
-        math::Vector2f  uv0;        // 8 bytes
-        math::Vector2f  uv1;        // 8 bytes
-        float           padding[2]; // 8 bytes
+        math::Vector3f	position;   // 12 bytes
+        math::Vector3f	normal;     // 12 bytes
+        math::Vector4f	color;      // 16 bytes
+        math::Vector2f	uv0;        // 8 bytes
+        math::Vector2f	uv1;        // 8 bytes
+		unsigned short	indices[3];	// 6 bytes
+        unsigned short	padding;	// 2 bytes
     };
 }
 

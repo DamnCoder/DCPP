@@ -20,7 +20,6 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <iostream>
 #include "physics/BoundingBox.h"
 
 namespace dc
@@ -31,14 +30,14 @@ namespace dc
 	 */
 
 	// Definicion de constantes
-	const int 	MAX_QPATH 		= 64;
-	const int 	MD3_MAX_FRAMES 	= 1024;
-	const int 	MD3_MAX_TAGS 	= 16;
-	const int 	MD3_MAX_MESHES 	= 32;
-	const int 	MD3_MAX_SHADERS = 256;
-	const int 	MD3_MAX_FACES 	= 8192;
-	const int 	MD3_MAX_VERTICES = 4096;
-	const float MD3_SCALE_FACTOR = 1.0f / 64.0f;
+	const int 	MAX_QPATH			= 64;
+	const int 	MD3_MAX_FRAMES		= 1024;
+	const int 	MD3_MAX_TAGS		= 16;
+	const int 	MD3_MAX_MESHES		= 32;
+	const int 	MD3_MAX_SHADERS		= 256;
+	const int 	MD3_MAX_FACES		= 8192;
+	const int 	MD3_MAX_VERTICES	= 4096;
+	const float MD3_SCALE_FACTOR	= 1.0f / 64.0f;
 
 	// This enumeration stores all the animations in order from the config file (.cfg).
 	typedef enum
@@ -162,30 +161,31 @@ namespace dc
 	};
 
 	/**
-	 * Indices a los arrays de vertices y coordenadas de textura
-	 * que indican cuales forman un triangulo.
+	 * Indices to the vertex and uv texture coordinates, 
+	 * configuring a triangle
 	 */
 	struct tMd3Face
 	{
-	   int indices[3];
+	   int indices[3]; // 12 bytes
 	};
 
 	/**
-	 * Coordenada UV de textura.
+	 * UV Texture coordinate
 	 */
 	struct tMd3TexCoord
 	{
-	   float uv[2];
+	   float uv[2];		// 8 bytes
 	};
 
 	/**
-	 * Vertice compuesto por la posicion y normal del mismo.
+	 * The vertices are composed of normal and vertex, both in kind of compressed formats so they need a manipulation
+	 * Normals come in polar coordinates
+	 * Vertex come scaled by 1 / 64 th of their right position
 	 */
 	struct tMd3Vertex
 	{
-	   signed short	 	coord[3];	// Coordenada del vertice (escalado por 1/64)
-	   unsigned char 	normal[2];	// Normales en forma polar, hace falta decodificarlas para poder usarlas
-	   	   	   	   	   	   	   		// como un vector normal.
+	   signed short	 	coord[3];	// 6 bytes
+	   unsigned char 	normal[2];	// 4 bytes
 	};
 }
 

@@ -5,7 +5,7 @@
  *      Author: jorge
  */
 
-#include "Model.h"
+#include "md3model.h"
 
 #include <math/matrix.h>
 

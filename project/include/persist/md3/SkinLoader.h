@@ -8,8 +8,8 @@
 #ifndef SKINLOADER_H_
 #define SKINLOADER_H_
 
-#include "MD3structs.h"
-#include "Model.h"
+#include "md3structs.h"
+#include "md3model.h"
 
 #include <string>
 

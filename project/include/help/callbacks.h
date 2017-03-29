@@ -17,28 +17,6 @@ namespace dc
 	};
 	typedef std::function<void(const TMouseData& mouseData)>	TMouseAction;
 	typedef std::function<void(void)> 							TAction;
-
-	struct TActionFunctor
-	{
-	public:
-		TActionFunctor(){}
-		TActionFunctor(const TAction& action) : m_action(action) {}
-		virtual ~TActionFunctor(){}
-
-	public:
-		void operator()()
-		{
-			m_action();
-		}
-
-		const bool operator==(const TActionFunctor& other) const
-		{
-			return (*this == other);
-		}
-
-	private:
-		TAction m_action;
-	};
 }
 
 #endif /* HELP_CALLBACKS_H_ */

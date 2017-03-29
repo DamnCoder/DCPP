@@ -4,99 +4,126 @@
 #include "containers/array.h"
 #include "vertices.h"
 
+#include <math/dcmath.h>
+
+#include <map>
+
 namespace dc
 {
-    
-    class CMesh
-    {
-    // Constructores / Destructores
-    public:
-        CMesh():
-            mv_center(),
-            mv_size(),
-            mn_indexCount(0),
-            mn_vertexCount(0)
-        {};
-        
-        ~CMesh() {}
-        
-        /**
-         * Initializes all data of this model with a number of empty vertexes.
-         */
-        void Initialize(const int vertexCount, const int indexCount);
-        
-        /**
-         * Resizes the mesh without modificate the current mesh data
-         */
-        void Resize(const int vertexCount, const int indexCount);
-        
-        /**
-         * Merges this mesh with another one and stores the result in
-         * this mesh. The other mesh is not modified at all in the process.
-         * \param mesh the mesh you want to merge with this one.
-         */
-        CMesh* MergeWith(const CMesh* mesh);
-        
-        /**
-         * Calculates size and center of this mesh.
-         */
-        void CalculateMeshDimensions();
-        
-    // Accesors
-    public:
-        const math::Vector3f&       Center() const { return mv_center; }
-        const math::Vector3f&       Size() const { return mv_size; }
-        const int                   IndexCount() const { return mn_indexCount; };
-        const int                   VertexCount() const { return mn_vertexCount; };
-        
-        TMultiTextureVertex         GetVertex(const int index);
-        
-        const TFloatArray&			PositionArray() const { return m_positionArray; }
-        const TFloatArray&			NormalArray() const { return m_normalArray; }
-        const TFloatArray&			ColorArray() const { return m_colorArray; }
-        const TFloatArray&			UV0Array() const { return m_uv0Array; }
-        const TFloatArray&			UV1Array() const { return m_uv1Array; }
-        const TUShortArray&			IndexArray() const { return m_indicesArray; }
-        
-        const bool                  IsValid() const
-        {
-            return m_indicesArray.IsValid() && m_positionArray.IsValid() && m_normalArray.IsValid() && m_colorArray.IsValid() && m_uv0Array.IsValid() && m_uv1Array.IsValid();
-        }
-    
-    // Public interface
-    public:
-        void AddVertex(const TMultiTextureVertex& vertex);
-        void AddIndex(const unsigned short index);
+	class CMesh
+	{
+	private:
+		using TFloatDataMap = std::map<const char*, TFloatArray>;
+		
+	public:
 
-        void ReplaceVertex(const int index, const TMultiTextureVertex& vertex);
-        
-        void ReplaceVertexPosition(const int index, const math::Vector3f& position);
-        void ReplaceVertexColor(const int index, const math::ColorRGBAf& color);
-        
-        // Reemplaza un array de vertices
-        void ReplaceVerticesPosition(const int index, const math::Vector3f* posArray, const int length);
-        
-    // Atributes
-    private:
-        math::Vector3f      mv_center;
-        math::Vector3f      mv_size;
-        
-        int                 mn_indexCount;
-        int                 mn_vertexCount;
-        
-        TFloatArray  m_positionArray;
-        TFloatArray  m_normalArray;
-        TFloatArray  m_colorArray;
-        TFloatArray  m_uv0Array;
-        TFloatArray  m_uv1Array;
-        
-        TUShortArray m_indicesArray;
-    };
+		static const char* VERTEX_ID;
+		static const char* NORMAL_ID;
+		static const char* UV0_ID;
+		static const char* UV1_ID;
+		static const char* COLOR_ID;
+
+		static const char* INDICES_ID;
+
+		// Accessors
+	public:
+		const bool IsValid() const;
+		
+		const char* Name() const
+		{
+			return m_name;
+		}
+		
+		const int IndexCount() const
+		{
+			return m_indexCount;
+		}
+		
+		void IndexCount(const unsigned int indexCount)
+		{
+			m_indexCount = indexCount;
+		}
+		
+		const int VertexCount() const
+		{
+			return m_vertexCount;
+		}
+		
+		void VertexCount(const unsigned int vertexCount)
+		{
+			m_vertexCount = vertexCount;
+		}
+		
+		const math::Vector3f& Center() const
+		{
+			return m_center;
+		}
+
+		const math::Vector3f& Size() const
+		{
+			return m_size;
+		}
+
+		TFloatArray& FloatDataArray(const char* id);
+		
+		void FloatDataArray(const char* id, TFloatArray& floatArray);
+		
+		void AddFloatDataArray(const char* id, TFloatArray& floatArray);
+		
+		const TUIntArray& IndexArray() const { return m_indexArray; }
+		
+		void IndexArray (const TUIntArray indexArray)
+		{
+			m_indexArray = indexArray;
+		}
+
+		// Constructores / Destructores
+	public:
+		CMesh(const char* name) :
+				m_name(name), m_indexCount(0), m_vertexCount(0), m_center(), m_size()
+		{
+		}
+
+		~CMesh()
+		{
+		}
+
+		// Public interface
+	public:
+
+		/**
+		 * Resizes the mesh without modificate the current mesh data
+		 */
+		void Resize(const int vertexCount, const int indexCount);
+
+		/**
+		 * Merges this mesh with another one and stores the result in
+		 * this mesh. The other mesh is not modified at all in the process.
+		 * \param mesh the mesh you want to merge with this one.
+		 */
+		CMesh* MergeWith(const CMesh* mesh);
+
+		/**
+		 * Calculates size and center of this mesh.
+		 */
+		void CalculateMeshDimensions();
+
+	public:
+
+		// Atributes
+	private:
+		const char*		m_name;
+		
+		unsigned int	m_indexCount;
+		unsigned int	m_vertexCount;
+		
+		math::Vector3f	m_center;
+		math::Vector3f	m_size;
+
+		TFloatDataMap	m_floatDataMap;
+		TUIntArray		m_indexArray;
+	};
 }
 
 #endif
-
-
-
-
 

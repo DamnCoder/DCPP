@@ -43,15 +43,16 @@ namespace CMakeConfigure
 
 		public static void GetAllDirectoryPaths(string rootPath, string searchPath, List<string> outPathList)
 		{
-			var rootDirInfo = new DirectoryInfo(searchPath);
+			var rootDirInfo = new DirectoryInfo(rootPath);
+			var searchDirInfo = new DirectoryInfo(searchPath);
 
-			foreach(var directoryInfo in rootDirInfo.EnumerateDirectories())
+			foreach(var directoryInfo in searchDirInfo.EnumerateDirectories())
 			{
 				var relativePath = MakeRelative(rootDirInfo.FullName, directoryInfo.FullName);
 				outPathList.Add(relativePath);
 			}
 
-			foreach(var directoryInfo in rootDirInfo.EnumerateDirectories())
+			foreach(var directoryInfo in searchDirInfo.EnumerateDirectories())
 			{
 				GetAllDirectoryPaths(rootPath, directoryInfo.FullName, outPathList);
 			}

@@ -12,12 +12,12 @@
 
 namespace dc
 {
-	const unsigned int GameObject::ComponentsNum(const CompId& comId) const
+	const unsigned int CGameObject::ComponentsNum(const CompId& comId) const
 	{
 		return 0;
 	}
 	
-	Component* GameObject::AddComponent(Component* component)
+	CComponent* CGameObject::AddComponent(CComponent* component)
 	{
 		if(component)
 		{
@@ -32,7 +32,7 @@ namespace dc
 		return component;
 	}
 	
-	Component* GameObject::RemoveComponent(const CompId& name)
+	CComponent* CGameObject::RemoveComponent(const CompId& name)
 	{
 		TComponentListTable::iterator componentsEntryIt = m_componentTable.find(name);
 		if(componentsEntryIt != m_componentTable.end())
@@ -42,7 +42,7 @@ namespace dc
 			--componentsEntry.first;
 			
 			TComponentList& componentList = componentsEntry.second;
-			Component* component = componentList.front();
+			CComponent* component = componentList.front();
 			componentList.pop_front();
 			
 			if(componentList.empty())
@@ -55,7 +55,7 @@ namespace dc
 		return 0;
 	}
 	
-	Component* GameObject::RemoveComponent(Component* component)
+	CComponent* CGameObject::RemoveComponent(CComponent* component)
 	{
 		TComponentListTable::iterator componentsEntryIt = m_componentTable.find(component->InstanceName());
 		if(componentsEntryIt != m_componentTable.end())
@@ -76,14 +76,14 @@ namespace dc
 		return 0;
 	}
 	
-	void GameObject::DestroyComponent(Component* component)
+	void CGameObject::DestroyComponent(CComponent* component)
 	{
-		Component* componentToRemove = RemoveComponent(component);
+		CComponent* componentToRemove = RemoveComponent(component);
 		
 		SafeDelete(componentToRemove);
 	}
 	
-	const GameObject::TComponentsEntry* GameObject::GetComponentsEntry(const CompId& compId) const
+	const CGameObject::TComponentsEntry* CGameObject::GetComponentsEntry(const CompId& compId) const
 	{
 		const auto& componentsEntryIt = m_componentTable.find(compId);
 		if(componentsEntryIt != m_componentTable.end())
