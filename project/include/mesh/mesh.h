@@ -12,20 +12,32 @@ namespace dc
 {
 	class CMesh
 	{
+		// ===========================================================
+		// Constant / Enums / Typedefs
+		// ===========================================================
 	private:
 		using TFloatDataMap = std::map<const char*, TFloatArray>;
 		
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
 	public:
-
+		
 		static const char* VERTEX_ID;
 		static const char* NORMAL_ID;
 		static const char* UV0_ID;
 		static const char* UV1_ID;
 		static const char* COLOR_ID;
-
+		
 		static const char* INDICES_ID;
-
-		// Accessors
+		
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
 	public:
 		const bool IsValid() const;
 		
@@ -76,19 +88,25 @@ namespace dc
 		{
 			m_indexArray = indexArray;
 		}
-
-		// Constructores / Destructores
+		
+		// ===========================================================
+		// Constructors
+		// ===========================================================
 	public:
 		CMesh(const char* name) :
 				m_name(name), m_indexCount(0), m_vertexCount(0), m_center(), m_size()
-		{
-		}
+		{}
 
 		~CMesh()
-		{
-		}
+		{}
 
-		// Public interface
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
+		
+		// ===========================================================
+		// Methods
+		// ===========================================================
 	public:
 
 		/**
@@ -108,9 +126,9 @@ namespace dc
 		 */
 		void CalculateMeshDimensions();
 
-	public:
-
-		// Atributes
+		// ===========================================================
+		// Fields
+		// ===========================================================
 	private:
 		const char*		m_name;
 		

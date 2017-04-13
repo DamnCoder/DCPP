@@ -9,15 +9,15 @@
 #ifndef scenemanagersubsystem_h
 #define scenemanagersubsystem_h
 
-#include "subsystem.h"
+#include "runnablesubsystem.h"
 
 #include "scenes/scenemanager.h"
 
 namespace dc
 {
-	class CSceneSubsystem : public ISubsystem
+	class CSceneSubsystem : public IRunnableSubsystem
 	{
-		RTTI_DECLARATIONS(CSceneSubsystem, ISubsystem)
+		RTTI_DECLARATIONS(CSceneSubsystem, IRunnableSubsystem)
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
@@ -49,19 +49,24 @@ namespace dc
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
 	public:
-		void Initialize() override;
-		
-		void Terminate() override;
+		void Initialize()	override;
+		void Run()			override;
+		void Terminate()	override;
 		
 		// ===========================================================
 		// Methods
 		// ===========================================================
+		CScene* CreateScene(const char* name);
+		
+		void SetCurrentScene(const char* name);
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		CSceneManager* mp_sceneManager;
+		CSceneManager*	mp_sceneManager;
+		
+		CScene*			mp_currentScene;
 
 	};
 }

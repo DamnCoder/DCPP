@@ -8,42 +8,47 @@
 
 #include "gameobject.h"
 
+#include <assert.h>
+
 #include "help/deletehelp.h"
 
 namespace dc
 {
-	const unsigned int CGameObject::ComponentsNum(const CompId& comId) const
+	const unsigned int CGameObject::ComponentsNum(const char* compId) const
 	{
+		return GetComponentList(compId)->size();
+	}
+	
+	const TComponentList* CGameObject::GetComponentList(const char* compId) const
+	{
+		const auto& componentsEntryIt = m_componentTable.find(compId);
+		if(componentsEntryIt != m_componentTable.end())
+		{
+			return &componentsEntryIt->second;
+		}
 		return 0;
 	}
 	
 	CComponent* CGameObject::AddComponent(CComponent* component)
 	{
-		if(component)
-		{
-			component->SetOwner(this);
-			TComponentsEntry& componentsEntry = m_componentTable[component->InstanceName()];
-			TComponentList& componentList = componentsEntry.second;
-			
-			// Increase components counter
-			++componentsEntry.first;
-			componentList.push_front(component);
-		}
+		assert(component && "Component is NULL");
+		
+		component->SetOwner(this);
+		TComponentList& componentList = m_componentTable[component->InstanceName()];
+		
+		componentList.push_back(component);
 		return component;
 	}
 	
-	CComponent* CGameObject::RemoveComponent(const CompId& name)
+	CComponent* CGameObject::RemoveComponent(const char* name)
 	{
 		TComponentListTable::iterator componentsEntryIt = m_componentTable.find(name);
 		if(componentsEntryIt != m_componentTable.end())
 		{
-			TComponentsEntry& componentsEntry = componentsEntryIt->second;
-			// Decrease components counter
-			--componentsEntry.first;
+			TComponentList& componentList = componentsEntryIt->second;
 			
-			TComponentList& componentList = componentsEntry.second;
 			CComponent* component = componentList.front();
-			componentList.pop_front();
+			componentList.erase(std::find(componentList.begin(), componentList.end(), component));
 			
 			if(componentList.empty())
 			{
@@ -57,23 +62,7 @@ namespace dc
 	
 	CComponent* CGameObject::RemoveComponent(CComponent* component)
 	{
-		TComponentListTable::iterator componentsEntryIt = m_componentTable.find(component->InstanceName());
-		if(componentsEntryIt != m_componentTable.end())
-		{
-			TComponentsEntry& componentsEntry = componentsEntryIt->second;
-			// Decrease components counter
-			--componentsEntry.first;
-			
-			TComponentList& componentList = componentsEntry.second;
-			componentList.remove(component);
-			if(componentList.empty())
-			{
-				m_componentTable.erase(componentsEntryIt);
-			}
-			
-			return component;
-		}
-		return 0;
+		return RemoveComponent(component->InstanceName());
 	}
 	
 	void CGameObject::DestroyComponent(CComponent* component)
@@ -81,15 +70,5 @@ namespace dc
 		CComponent* componentToRemove = RemoveComponent(component);
 		
 		SafeDelete(componentToRemove);
-	}
-	
-	const CGameObject::TComponentsEntry* CGameObject::GetComponentsEntry(const CompId& compId) const
-	{
-		const auto& componentsEntryIt = m_componentTable.find(compId);
-		if(componentsEntryIt != m_componentTable.end())
-		{
-			return &componentsEntryIt->second;
-		}
-		return 0;
 	}
 }

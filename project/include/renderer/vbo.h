@@ -9,42 +9,85 @@
 #ifndef vbo_hpp
 #define vbo_hpp
 
+#include <map>
+
 #include "containers/array.h"
 
 #include "glwraps.h"
 
 namespace dc
 {
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
+	
 	template <typename ArrayType>
 	class CVBO
 	{
+		// ===========================================================
+		// Constant / Enums / Typedefs internal usage
+		// ===========================================================
+		
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
 	public:
 		static CVBO<ArrayType>& Create(ArrayType* array, const EVBOUsage usage);
 		static void Delete(const CVBO<ArrayType>& vbo);
 		
 		static void Activate(const CVBO<ArrayType>& vbo);
 		static void Submit(const CVBO<ArrayType>& vbo, size_t primitiveSize);
-
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
 	public:
 		const unsigned int	Id()		const { return m_id; }
 		const EVBOTarget	Target()	const { return m_target; }
 		const EVBOUsage		Usage()		const { return m_usage; }
 		const ArrayType*	DataArray() const { return m_dataArray; }
 		
+		// ===========================================================
+		// Constructors
+		// ===========================================================
 	private:
 		CVBO (const unsigned int identifier, const EVBOTarget target, const EVBOUsage usage, ArrayType* dataArray):
-			m_id(identifier),
-			m_target(target),
-			m_usage(usage),
-			m_dataArray(dataArray)
+		m_id(identifier),
+		m_target(target),
+		m_usage(usage),
+		m_dataArray(dataArray)
 		{}
+
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
 		
+		// ===========================================================
+		// Methods
+		// ===========================================================
+		
+		// ===========================================================
+		// Fields
+		// ===========================================================
 	private:
 		unsigned int	m_id;
 		EVBOTarget		m_target;
 		EVBOUsage		m_usage;
 		ArrayType*		m_dataArray;
 	};
+	
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	template<typename ArrayType>
+	using TVBOMap = std::map<unsigned int, CVBO<ArrayType>>;
+	
+	// ===========================================================
+	// Template implementation
+	// ===========================================================
 	
 	template<typename ArrayType>
 	inline

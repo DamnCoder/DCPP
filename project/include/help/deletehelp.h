@@ -9,6 +9,7 @@
 #ifndef DeleteHelp_h
 #define DeleteHelp_h
 
+#include <forward_list>
 #include <vector>
 #include <list>
 #include <map>
@@ -54,6 +55,27 @@ namespace dc
 		v.clear();
 	}
 
+	/**
+	 * Template for deleting pointers from forward_lists
+	 * Calls clear at the end.
+	 */
+	template<typename T>
+	void SafeDelete(std::forward_list<T*>& v)
+	{
+		typename std::forward_list<T*>::iterator it, end;
+		it = v.begin();
+		end = v.end();
+		
+		for (; it!=end; ++it)
+		{
+			delete (*it);
+			(*it) = 0;
+		}
+		
+		v.clear();
+	}
+
+	
 	/**
 	 * Template for deleting pointers from lists
      * Calls clear at the end.

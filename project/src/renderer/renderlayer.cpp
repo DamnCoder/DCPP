@@ -14,6 +14,11 @@
 
 namespace dc
 {
+	void CRenderLayer::Render()
+	{
+		
+	}
+	
     CGraphicNode* CRenderLayer::GetNode(const std::string& identifier)
     {
         TNodesList::iterator requestedNodeIt = FindNodeIterator(identifier);

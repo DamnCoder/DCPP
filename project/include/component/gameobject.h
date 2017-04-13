@@ -11,32 +11,87 @@
 
 #include "component.h"
 
-#include <map>
-#include <forward_list>
-#include <vector>
+#include "renderer/renderlayermanager.h"
+
+#include <string>
 
 namespace dc
 {
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
 	using GOID = std::string;
-    using TComponentList = std::forward_list<CComponent*>;
 	
     class CGameObject
     {
-	private:
-		using TComponentsEntry = std::pair<unsigned int, TComponentList>;
-		using TComponentListTable = std::map<const CompId, TComponentsEntry>;
+		// ===========================================================
+		// Constant / Enums / Typedefs internal usage
+		// ===========================================================
+
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
 		
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
 	public:
-		const unsigned int ComponentsNum(const CompId& compId) const;
+		const char*			LayerName() const			{ return mp_layer; }
+		void				LayerName(const char* name) { mp_layer = name; }
 		
+		const unsigned int	ComponentsNum(const char* compId) const;
+		
+		/**
+		 * Returns the first component of the specified type
+		 */
+		template<typename ComponentType>
+		ComponentType*				GetComponent() const;
+		
+		/**
+		 * Returns all the components of the specified type in an array
+		 */
+		template<typename ComponentType>
+		std::vector<ComponentType*> GetComponents() const;
+
+		const TComponentListTable&	ComponentsTable() const { return m_componentTable; }
+		
+	private:
+		const TComponentList* GetComponentList(const char* compId) const;
+		
+		template<typename ComponentType>
+		const TComponentList* GetComponentList() const;
+		
+		// ===========================================================
+		// Constructors
+		// ===========================================================
     public:
         CGameObject(const GOID& id):
-            m_id(id)
+            m_id(id),
+			mp_layer(CRenderLayerManager::DEFAULT_LAYER)
         {}
-        
+		
+		CGameObject(const GOID& id, const char* layerName):
+			m_id(id),
+			mp_layer(layerName)
+		{}
+		
         ~CGameObject()
         {}
 		
+		CGameObject(const CGameObject& copy) = delete;
+		
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
+		void operator= (const CGameObject& copy) = delete;
+		
+		// ===========================================================
+		// Methods
+		// ===========================================================
 	public:
 		/**
 		 * Adds a previously created component
@@ -46,7 +101,7 @@ namespace dc
 		/**
 		 * Removes the component from the GameObject and returns its ownership to the caller
 		 */
-		CComponent* RemoveComponent(const CompId& name);
+		CComponent* RemoveComponent(const char* name);
 		CComponent* RemoveComponent(CComponent* component);
 		
 		/**
@@ -66,29 +121,53 @@ namespace dc
 		template<typename ComponentType>
 		void DestroyComponent();
 		
-		/**
-		 * Returns the first component of the specified type
-		 */
-		template<typename ComponentType>
-		ComponentType* GetComponent() const;
-		
-		/**
-		 * Returns all the components of the specified type in an array
-		 */
-		template<typename ComponentType>
-		std::vector<ComponentType*> GetComponents() const;
-		
-	private:
-		const TComponentsEntry* GetComponentsEntry(const CompId& compId) const;
-		
-		template<typename ComponentType>
-		const TComponentsEntry* GetComponentsEntry() const;
-
+		// ===========================================================
+		// Fields
+		// ===========================================================
     private:
         
         GOID				m_id;
+		const char*			mp_layer;
 		TComponentListTable	m_componentTable;
     };
+	
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	using TGOList = std::vector<CGameObject*>;
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
+
+	template<typename ComponentType>
+	ComponentType* CGameObject::GetComponent() const
+	{
+		CComponent* component = GetComponentList<ComponentType>()->front();
+		return component->CComponent::template DirectCast<ComponentType>();
+	}
+	
+	template<typename ComponentType>
+	std::vector<ComponentType*> CGameObject::GetComponents() const
+	{
+		TComponentList& componentList = *GetComponentList<ComponentType>();
+		
+		const unsigned int componentsCount = componentList.size();
+		std::vector<ComponentType*> castedComponentList(componentsCount);
+		
+		for(const CComponent* component : componentList)
+		{
+			castedComponentList.push_back(component->DirectCast<ComponentType>());
+		}
+		
+		return castedComponentList;
+	}
+	
+	template<typename ComponentType>
+	const TComponentList* CGameObject::GetComponentList() const
+	{
+		return GetComponentList(ComponentType::TypeName());
+	}
 	
 	template<typename ComponentType>
 	ComponentType* CGameObject::CreateComponent()
@@ -107,36 +186,6 @@ namespace dc
 			delete component;
 			component = 0;
 		}
-	}
-	
-	template<typename ComponentType>
-	ComponentType* CGameObject::GetComponent() const
-	{
-		CComponent* component = GetComponentsEntry<ComponentType>()->second.front();
-		return component->CComponent::template DirectCast<ComponentType>();
-	}
-	
-	template<typename ComponentType>
-	std::vector<ComponentType*> CGameObject::GetComponents() const
-	{
-		TComponentsEntry* componentsEntry = GetComponentsEntry<ComponentType>();
-		
-		unsigned int componentsCount = componentsEntry->first;
-		std::vector<ComponentType*> castedComponentList(componentsCount);
-		
-		TComponentList& componentList = componentsEntry->second;
-		for(const CComponent* component : componentList)
-		{
-			castedComponentList.push_back(component->DirectCast<ComponentType>());
-		}
-		
-		return castedComponentList;
-	}
-	
-	template<typename ComponentType>
-	const CGameObject::TComponentsEntry* CGameObject::GetComponentsEntry() const
-	{
-		return GetComponentsEntry(ComponentType::TypeName());
 	}
 }
 

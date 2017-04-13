@@ -9,7 +9,7 @@
 #ifndef __BitThemAll__renderlayer__
 #define __BitThemAll__renderlayer__
 
-#include "graphicnode.h"
+#include "nodes/graphicnode.h"
 
 namespace dc
 {
@@ -41,6 +41,8 @@ namespace dc
         
     // Public interface
     public:
+		void Render();
+		
         /**
          * Adds a node to this render group. Note that only the node is added, children and parent nodes
          * are not affected.

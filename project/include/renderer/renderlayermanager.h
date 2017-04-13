@@ -1,19 +1,18 @@
 //
-//  renderer.h
-//  BitThemAll
+//  layermanager.h
+//  DCPP
 //
-//  Created by Jorge López González on 07/11/12.
-//  Copyright (c) 2012 Jorge López González. All rights reserved.
+//  Created by Jorge López on 1/4/17.
+//
 //
 
-#ifndef __BitThemAll__renderer__
-#define __BitThemAll__renderer__
+#ifndef layermanager_h
+#define layermanager_h
 
 #include <vector>
 #include <map>
 
-#include "renderlayermanager.h"
-
+#include "renderlayer.h"
 #include "structures/singleton.h"
 
 namespace dc
@@ -21,12 +20,20 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-    class CRenderer : public CSingleton<CRenderer>
-    {
+	using TLayerList		= std::vector<const char*>;
+	using TRenderLayerMap	= std::map<const char*, CRenderLayer*>;
+	using TRenderLayerList	= std::vector<CRenderLayer*>;
+	
+	class CRenderLayerManager : public CSingleton<CRenderLayerManager>
+	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
-		friend class CSingleton<CRenderer>;
+		friend class CSingleton<CRenderLayerManager>;
+		
+	public:
+		
+		static const char* DEFAULT_LAYER;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -39,18 +46,25 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
-		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
+	public:
+		const char*				DefaultLayer() const;
+		const unsigned int		DefaultLayerIndex() const;
+		
+		const char*				Layer(const unsigned int index) const;
+		const unsigned int		LayerIndex(const char* name) const;
+		
+		const unsigned int		Count() const;
+		
+		const TRenderLayerList&	RenderLayerList() const { return m_renderLayerList; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
+	private:
+		CRenderLayerManager();
 		
-    public:
-        CRenderer()
-        {}
-        
-        ~CRenderer()
-        {}
+		~CRenderLayerManager();
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
@@ -59,23 +73,26 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void Initialize();
-		void Terminate();
+		void Add(const char* name);
+		void Add(const char* name, CRenderLayer* renderLayer);
 		
-		void Prepare();
+		void Remove(const char* name);
 		
-		void Render();
+		const bool Exists(const char* name) const;
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		CRenderLayerManager*	mp_renderLayerMgr;
-		
-    };
+		TLayerList			m_layerList;
+		TRenderLayerMap		m_renderLayerMap;
+		TRenderLayerList	m_renderLayerList;
+	};
 	
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
 }
-#endif /* defined(__BitThemAll__renderer__) */
+
+
+#endif /* layermanager_hpp */

@@ -1,32 +1,30 @@
 //
-//  renderer.h
-//  BitThemAll
+//  rendersubsystem.hpp
+//  DCPPTest
 //
-//  Created by Jorge López González on 07/11/12.
-//  Copyright (c) 2012 Jorge López González. All rights reserved.
+//  Created by Jorge López on 1/4/17.
+//
 //
 
-#ifndef __BitThemAll__renderer__
-#define __BitThemAll__renderer__
+#ifndef rendersubsystem_h
+#define rendersubsystem_h
 
-#include <vector>
-#include <map>
+#include "runnablesubsystem.h"
 
-#include "renderlayermanager.h"
+#include "renderer/renderer.h"
 
-#include "structures/singleton.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-    class CRenderer : public CSingleton<CRenderer>
-    {
+	class CRenderSubsystem : public IRunnableSubsystem
+	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
-		friend class CSingleton<CRenderer>;
+		RTTI_DECLARATIONS(CRenderSubsystem, IRunnableSubsystem)
 		
 		// ===========================================================
 		// Static fields / methods
@@ -39,43 +37,43 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
-		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
-		
+	public:
+		CRenderer* Renderer() const { return mp_renderer; }
+	
 		// ===========================================================
 		// Constructors
 		// ===========================================================
+	public:
+		CRenderSubsystem() : mp_renderer(0)
+		{}
 		
-    public:
-        CRenderer()
-        {}
-        
-        ~CRenderer()
-        {}
+		~CRenderSubsystem()
+		{}
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
-		
+	public:
+		void Initialize()	override;
+		void Run()			override;
+		void Terminate()	override;
+
 		// ===========================================================
 		// Methods
 		// ===========================================================
-	public:
-		void Initialize();
-		void Terminate();
-		
-		void Prepare();
-		
-		void Render();
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		CRenderLayerManager*	mp_renderLayerMgr;
-		
-    };
+		CRenderer* mp_renderer;
+	};
 	
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
 }
-#endif /* defined(__BitThemAll__renderer__) */
+
+
+
+#endif /* rendersubsystem_hpp */

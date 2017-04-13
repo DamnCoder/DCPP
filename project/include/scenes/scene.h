@@ -9,7 +9,7 @@
 #ifndef scene_h
 #define scene_h
 
-#include <list>
+#include <vector>
 
 #include "component/gameobject.h"
 
@@ -24,7 +24,6 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs
 		// ===========================================================
-		using GOList = std::list<CGameObject*>;
 		
 		// ===========================================================
 		// Inner and Anonymous Classes
@@ -36,38 +35,48 @@ namespace dc
 	public:
 		const char*			Name()				const { return mp_name; }
 		const unsigned int	RootCount()			const { return m_goList.size(); }
-		const GOList&		GameObjectList()	const { return m_goList; }
+		const TGOList&		GameObjectList()	const { return m_goList; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
 		CScene(const char* name) : mp_name(name) {}
-		virtual ~CScene() {}
+		~CScene() {}
+		
+		CScene(const CScene& copy) = delete;
 		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+		void operator= (const CScene& copy) = delete;
 		
 		// ===========================================================
 		// Methods
 		// ===========================================================
-		void Add(CGameObject* gameObject)
-		{
-			m_goList.push_back(gameObject);
-		}
+	public:
+		void PrepareUpdate();
 		
-		void Remove(CGameObject* gameObject)
-		{
-			m_goList.remove(gameObject);
-		}
+		void Update();
+		
+		void Add(CGameObject* gameObject);
+		
+		void Remove(CGameObject* gameObject);
+		
+	private:
+		void Add(const char* name, const TComponentList& componentList);
+		void Remove(const char* name, const TComponentList& componentList);
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		const char*	mp_name;
-		GOList		m_goList;
+		const char*			mp_name;
+		TGOList				m_goList;
+		
+		TGOList				m_newGOList;
+		
+		TComponentListTable	m_componentsMap;
 	};
 }
 

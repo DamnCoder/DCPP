@@ -1,32 +1,27 @@
 //
-//  renderer.h
-//  BitThemAll
+//	#FILENAME
+//	#PROJECT_NAME
 //
-//  Created by Jorge López González on 07/11/12.
-//  Copyright (c) 2012 Jorge López González. All rights reserved.
+//	Created by #AUTHOR on #DATE.
 //
 
-#ifndef __BitThemAll__renderer__
-#define __BitThemAll__renderer__
+#ifndef node_h
+#define node_h
 
-#include <vector>
-#include <map>
-
-#include "renderlayermanager.h"
-
-#include "structures/singleton.h"
+#include "help/deletehelp.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-    class CRenderer : public CSingleton<CRenderer>
-    {
+	
+	template<typename T>
+	class CNode
+	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
-		friend class CSingleton<CRenderer>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -39,43 +34,81 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
-		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
+	public:
+		CNode<T>* Link() const
+		{
+			return mp_link;
+		}
+		
+		const T& Data() const
+		{
+			return m_data;
+		}
+		
+		void Connect(CNode* node)
+		{
+			mp_link = node;
+		}
+		
+		void Data(const T& data)
+		{
+			m_data = data;
+		}
+		
+		const bool Connected() const { return mp_link != 0; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
+	public:
+		CNode() :
+			mp_link (0)
+		{}
 		
-    public:
-        CRenderer()
-        {}
-        
-        ~CRenderer()
-        {}
+		CNode(const T& data) :
+			mp_link (0),
+			m_data (data)
+		{}
+		
+		CNode(const T& data, CNode<T>* link) :
+			mp_link (link),
+			m_data (data)
+		{}
+		
+		~CNode()
+		{
+			SafeDelete(mp_link);
+		}
+		
+		CNode(const CNode<T>& copy):
+			mp_link(copy.mp_link),
+			m_data(copy.data)
+		{}
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
+		void operator= (const CNode<T>& copy)
+		{
+			this(copy);
+		}
 		
 		// ===========================================================
 		// Methods
 		// ===========================================================
-	public:
-		void Initialize();
-		void Terminate();
-		
-		void Prepare();
-		
-		void Render();
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
-	private:
-		CRenderLayerManager*	mp_renderLayerMgr;
-		
-    };
-	
+	public:
+		CNode*	mp_link;
+		T		m_data;
+	};
+
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
 }
-#endif /* defined(__BitThemAll__renderer__) */
+
+#endif /* #CLASS_NAME */

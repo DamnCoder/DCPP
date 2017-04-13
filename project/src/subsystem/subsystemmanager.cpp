@@ -34,10 +34,14 @@ namespace dc
     
     void CSubsystemManager::Run()
     {
+		// Prepare update
+		
         for(IRunnableSubsystem* runnableSubsystem : m_runnableSubsystemList)
         {
             runnableSubsystem->Run();
         }
+		
+		// End update
     }
     
     void CSubsystemManager::Add(ISubsystem* subsystem)
