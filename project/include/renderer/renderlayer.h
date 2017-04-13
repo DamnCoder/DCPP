@@ -9,10 +9,14 @@
 #ifndef __BitThemAll__renderlayer__
 #define __BitThemAll__renderlayer__
 
-#include "nodes/graphicnode.h"
+#include "component/renderercomponent.h"
 
 namespace dc
 {
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
+	
     /**
      * \class RenderLayer
      * \brief This class groups a subset of the graphic nodes for rendering
@@ -23,23 +27,42 @@ namespace dc
      */
     class CRenderLayer
     {
-    // Constructors / Destructors
+		// ===========================================================
+		// Constant / Enums / Typedefs internal usage
+		// ===========================================================
+		
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
+		
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
+	public:
+		const unsigned int			Count()			const { return ml_renderList.size(); }
+		const TRenderComponentList&	RenderList()	const { return ml_renderList; }
+		
+		// ===========================================================
+		// Constructors
+		// ===========================================================
     public:
-        CRenderLayer():
-            mn_count(0)
+        CRenderLayer()
         {}
         
         ~CRenderLayer()
         {};
         
-    // Accesors
-    public:
-        const unsigned int  Count() const { return mn_count; }
-        const TNodesList    LayerNodes() const { return ml_layerNodes; }
-        
-        CGraphicNode*       GetNode(const std::string& identifier);
-        
-    // Public interface
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
+		
+		// ===========================================================
+		// Methods
+		// ===========================================================
     public:
 		void Render();
 		
@@ -47,42 +70,31 @@ namespace dc
          * Adds a node to this render group. Note that only the node is added, children and parent nodes
          * are not affected.
          * \param a the node.
-         * \return true if there was no existing node with the same name. false otherwise.
          */
-        bool AddNode(CGraphicNode* newNode);
-        
-        /**
-         * Adds a node to this render group. This also adds all its children recursively down to the
-         * leafs of the node tree.
-         * \param a the node.
-         * \return true if there was no existing nodes with the same names. false otherwise.
-         */
-        bool AddNodeAndChildren(CGraphicNode* parentNode);
-        
+        void Add(CRendererComponent* renderComponent);
+
         /**
          * Removes a node from this render group. Note that only this node is removed, children and parent nodes
          * are not affected.
          * \param a the node.
-         * \return true if there was no existing node with the same name. false otherwise.
          */
-        bool RemoveNode(CGraphicNode* oldNode);
-        bool RemoveNode(const std::string& identifier);
+        void Remove(CRendererComponent* oldRenderComponent);
         
         void Clear();
-        
-        bool IdExists(const std::string &name);
-        bool NodeExists(const CGraphicNode* node);
-        
-    // Hidden member functions
+
+		// ===========================================================
+		// Fields
+		// ===========================================================
     private:
-        TNodesList::iterator FindNodeIterator(const std::string& name);
-        TNodesList::iterator FindNodeIterator(const CGraphicNode* node);
-        
-    // Atributes
-    private:
-        TNodesList              ml_layerNodes;
-        unsigned int            mn_count;
+        TRenderComponentList	ml_renderList;
     };
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
 }
 
 #endif /* defined(__BitThemAll__renderlayer__) */

@@ -64,7 +64,8 @@ namespace dc
 		void Remove(CGameObject* gameObject);
 		
 	private:
-		void Add(const char* name, const TComponentList& componentList);
+		void AddToScene(CGameObject* gameObject);
+		void AddToScene(const char* name, const TComponentList& componentList);
 		void Remove(const char* name, const TComponentList& componentList);
 		
 		// ===========================================================

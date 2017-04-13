@@ -20,7 +20,7 @@ namespace dc
 	void CApp::Initialize()
 	{
 		printf("Initializing app\n");
-		// First creation stage, so other subsystems can be created
+		// First creation stage, where subsystems are created
 		Create();
 		
 		// Second, initialization of the subsystems

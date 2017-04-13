@@ -13,7 +13,13 @@ namespace #NAMESPACE_NAME
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	
+	/**
+	 * \class
+	 * \brief
+	 * \author Jorge Lopez Gonzalez
+	 *
+	 * Description.
+	 */
 class #CLASS_NAME
 {
 	// ===========================================================

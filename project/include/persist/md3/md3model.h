@@ -8,7 +8,7 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include "MD3structs.h"
+#include "md3structs.h"
 
 #include <math/quaternion.h>
 

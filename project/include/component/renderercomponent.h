@@ -9,6 +9,8 @@
 #ifndef RendererComponent_hpp
 #define RendererComponent_hpp
 
+#include <vector>
+
 #include "component.h"
 
 #include "modelcomponent.h"
@@ -56,7 +58,13 @@ namespace dc
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+		void Initialize() override;
+		void Terminate() override;
 		
+		void Awake() override {}
+		void Start() override {}
+		void Finish() override {}
+		void Sleep() override {}
 		// ===========================================================
 		// Methods
 		// ===========================================================
@@ -69,6 +77,14 @@ namespace dc
 		TMaterialArray		m_materialArray;
 	};
 	
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	using TRenderComponentList = std::vector<CRendererComponent*>;
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
 }
 
 #endif /* RendererComponent_hpp */

@@ -15,7 +15,11 @@ namespace dc
 {
 	void CScene::PrepareUpdate()
 	{
-		
+		for(CGameObject* gameObject : m_newGOList)
+		{
+			Add(gameObject);
+		}
+		m_newGOList.clear();
 	}
 	
 	void CScene::Update()
@@ -25,16 +29,7 @@ namespace dc
 	
 	void CScene::Add(CGameObject* gameObject)
 	{
-		TGOList::iterator it = std::find(m_goList.begin(), m_goList.end(), gameObject);
-		assert(it != m_goList.end() && "You can't add more than one instance of a GameObject");
-		
-		m_goList.push_back(gameObject);
-		
-		const TComponentListTable& goComponentsMap = gameObject->ComponentsTable();
-		for(auto& componentListEntry : goComponentsMap)
-		{
-			Add(componentListEntry.first, componentListEntry.second);
-		}
+		m_newGOList.push_back(gameObject);
 	}
 	
 	void CScene::Remove(CGameObject* gameObject)
@@ -49,7 +44,21 @@ namespace dc
 		}
 	}
 
-	void CScene::Add(const char* name, const TComponentList& newComponentList)
+	void CScene::AddToScene(CGameObject* gameObject)
+	{
+		TGOList::iterator it = std::find(m_goList.begin(), m_goList.end(), gameObject);
+		assert(it != m_goList.end() && "You can't add more than one instance of a GameObject");
+		
+		m_goList.push_back(gameObject);
+		
+		const TComponentListTable& goComponentsMap = gameObject->ComponentsTable();
+		for(auto& componentListEntry : goComponentsMap)
+		{
+			AddToScene(componentListEntry.first, componentListEntry.second);
+		}
+	}
+	
+	void CScene::AddToScene(const char* name, const TComponentList& newComponentList)
 	{
 		assert(newComponentList.size() && "No components being added");
 		

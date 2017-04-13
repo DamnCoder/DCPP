@@ -8,9 +8,11 @@
 #ifndef SINGLETON_H_
 #define SINGLETON_H_
 
+#include <assert.h>
+#include <utility>
 
 /**
- * Template para crear singletons genericos
+ * Template for generic singleton creation
  */
 
 template <typename T>
@@ -19,40 +21,48 @@ class CSingleton
 public:
 	static T& Instance()
     {
-		if(!instance)
-        {
-            instance = new T();
-        }
-
-		return *instance;
+		assert(mp_instance && "You need to create the singleton first!");
+        return *mp_instance;
 	}
 
 	static T* Pointer()
     {
-		return &Instance();
+		assert(mp_instance && "You need to create the singleton first!");
+		return mp_instance;
+	}
+	
+	// ST: Specialized Type
+	template<typename ST, typename... Args>
+	static T* New(Args&&... args)
+	{
+		if(!mp_instance)
+		{
+			mp_instance = new ST(std::forward<Args>(args)...);
+		}
+		return mp_instance;
 	}
 
 	static void Destroy()
     {
-		if(instance)
+		if(mp_instance)
         {
-			delete instance;
-			instance = 0;
+			delete mp_instance;
+			mp_instance = 0;
 		}
 	}
 
 protected:
-	virtual ~CSingleton(){};
 	CSingleton(){};
+	virtual ~CSingleton(){};
 
 private:
     /// Copy constructor and assignation operator are private to avoid any copy
 	CSingleton(const CSingleton&) = delete;
 	CSingleton& operator=(const CSingleton&) = delete;
     
-    static T* instance;
+    static T* mp_instance;
 };
 
-template <typename T> T* CSingleton<T>::instance = 0;
+template <typename T> T* CSingleton<T>::mp_instance = 0;
 
 #endif /* SINGLETON_H_ */

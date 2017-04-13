@@ -9,22 +9,48 @@
 #ifndef App_hpp
 #define App_hpp
 
+#include "structures/singleton.h"
 #include "subsystem/subsystemmanager.h"
 
 namespace dc
 {
-	class CApp
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
+	class CApp : public CSingleton<CApp>
 	{
+		// ===========================================================
+		// Constant / Enums / Typedefs internal usage
+		// ===========================================================
+		friend class CSingleton<CApp>;
+		
+		// ===========================================================
+		// Static fields / methods
+		// ===========================================================
+		
+		// ===========================================================
+		// Inner and Anonymous Classes
+		// ===========================================================
+		
+		// ===========================================================
+		// Getter & Setter
+		// ===========================================================
 	public:
 		void AskForTermination(const bool value) { m_terminationAsked = value; }
 
 		template <typename T>
 		T* GetSubsystem();
 
-	public:
+		// ===========================================================
+		// Constructors
+		// ===========================================================
+	protected:
 		CApp(): m_terminationAsked(false) {}
 		virtual ~CApp() {}
 
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
 	public:
 		virtual void Create() = 0;
 		virtual void Configure() = 0;
@@ -33,6 +59,9 @@ namespace dc
 		virtual void Initialize();
 		virtual void Terminate();
 		
+		// ===========================================================
+		// Methods
+		// ===========================================================
 	public:
 		void Run();
 
@@ -43,11 +72,21 @@ namespace dc
 	private:
 		void RunSubsystems();
 
+		// ===========================================================
+		// Fields
+		// ===========================================================
 	private:
 		CSubsystemManager 	m_subsystemManager;
 		bool				m_terminationAsked;
 	};
 
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
 	template<typename T>
 	inline
 	T* CApp::GetSubsystem()

@@ -21,6 +21,7 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	
     class CRenderer : public CSingleton<CRenderer>
     {
 		// ===========================================================
@@ -39,6 +40,7 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
+	public:
 		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
 		
 		// ===========================================================

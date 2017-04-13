@@ -20,7 +20,7 @@
 #include <fstream>
 #include <cstdlib>
 
-#include "physics/BoundingBox.h"
+#include "physics/boundingbox.h"
 
 namespace dc
 {

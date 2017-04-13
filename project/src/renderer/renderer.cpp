@@ -34,6 +34,9 @@ namespace dc
 	
 	void CRenderer::Render()
 	{
+		// Clear the screen
+		
+		
 		for(auto renderLayer : mp_renderLayerMgr->RenderLayerList())
 		{
 			renderLayer->Render();

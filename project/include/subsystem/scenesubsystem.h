@@ -13,17 +13,23 @@
 
 #include "scenes/scenemanager.h"
 
+#include "rendersubsystem.h"
+
 namespace dc
 {
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
+	
 	class CSceneSubsystem : public IRunnableSubsystem
 	{
+		// ===========================================================
+		// Constant / Enums / Typedefs internal usage
+		// ===========================================================
 		RTTI_DECLARATIONS(CSceneSubsystem, IRunnableSubsystem)
-		// ===========================================================
-		// Static fields / methods
-		// ===========================================================
 		
 		// ===========================================================
-		// Constant / Enums / Typedefs
+		// Static fields / methods
 		// ===========================================================
 		
 		// ===========================================================
@@ -40,7 +46,12 @@ namespace dc
 		// Constructors
 		// ===========================================================
 	public:
-		CSceneSubsystem() {}
+		CSceneSubsystem():
+			mp_sceneManager(0),
+			mp_currentScene(0),
+			mp_renderSubsystem(0)
+		{}
+		
 		CSceneSubsystem (const CSceneSubsystem& copy) = delete;
 		
 		virtual ~CSceneSubsystem() {}
@@ -50,12 +61,17 @@ namespace dc
 		// ===========================================================
 	public:
 		void Initialize()	override;
-		void Run()			override;
 		void Terminate()	override;
+		
+		void Run()			override;
+		
+	protected:
+		void PrepareUpdate();
 		
 		// ===========================================================
 		// Methods
 		// ===========================================================
+	public:
 		CScene* CreateScene(const char* name);
 		
 		void SetCurrentScene(const char* name);
@@ -64,11 +80,21 @@ namespace dc
 		// Fields
 		// ===========================================================
 	private:
-		CSceneManager*	mp_sceneManager;
+		CSceneManager*		mp_sceneManager;
 		
-		CScene*			mp_currentScene;
+		CScene*				mp_currentScene;
+		
+		CRenderSubsystem*	mp_renderSubsystem;
 
 	};
+	
+	// ===========================================================
+	// Class typedefs
+	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
 }
 
 #endif /* scenemanagersubsystem_h */

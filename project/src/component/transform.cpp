@@ -21,7 +21,7 @@ namespace dc
 		return m_matrix;
 	}
 	
-	void CTransform::SetParent(CTransform* parent)
+	void CTransform::Parent(CTransform* parent)
 	{
 		assert(parent != 0);
 		mp_parent = parent;

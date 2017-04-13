@@ -14,7 +14,7 @@ namespace dc
 {
 	const char* CRenderLayerManager::DEFAULT_LAYER = "Default";
 	
-	const char* CRenderLayerManager::DefaultLayer() const
+	const char* CRenderLayerManager::DefaultLayerName() const
 	{
 		return DEFAULT_LAYER;
 	}
@@ -24,7 +24,7 @@ namespace dc
 		return 0;
 	}
 	
-	const char* CRenderLayerManager::Layer(const unsigned int index) const
+	const char* CRenderLayerManager::LayerName(const unsigned int index) const
 	{
 		TLayerList::const_iterator first = m_layerList.begin();
 		TLayerList::const_iterator last = m_layerList.end();
@@ -58,6 +58,12 @@ namespace dc
 		while(first != last);
 		
 		return i;
+	}
+	
+	CRenderLayer* CRenderLayerManager::Layer(const char* name)
+	{
+		assert(Exists(name) && "The render layer does not exist!");
+		return m_renderLayerMap[name];
 	}
 	
 	const unsigned int CRenderLayerManager::Count() const

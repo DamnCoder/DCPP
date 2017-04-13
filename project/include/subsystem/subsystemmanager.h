@@ -22,19 +22,29 @@ namespace dc
 	public:
 		template <typename T>
 		T* GetSubsystem();
+		
+		template <typename T, typename... Args>
+		void AddSubsystem(Args&&... args);
 
 	public:
 		CSubsystemManager() {}
 		~CSubsystemManager() {}
 
 	public:
-		void Initialize() override;
-		void Terminate() override;
-		void Run() override;
+		void Initialize()	override;
+		void Terminate()	override;
+		
+		void Run()			override;
+		
+	protected:
+		void PrepareUpdate();
+		void Update();
+		void FinishUpdate();
 
+	public:
 		void Add(ISubsystem* subsystem);
 		void Add(IRunnableSubsystem* runnableSubsystem);
-
+		
 	private:
 		ISubsystem* Find(const int subsystemID) const;
 
@@ -65,6 +75,14 @@ namespace dc
 			}
 		}
 		return 0;
+	}
+	
+	template <typename T, typename... Args>
+	inline
+	void CSubsystemManager::AddSubsystem(Args&&... args)
+	{
+		T* newSubsystem = new T(std::forward<Args>(args)...);
+		Add(newSubsystem);
 	}
 }
 

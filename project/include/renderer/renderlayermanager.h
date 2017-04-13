@@ -47,11 +47,13 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char*				DefaultLayer() const;
+		const char*				DefaultLayerName() const;
 		const unsigned int		DefaultLayerIndex() const;
 		
-		const char*				Layer(const unsigned int index) const;
+		const char*				LayerName(const unsigned int index) const;
 		const unsigned int		LayerIndex(const char* name) const;
+		
+		CRenderLayer*			Layer(const char* name);
 		
 		const unsigned int		Count() const;
 		

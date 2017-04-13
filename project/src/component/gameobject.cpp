@@ -33,7 +33,7 @@ namespace dc
 	{
 		assert(component && "Component is NULL");
 		
-		component->SetOwner(this);
+		component->GameObject(this);
 		TComponentList& componentList = m_componentTable[component->InstanceName()];
 		
 		componentList.push_back(component);
