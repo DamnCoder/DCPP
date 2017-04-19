@@ -24,6 +24,8 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
+		using iterator = T*;
+		using const_iterator = const T*;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -43,6 +45,13 @@ namespace dc
 		const T*            Data()		const { return mp_data; }
 		const bool			Empty()		const { return m_currentSize == 0; }
 		const bool          IsValid()	const { return m_maxSize >= 0 && m_currentSize >= 0 && mp_data != 0; }
+
+		iterator begin() { return &mp_data[0]; }
+		iterator end() { return &mp_data[m_currentSize]; }
+		
+		const_iterator begin() const { return &mp_data[0]; }
+		const_iterator end() const { return &mp_data[m_currentSize]; }
+		
 		
 		inline
 		const bool			IsInside(const unsigned int i) const
@@ -51,7 +60,7 @@ namespace dc
 		}
 		
 	private:
-		inline const bool IsOutOfBounds(const unsigned int length)
+		inline const bool	IsOutOfBounds(const unsigned int length)
 		{
 			return (m_maxSize < length);
 		}
@@ -169,7 +178,7 @@ namespace dc
 				unsigned int lengthAddition = newLength - m_maxSize;
 				Resize(lengthAddition);
 			}
-			//assert(!IsOutOfBounds(m_currentSize + dataLength));
+			
 			std::copy(data, data + dataLength, mp_data + m_currentSize);
 			m_currentSize += dataLength;
 		}
@@ -193,10 +202,7 @@ namespace dc
 		void Clear()
 		{
 			m_currentSize = 0;
-			m_maxSize = 0;
-			
-			delete [] mp_data;
-			mp_data = 0;
+			// We can optimize a bit just by not deleting the data yet, and keeping the memory to be reused
 		}
 
 		// ===========================================================

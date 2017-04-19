@@ -12,13 +12,19 @@
 
 namespace dc
 {
-	math::Matrix4x4f CTransform::WorldMatrix() const
+	const math::Matrix4x4f CTransform::WorldMatrix() const
 	{
-		if (mp_parent)
+		CTransform* parentTrans = Parent();
+		math::Matrix4x4f worldMatrix = LocalMatrix();
+		
+		while(parentTrans)
 		{
-			return mp_parent->WorldMatrix() * m_matrix;
+			worldMatrix *= parentTrans->LocalMatrix();
+			
+			parentTrans = parentTrans->Parent();
 		}
-		return m_matrix;
+			
+		return worldMatrix;
 	}
 	
 	void CTransform::Parent(CTransform* parent)

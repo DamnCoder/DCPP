@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 Jorge López González. All rights reserved.
 //
 
-#ifndef __BitThemAll__renderlayer__
-#define __BitThemAll__renderlayer__
+#ifndef __renderlayer__
+#define __renderlayer__
 
 #include "component/renderercomponent.h"
 
@@ -64,6 +64,7 @@ namespace dc
 		// Methods
 		// ===========================================================
     public:
+		void PrepareRender();
 		void Render();
 		
         /**
@@ -97,4 +98,4 @@ namespace dc
 	// ===========================================================
 }
 
-#endif /* defined(__BitThemAll__renderlayer__) */
+#endif /* defined(__renderlayer__) */

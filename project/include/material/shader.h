@@ -15,7 +15,7 @@
 #include "math/vector.h"
 #include "math/matrix.h"
 
-#include <forward_list>
+#include <vector>
 
 namespace dc
 {
@@ -23,8 +23,8 @@ namespace dc
      * \class CShader
      * \brief shader class.
      * \author Jorge López González
-     * \version 0.9
-     * \date 2008
+     * \version 1.0
+     * \date 2016
      *
      * Holds glsl shader data. Allows for the shader program to be activated/deactivated.
      * It is possible to pass data to the shader, as well.
@@ -82,7 +82,7 @@ namespace dc
 	class CShaderProgram
 	{
 	public:
-		using TShaderList = std::forward_list<CShader>;
+		using TShaderList = std::vector<CShader>;
 		
 	public:
 		const bool CorrectlyLinked() const;
@@ -109,18 +109,18 @@ namespace dc
 		void Link();
 		
 	public:
-		void PassFloat(const char* name, float value);
+		void PassFloat	(const char* name, float value);
 		void PassInteger(const char* name, int value);
 		
-		void PassVector3f(const char* name, const math::Vector3f& vector);
-		void PassVector4f(const char* name, const math::Vector4f& vector);
-		void PassQuaternion(const char* name, const math::Quaternionf& quaternion);
-		void PassMatrix4x4f(const char* name, const math::Matrix4x4f& matrix);
+		void PassVector3f	(const char* name, const math::Vector3f& vector);
+		void PassVector4f	(const char* name, const math::Vector4f& vector);
+		void PassQuaternion	(const char* name, const math::Quaternionf& quaternion);
+		void PassMatrix4x4f	(const char* name, const math::Matrix4x4f& matrix);
 		
-		void PassVector3fArray(const char* name, const math::Vector3f value[], int size);
-		void PassVector4fArray(const char* name, const math::Vector4f value[], int size);
+		void PassVector3fArray	(const char* name, const math::Vector3f value[], int size);
+		void PassVector4fArray	(const char* name, const math::Vector4f value[], int size);
 		void PassQuaternionArray(const char* name, const math::Quaternionf value[], int size);
-		void PassMat4x4fArray(const char* name, const math::Matrix4x4f value[], int size);
+		void PassMat4x4fArray	(const char* name, const math::Matrix4x4f value[], int size);
 		
 	private:
 		void PrintLinkInfoLog(const GLuint obj);

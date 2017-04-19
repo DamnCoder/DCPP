@@ -21,7 +21,10 @@ namespace dc
         virtual ~IRunnableSubsystem() {}
         
     public:
-        virtual void Run() = 0;
+		virtual void Run() = 0;
+		
+		virtual void PrepareUpdate() = 0;
+		virtual void FinishUpdate() = 0;
     };
 }
 

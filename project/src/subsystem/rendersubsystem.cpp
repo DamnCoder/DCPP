@@ -12,7 +12,7 @@ namespace dc
 {
 	void CRenderSubsystem::Initialize()
 	{
-		mp_renderer = CRenderer::New<CRenderer>();
+		mp_renderer = CRenderer::New();
 		mp_renderer->Initialize();
 	}
 	

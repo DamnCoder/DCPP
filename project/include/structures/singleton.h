@@ -41,6 +41,16 @@ public:
 		}
 		return mp_instance;
 	}
+	
+	template<typename... Args>
+	static T* New(Args&&... args)
+	{
+		if(!mp_instance)
+		{
+			mp_instance = new T(std::forward<Args>(args)...);
+		}
+		return mp_instance;
+	}
 
 	static void Destroy()
     {

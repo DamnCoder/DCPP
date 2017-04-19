@@ -13,6 +13,7 @@
 #include <map>
 
 #include "renderlayermanager.h"
+#include "vertexproperty.h"
 
 #include "structures/singleton.h"
 
@@ -43,6 +44,10 @@ namespace dc
 	public:
 		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
 		
+		void AddVertexProperty(const char* name, const unsigned int size);
+		
+		const TVertexPropertyMap& VertexProperties() const;
+		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
@@ -52,7 +57,9 @@ namespace dc
         {}
         
         ~CRenderer()
-        {}
+        {
+			m_vertexProperties.clear();
+		}
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
@@ -73,6 +80,7 @@ namespace dc
 		// ===========================================================
 	private:
 		CRenderLayerManager*	mp_renderLayerMgr;
+		TVertexPropertyMap		m_vertexProperties;
 		
     };
 	

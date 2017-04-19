@@ -5,7 +5,7 @@
  *      Author: jorge
  */
 
-#include "persist/md3/SkinLoader.h"
+#include "persist/md3/skinloader.h"
 
 //#include "gui/TextureManager.h"
 //#include "utilitys/utils.h"

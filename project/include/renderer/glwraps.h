@@ -12,55 +12,42 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 
-#include "mesh/mesh.h"
-
 namespace dc
 {
+	enum ETopology
+	{
+		LINES			= GL_LINES,
+		LINE_LOOP		= GL_LINE_LOOP,
+		LINE_STRIP		= GL_LINE_STRIP,
+		TRIANGLES		= GL_TRIANGLES,
+		TRIANGLE_STRIP	= GL_TRIANGLE_STRIP,
+		TRIANGLE_FAN	= GL_TRIANGLE_FAN,
+	};
+	
 	enum EVBOUsage
 	{
-		STATIC_COPY = GL_STATIC_COPY,
-		STATIC_DRAW = GL_STATIC_DRAW,
-		STATIC_READ = GL_STATIC_READ,
-		DYNAMIC_COPY = GL_DYNAMIC_COPY,
-		DYNAMIC_DRAW = GL_DYNAMIC_DRAW,
-		DYNAMIC_READ = GL_DYNAMIC_READ,
-		STREAM_COPY = GL_STREAM_COPY,
-		STREAM_DRAW = GL_STREAM_DRAW,
-		STREAM_READ = GL_STREAM_READ,
+		STATIC_COPY		= GL_STATIC_COPY,
+		STATIC_DRAW		= GL_STATIC_DRAW,
+		STATIC_READ		= GL_STATIC_READ,
+		DYNAMIC_COPY	= GL_DYNAMIC_COPY,
+		DYNAMIC_DRAW	= GL_DYNAMIC_DRAW,
+		DYNAMIC_READ	= GL_DYNAMIC_READ,
+		STREAM_COPY		= GL_STREAM_COPY,
+		STREAM_DRAW		= GL_STREAM_DRAW,
+		STREAM_READ		= GL_STREAM_READ,
 	};
 	
 	enum EVBOTarget
 	{
-		ELEMENT_ARRAY = GL_ELEMENT_ARRAY_BUFFER,
-		ARRAY = GL_ARRAY_BUFFER,
+		ELEMENT_ARRAY	= GL_ELEMENT_ARRAY_BUFFER,
+		ARRAY			= GL_ARRAY_BUFFER,
 	};
-	
-    struct DrawTris
-    {
-        void operator()(const CMesh* mesh) const
-        {
-            glDrawElements(GL_TRIANGLES, mesh->IndexCount(), GL_UNSIGNED_SHORT, 0);
-        }
-        
-    };
-    
-    struct DrawLines
-    {
-        void operator()(const CMesh* mesh) const
-        {
-            glDrawElements(GL_LINES, mesh->IndexCount(), GL_UNSIGNED_SHORT,0);
-        }
-        
-    };
-    
-    struct DrawTriangleStrip
-    {
-        void operator()(const CMesh* mesh) const
-        {
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, mesh->IndexCount());
-        }
-        
-    };
+	//*
+	inline void DrawElements(const ETopology& topology, const unsigned int indexCount)
+	{
+		glDrawElements((GLenum)topology, (GLsizei)indexCount, GL_UNSIGNED_SHORT, 0);
+	}
+	//*/
 }
 
 #endif

@@ -14,6 +14,11 @@
 
 namespace dc
 {
+	CGameObject::~CGameObject()
+	{
+		SafeDelete(m_componentTable);
+	}
+	
 	const unsigned int CGameObject::ComponentsNum(const char* compId) const
 	{
 		return GetComponentList(compId)->size();

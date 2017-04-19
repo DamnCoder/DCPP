@@ -5,7 +5,7 @@
  *      Author: jorge
  */
 
-#include "BoundingBox.h"
+#include "boundingbox.h"
 
 namespace dc
 {

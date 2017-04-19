@@ -65,10 +65,9 @@ namespace dc
         if (infologLength > 0)
         {
 			int charsWritten = 0;
-            char *infoLog = (char *)malloc(infologLength);
+			char infoLog[infologLength];
             glGetShaderInfoLog(shaderID, infologLength, &charsWritten, infoLog);
             //general::CLog::getInstance()->log(HE_LogLevel::INFO,"Shader log:\n\n"+log);
-            free(infoLog);
             return false;
         }
         
@@ -113,14 +112,18 @@ namespace dc
 	
 	void CShaderProgram::Add(const CShader& shader)
 	{
-		m_shaderList.push_front(shader);
+		m_shaderList.push_back(shader);
 	}
 	
 	//------------------------------------------------------------//
 	
 	void CShaderProgram::Remove(CShader& shader)
 	{
-		m_shaderList.remove(shader);
+		TShaderList::iterator it = std::find(m_shaderList.begin(), m_shaderList.end(), shader);
+		
+		assert(it != m_shaderList.end() && "[CShaderProgram::Remove] The shader you try to remove doesn't exist!");
+		
+		m_shaderList.erase(it);
 	}
 	
 	//------------------------------------------------------------//
@@ -342,11 +345,10 @@ namespace dc
 		
 		if (infologLength > 0)
 		{
-			char *infoLog = (char *)malloc(infologLength);
+			char infoLog[infologLength];
 			glGetShaderInfoLog(programID, infologLength, &charsWritten, infoLog);
 			std::string log = infoLog;
 			//general::CLog::getInstance()->log(HE_LogLevel::INFO,"Program log:\n\n"+log);
-			free(infoLog);
 		}
 	}
 }

@@ -22,15 +22,7 @@ namespace dc
 		// Static fields / methods
 		// ===========================================================
 	public:
-		
-		static const char* VERTEX_ID;
-		static const char* NORMAL_ID;
-		static const char* UV0_ID;
-		static const char* UV1_ID;
-		static const char* COLOR_ID;
-		
-		static const char* INDICES_ID;
-		
+
 		// ===========================================================
 		// Inner and Anonymous Classes
 		// ===========================================================
@@ -82,7 +74,7 @@ namespace dc
 		
 		void AddFloatDataArray(const char* id, TFloatArray& floatArray);
 		
-		const TUIntArray& IndexArray() const { return m_indexArray; }
+		TUIntArray& IndexArray() { return m_indexArray; }
 		
 		void IndexArray (const TUIntArray indexArray)
 		{
@@ -110,21 +102,16 @@ namespace dc
 	public:
 
 		/**
-		 * Resizes the mesh without modificate the current mesh data
-		 */
-		void Resize(const int vertexCount, const int indexCount);
-
-		/**
 		 * Merges this mesh with another one and stores the result in
 		 * this mesh. The other mesh is not modified at all in the process.
 		 * \param mesh the mesh you want to merge with this one.
 		 */
-		CMesh* MergeWith(const CMesh* mesh);
+		CMesh* MergeWith(const CMesh* mesh) { return 0; }
 
 		/**
 		 * Calculates size and center of this mesh.
 		 */
-		void CalculateMeshDimensions();
+		void CalculateMeshDimensions() {}
 
 		// ===========================================================
 		// Fields

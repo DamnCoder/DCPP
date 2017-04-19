@@ -53,7 +53,8 @@ namespace dc
 		// Constructors
 		// ===========================================================
 	public:
-        CComponent(): mp_gameObject(0)
+        CComponent():
+			mp_gameObject(0)
         {}
         
         virtual ~CComponent() {}

@@ -30,14 +30,17 @@ namespace dc
 	void CSceneSubsystem::Run()
 	{
 		assert(mp_currentScene && "There is no current scene set");
-		PrepareUpdate();
 		mp_currentScene->Update();
 	}
 	
 	void CSceneSubsystem::PrepareUpdate()
 	{
-		
 		mp_currentScene->PrepareUpdate();
+	}
+	
+	void CSceneSubsystem::FinishUpdate()
+	{
+		
 	}
 	
 	CScene* CSceneSubsystem::CreateScene(const char* name)

@@ -13,10 +13,6 @@
 
 #include "component.h"
 
-#include "modelcomponent.h"
-
-#include "containers/array.h"
-
 #include "material/material.h"
 
 namespace dc
@@ -24,7 +20,9 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using TMaterialArray = CArray<CMaterial>;
+	class CModelComponent;
+	
+	using TMaterialList = std::vector<CMaterial*>;
 	
 	class CRendererComponent : public CComponent
 	{
@@ -44,6 +42,8 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
+	public:
+		TMaterialList& MaterialList() { return m_materialList; }
 		
 		// ===========================================================
 		// Constructors
@@ -58,6 +58,7 @@ namespace dc
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
 		void Initialize() override;
 		void Terminate() override;
 		
@@ -65,16 +66,20 @@ namespace dc
 		void Start() override {}
 		void Finish() override {}
 		void Sleep() override {}
+		
 		// ===========================================================
 		// Methods
 		// ===========================================================
+	public:
+		void AddMaterial(CMaterial* material);
+		void Render();
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
 		CModelComponent*	mp_modelComponent;
-		TMaterialArray		m_materialArray;
+		TMaterialList		m_materialList;
 	};
 	
 	// ===========================================================

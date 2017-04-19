@@ -14,13 +14,17 @@
 
 namespace dc
 {
+	// ===========================================================
+	// External Enums / Typedefs for global usage
+	// ===========================================================
+	using TMeshArray = CArray<CMesh*>;
 	
 	class CModel
 	{
 		// ===========================================================
 		// Constant / Enums / Typedefs
 		// ===========================================================
-		using TMeshArray = CArray<CMesh*>;
+		
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
@@ -38,7 +42,7 @@ namespace dc
 			m_meshArray = meshArray;
 		}
 		
-		const TMeshArray& MeshArray() const
+		TMeshArray& MeshArray()
 		{
 			return m_meshArray;
 		}

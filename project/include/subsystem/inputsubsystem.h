@@ -30,9 +30,12 @@ namespace dc
 	public:
 
 	public:
-		void Initialize() override;
-		void Run() override;
-		void Terminate() override;
+		void Initialize()		override;
+		void Terminate()		override;
+		
+		void Run()				override;
+		void PrepareUpdate()	override {}
+		void FinishUpdate()		override {}
 
 	public:
 		CKeyInputManager* CreateKeyInputManager();

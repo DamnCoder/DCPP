@@ -103,8 +103,8 @@ namespace dc
 	template <typename K, typename T>
 	void SafeDelete(std::map<K, T*>& m)
 	{
-		typename std::map<K, T* >::iterator it, end;
-		it=m.begin();
+		typename std::map<K, T*>::iterator it, end;
+		it = m.begin();
 		end = m.end();
 
 		for(; it!=end; ++it)
@@ -116,6 +116,24 @@ namespace dc
 			element = 0;
 		}
 
+		m.clear();
+	}
+	
+	template <typename K, typename T>
+	void SafeDelete(std::map<K, std::vector<T*>>& m)
+	{
+		typename std::map<K, std::vector<T*>>::iterator it, end;
+		it = m.begin();
+		end = m.end();
+		
+		for(; it!=end; ++it)
+		{
+			std::vector<T*> elementList = it->second;
+			m.erase(it);
+			
+			SafeDelete(elementList);
+		}
+		
 		m.clear();
 	}
     

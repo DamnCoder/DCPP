@@ -35,6 +35,9 @@ namespace dc
 	void CScene::Remove(CGameObject* gameObject)
 	{
 		TGOList::iterator it = std::find(m_goList.begin(), m_goList.end(), gameObject);
+		
+		assert(it != m_goList.end() && "[CScene::Remove] The game object is not in the scene");
+		
 		m_goList.erase(it);
 		
 		const TComponentListTable& goComponentsMap = gameObject->ComponentsTable();
@@ -47,7 +50,8 @@ namespace dc
 	void CScene::AddToScene(CGameObject* gameObject)
 	{
 		TGOList::iterator it = std::find(m_goList.begin(), m_goList.end(), gameObject);
-		assert(it != m_goList.end() && "You can't add more than one instance of a GameObject");
+		
+		assert(it != m_goList.end() && "[CScene::AddToScene] You can't add more than one instance of a GameObject");
 		
 		m_goList.push_back(gameObject);
 		
@@ -60,19 +64,20 @@ namespace dc
 	
 	void CScene::AddToScene(const char* name, const TComponentList& newComponentList)
 	{
-		assert(newComponentList.size() && "No components being added");
+		assert(newComponentList.size() && "[CScene::AddToScene] No components being added");
 		
 		TComponentList& componentList = m_componentsMap[name];
 		for(CComponent* component : newComponentList)
 		{
 			componentList.push_back(component);
 			component->Initialize();
+			component->Awake();
 		}
 	}
 	
 	void CScene::Remove(const char* name, const TComponentList& oldComponentList)
 	{
-		assert(oldComponentList.size() && "No components being removed");
+		assert(oldComponentList.size() && "[CScene::Remove] No components being removed");
 		
 		TComponentList& componentList = m_componentsMap[name];
 		

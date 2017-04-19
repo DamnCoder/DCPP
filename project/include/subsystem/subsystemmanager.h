@@ -31,15 +31,13 @@ namespace dc
 		~CSubsystemManager() {}
 
 	public:
-		void Initialize()	override;
-		void Terminate()	override;
+		void Initialize()		override;
+		void Terminate()		override;
 		
-		void Run()			override;
+		void Run()				override;
 		
-	protected:
-		void PrepareUpdate();
-		void Update();
-		void FinishUpdate();
+		void PrepareUpdate()	override;
+		void FinishUpdate()		override;
 
 	public:
 		void Add(ISubsystem* subsystem);

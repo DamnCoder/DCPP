@@ -1,25 +1,35 @@
 //
-//  transform.h
-//  BitThemAll
+//  property.h
+//  DCPPTest
 //
-//  Created by Jorge López González on 27/12/12.
-//  Copyright (c) 2012 Jorge López González. All rights reserved.
+//  Created by Jorge López on 18/4/17.
+//
 //
 
-#ifndef BitThemAll_transform_h
-#define BitThemAll_transform_h
+#ifndef property_h
+#define property_h
 
-#include "math/matrix.h"
+#include <functional>
 
-#include "component.h"
-
-#include <vector>
+#include "math/dcmath.h"
+#include "signals/signal.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	class IProperty
+	{
+	public:
+		IProperty() {}
+		virtual ~IProperty() {}
+		
+	public:
+		virtual void Activate() = 0;
+		virtual void CalculateOrder() = 0;
+	};
+	
 	/**
 	 * \class
 	 * \brief
@@ -27,17 +37,15 @@ namespace dc
 	 *
 	 * Description.
 	 */
-	class CTransform : public CComponent
+	template<typename T>
+	class CMaterialProperty : public IProperty
 	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
-		RTTI_DECLARATIONS(CTransform, CComponent)
-		
 	public:
-		typedef std::vector<CTransform*>	TTransformList;
-		typedef TTransformList::iterator	TTransformIterator;
-		
+		const int MIN_PRIO = 0;
+		const int MAX_PRIO = 9;
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
@@ -50,35 +58,48 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		// Getters
-		const math::Matrix4x4f&	LocalMatrix() const { return m_matrix; }
-		const math::Matrix4x4f	WorldMatrix() const;
 		
-		const TTransformList	Childs() const { return ml_childs; }
-		TTransformIterator		Begin() { return ml_childs.begin(); }
-		TTransformIterator		End() { return ml_childs.end(); }
+		const int	Order()		const { return m_order; }
 		
-		CTransform*				Root() const { return mp_root; }
-		CTransform*				Parent() const { return mp_parent; }
+		const bool	Enabled()	const { return m_enabled;}
+		void SetEnable(const bool enable) { m_enabled = enable; }
 		
-		void					Parent(CTransform* parent);
+		const int	Priority()	const { return m_priority; }
 		
-		math::Vector3f			LocalPos() const { return m_matrix.Translation(); }
-		math::Vector3f			WorldPos() const { return WorldMatrix().Translation(); }
+		void SetPriority(const int priority)
+		{
+			m_priority = math::Clamp(priority, MIN_PRIO, MAX_PRIO);
+		}
 		
-		math::Vector3f			LocalEulerAngles() const { return m_matrix.EulerAngles(); }
-		math::Vector3f			WorldEulerAngles() const { return WorldMatrix().EulerAngles(); }
+		const T Value() const { return m_value; }
+		
+		void Value(const T value)
+		{
+			m_value = value;
+		}
+		
+		void ActivationCallback(std::function<void(T)>& callback)
+		{
+			m_orderCallback.Connect(callback);
+		}
+		
+		void OrderCallback(std::function<int(T)>& callback)
+		{
+			m_orderCallback.Connect(callback);
+		}
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
-		CTransform()
-		{
-			Reset();
-		}
+		CMaterialProperty():
+			m_enabled(false),
+			m_priority(0),
+			m_order(0)
+		{}
 		
-		~CTransform() {}
+		~CMaterialProperty()
+		{}
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
@@ -87,28 +108,45 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void Reset();
+		void Activate() override
+		{
+			if(Enabled())
+			{
+				m_activationCallback(m_value);
+			}
+		}
 		
-		void AddChild(CTransform* child);
-		
-		void Translate(const math::Vector3f& position);
-		void Rotate(const math::Vector3f& rotation);
-		void Scale(const math::Vector3f& scale);
-		
-		// Transforms position from local space to world space.
-		math::Vector3f TransformPosition(const math::Vector3f& point);
+		void CalculateOrder() override
+		{
+			if(!m_orderCallback.IsEmpty())
+			{
+				std::vector<int> values;
+				m_orderCallback(&values, m_value);
+				m_order = values[0];
+			}
+			else
+			{
+				m_order = 0;
+			}
+		}
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
-        
-    private:
-		CTransform*			mp_root;    // Topmost transform in the hierarchy
-		CTransform*			mp_parent;  // Transform parent
-
-		math::Matrix4x4f	m_matrix;   // Local
-		TTransformList		ml_childs;
-    };
+	
+	protected:
+		
+		bool				m_enabled;
+		int					m_priority;
+		int					m_order;
+		
+		T					m_value;
+		
+		CSignal<void(T)>	m_activationCallback;
+		CSignal<int(T)>		m_orderCallback;
+		
+	};
+	
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
@@ -118,4 +156,4 @@ namespace dc
 	// ===========================================================
 }
 
-#endif
+#endif /* property_h */

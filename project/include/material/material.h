@@ -1,19 +1,24 @@
 //
-//  material.hpp
+//  material.h
 //  DCPPTest
 //
 //  Created by Jorge López on 27/3/17.
 //
 //
 
-#ifndef material_hpp
-#define material_hpp
+#ifndef material_h
+#define material_h
+
+#include <map>
+
+#include "property.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	using TPropertiesMap = std::map<const char*, IProperty*>;
 	class CMaterial
 	{
 		// ===========================================================
@@ -48,10 +53,17 @@ namespace dc
 		// ===========================================================
 		// Methods
 		// ===========================================================
+		void Activate();
+		
+		void AddProperty(const char* name, IProperty* property);
+		
+		IProperty* GetProperty(const char* name);
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
+	private:
+		TPropertiesMap	m_propertiesMap;
 	};
 	
 	// ===========================================================

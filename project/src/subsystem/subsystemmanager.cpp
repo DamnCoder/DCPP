@@ -35,7 +35,12 @@ namespace dc
     void CSubsystemManager::Run()
     {
 		PrepareUpdate();
-		Update();
+		
+		for(IRunnableSubsystem* runnableSubsystem : m_runnableSubsystemList)
+		{
+			runnableSubsystem->Run();
+		}
+		
 		FinishUpdate();
     }
     
@@ -52,20 +57,17 @@ namespace dc
 	
 	void CSubsystemManager::PrepareUpdate()
 	{
-		
+		for(IRunnableSubsystem* runnableSubsystem : m_runnableSubsystemList)
+		{
+			runnableSubsystem->PrepareUpdate();
+		}
 	}
-	
-	void CSubsystemManager::Update()
+
+	void CSubsystemManager::FinishUpdate()
 	{
 		for(IRunnableSubsystem* runnableSubsystem : m_runnableSubsystemList)
 		{
-			runnableSubsystem->Run();
+			runnableSubsystem->FinishUpdate();
 		}
-
-	}
-	
-	void CSubsystemManager::FinishUpdate()
-	{
-		
 	}
 }

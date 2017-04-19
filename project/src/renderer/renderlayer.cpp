@@ -8,17 +8,18 @@
 
 #include "renderlayer.h"
 
-#include <algorithm>
-#include "help/deletehelp.h"
-#include "help/utils.h"
-
 namespace dc
 {
+	void CRenderLayer::PrepareRender()
+	{
+		
+	}
+	
 	void CRenderLayer::Render()
 	{
 		for(auto* renderComponent : ml_renderList)
 		{
-			
+			renderComponent->Render();
 		}
 	}
     

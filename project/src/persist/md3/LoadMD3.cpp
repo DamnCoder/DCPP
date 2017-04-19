@@ -5,12 +5,13 @@
  *      Author: jorge
  */
 
-#include "LoadMD3.h"
+#include "loadmd3.h"
 //#include "gui/TextureManager.h"
 #include <cmath>
 #include <dirent.h>
 #include "help/utils.h"
 
+#include "renderer/vertexproperty.h"
 #include "mesh/mesh.h"
 
 namespace dc
@@ -143,9 +144,9 @@ namespace dc
 			AdaptVertices(md3VertexArray, &vertexArray, &normalArray, meshHeader.numVerts);
 			
 			// Assign the arrays to the mesh
-			mesh->FloatDataArray(CMesh::VERTEX_ID, vertexArray);
-			mesh->FloatDataArray(CMesh::NORMAL_ID, normalArray);
-			mesh->FloatDataArray(CMesh::UV0_ID, uvCoordArray);
+			mesh->FloatDataArray(CVertexProperty::IN_VERTEX, vertexArray);
+			mesh->FloatDataArray(CVertexProperty::IN_NORMAL, normalArray);
+			mesh->FloatDataArray(CVertexProperty::IN_UV0, uvCoordArray);
 			mesh->IndexArray(indexArray);
 			
 			// Set the offset to read the next mesh if there is any
@@ -222,7 +223,7 @@ namespace dc
 		{
 			for(int i = 0; i < pModel->numMeshes; i++)
 			{
-				
+				//extern const bool IsInString(const std::string& strString, const std::string& strSubString);
 				// Asociamos un material a una malla
 				if(IsInString(strLine, pModel->meshes[i].name) )
 				{

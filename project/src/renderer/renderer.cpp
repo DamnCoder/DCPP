@@ -12,13 +12,26 @@
 
 #include "renderlayermanager.h"
 
-#include "help/deletehelp.h"
-
 namespace dc
 {
+	void CRenderer::AddVertexProperty(const char* name, const unsigned int size)
+	{
+		static unsigned int identifier = 0;
+		m_vertexProperties[name] = CVertexProperty(name, size, identifier++);
+	}
+	
+	const TVertexPropertyMap& CRenderer::VertexProperties() const
+	{
+		return m_vertexProperties;
+	}
+	
     void CRenderer::Initialize()
     {
 		mp_renderLayerMgr = CRenderLayerManager::Pointer();
+		
+		AddVertexProperty(CVertexProperty::IN_VERTEX, 3);
+		AddVertexProperty(CVertexProperty::IN_NORMAL, 3);
+		AddVertexProperty(CVertexProperty::IN_UV0, 2);
     }
 	
     void CRenderer::Terminate()
@@ -29,7 +42,10 @@ namespace dc
 	
 	void CRenderer::Prepare()
 	{
-		
+		for(auto renderLayer : mp_renderLayerMgr->RenderLayerList())
+		{
+			renderLayer->PrepareRender();
+		}
 	}
 	
 	void CRenderer::Render()

@@ -13,14 +13,11 @@
 
 #include "renderer/renderlayermanager.h"
 
-#include <string>
-
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using GOID = std::string;
 	
     class CGameObject
     {
@@ -40,8 +37,11 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char*			LayerName() const			{ return mp_layer; }
-		void				LayerName(const char* name) { mp_layer = name; }
+		const char*			Name()		const			{ return m_id; }
+		void				Name(const char* name)		{ m_id = name; }
+		
+		const char*			LayerName() const			{ return m_layer; }
+		void				LayerName(const char* name) { m_layer = name; }
 		
 		const unsigned int	ComponentsNum(const char* compId) const;
 		
@@ -49,13 +49,13 @@ namespace dc
 		 * Returns the first component of the specified type
 		 */
 		template<typename ComponentType>
-		ComponentType*				GetComponent() const;
+		ComponentType*	GetComponent() const;
 		
 		/**
 		 * Returns all the components of the specified type in an array
 		 */
 		template<typename ComponentType>
-		std::vector<ComponentType*> GetComponents() const;
+		TComponentList	GetComponents() const;
 
 		const TComponentListTable&	ComponentsTable() const { return m_componentTable; }
 		
@@ -69,18 +69,17 @@ namespace dc
 		// Constructors
 		// ===========================================================
     public:
-        CGameObject(const GOID& id):
-            m_id(id),
-			mp_layer(CRenderLayerManager::DEFAULT_LAYER)
+        CGameObject(const char* name):
+            m_id(name),
+			m_layer(CRenderLayerManager::DEFAULT_LAYER)
         {}
 		
-		CGameObject(const GOID& id, const char* layerName):
-			m_id(id),
-			mp_layer(layerName)
+		CGameObject(const char* name, const char* layerName):
+			m_id(name),
+			m_layer(layerName)
 		{}
 		
-        ~CGameObject()
-        {}
+		~CGameObject();
 		
 		CGameObject(const CGameObject& copy) = delete;
 		
@@ -126,8 +125,8 @@ namespace dc
 		// ===========================================================
     private:
         
-        GOID				m_id;
-		const char*			mp_layer;
+        const char*			m_id;
+		const char*			m_layer;
 		TComponentListTable	m_componentTable;
     };
 	
@@ -148,12 +147,12 @@ namespace dc
 	}
 	
 	template<typename ComponentType>
-	std::vector<ComponentType*> CGameObject::GetComponents() const
+	TComponentList CGameObject::GetComponents() const
 	{
 		TComponentList& componentList = *GetComponentList<ComponentType>();
 		
 		const unsigned int componentsCount = componentList.size();
-		std::vector<ComponentType*> castedComponentList(componentsCount);
+		TComponentList castedComponentList(componentsCount);
 		
 		for(const CComponent* component : componentList)
 		{

@@ -63,10 +63,9 @@ namespace dc
 		void Initialize()	override;
 		void Terminate()	override;
 		
-		void Run()			override;
-		
-	protected:
-		void PrepareUpdate();
+		void Run()				override;
+		void PrepareUpdate()	override;
+		void FinishUpdate()		override;
 		
 		// ===========================================================
 		// Methods
