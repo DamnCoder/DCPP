@@ -19,6 +19,7 @@ namespace dc
 	// External Enums / Typedefs for global usage
 	// ===========================================================
 	using TPropertiesMap = std::map<const char*, IProperty*>;
+	
 	class CMaterial
 	{
 		// ===========================================================
@@ -36,12 +37,19 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
+	public:
+		const char* Name() const { return m_name; }
+		
+		IProperty*	GetProperty(const char* name);
+		
+		const bool Exists(const char* name) const;
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
-		CMaterial()
+		CMaterial(const char* name):
+			m_name(name)
 		{}
 		
 		~CMaterial()
@@ -57,12 +65,13 @@ namespace dc
 		
 		void AddProperty(const char* name, IProperty* property);
 		
-		IProperty* GetProperty(const char* name);
+		
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
+		const char*		m_name;
 		TPropertiesMap	m_propertiesMap;
 	};
 	

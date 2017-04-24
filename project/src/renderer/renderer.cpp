@@ -27,7 +27,7 @@ namespace dc
 	
     void CRenderer::Initialize()
     {
-		mp_renderLayerMgr = CRenderLayerManager::Pointer();
+		mp_renderLayerMgr = CRenderLayerManager::New();
 		
 		AddVertexProperty(CVertexProperty::IN_VERTEX, 3);
 		AddVertexProperty(CVertexProperty::IN_NORMAL, 3);
@@ -50,8 +50,7 @@ namespace dc
 	
 	void CRenderer::Render()
 	{
-		// Clear the screen
-		
+		ClearScreen();
 		
 		for(auto renderLayer : mp_renderLayerMgr->RenderLayerList())
 		{

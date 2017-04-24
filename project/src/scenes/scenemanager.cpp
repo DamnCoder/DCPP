@@ -9,9 +9,15 @@
 #include "scenemanager.h"
 
 #include <assert.h>
+#include "help/deletehelp.h"
 
 namespace dc
 {
+	CSceneManager::~CSceneManager()
+	{
+		SafeDelete(m_sceneList);
+	}
+	
 	CScene* CSceneManager::Scene(const char* name)
 	{
 		assert(name && "You need to specify a name");

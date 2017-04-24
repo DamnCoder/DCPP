@@ -62,6 +62,7 @@ namespace dc
 		const int	Order()		const { return m_order; }
 		
 		const bool	Enabled()	const { return m_enabled;}
+		
 		void SetEnable(const bool enable) { m_enabled = enable; }
 		
 		const int	Priority()	const { return m_priority; }
@@ -73,10 +74,7 @@ namespace dc
 		
 		const T Value() const { return m_value; }
 		
-		void Value(const T value)
-		{
-			m_value = value;
-		}
+		void Value(const T value) { m_value = value; }
 		
 		void ActivationCallback(std::function<void(T)>& callback)
 		{
@@ -92,10 +90,11 @@ namespace dc
 		// Constructors
 		// ===========================================================
 	public:
-		CMaterialProperty():
+		CMaterialProperty(const T& property):
 			m_enabled(false),
 			m_priority(0),
-			m_order(0)
+			m_order(0),
+			m_value(property)
 		{}
 		
 		~CMaterialProperty()
@@ -116,20 +115,7 @@ namespace dc
 			}
 		}
 		
-		void CalculateOrder() override
-		{
-			if(!m_orderCallback.IsEmpty())
-			{
-				std::vector<int> values;
-				m_orderCallback(&values, m_value);
-				m_order = values[0];
-			}
-			else
-			{
-				m_order = 0;
-			}
-		}
-		
+		void CalculateOrder() override {}
 		// ===========================================================
 		// Fields
 		// ===========================================================

@@ -37,6 +37,8 @@ namespace dc
 		const unsigned int	RootCount()			const { return m_goList.size(); }
 		const TGOList&		GameObjectList()	const { return m_goList; }
 		
+		const bool			Exists(const CGameObject* gameObject);
+		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
@@ -55,9 +57,10 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void PrepareUpdate();
-		
 		void Update();
+		
+		void PrepareUpdate();
+		void FinishUpdate();
 		
 		void Add(CGameObject* gameObject);
 		
@@ -65,8 +68,10 @@ namespace dc
 		
 	private:
 		void AddToScene(CGameObject* gameObject);
-		void AddToScene(const char* name, const TComponentList& componentList);
-		void Remove(const char* name, const TComponentList& componentList);
+		void RemoveFromScene(CGameObject* gameObject);
+		
+		void AddComponents(const char* name, const TComponentList& componentList);
+		void RemoveComponents(const char* name, const TComponentList& componentList);
 		
 		// ===========================================================
 		// Fields
@@ -76,6 +81,7 @@ namespace dc
 		TGOList				m_goList;
 		
 		TGOList				m_newGOList;
+		TGOList				m_oldGOList;
 		
 		TComponentListTable	m_componentsMap;
 	};

@@ -30,10 +30,12 @@ namespace dc
         
     private:
         //The window we'll be rendering to
-        SDL_Window* window = NULL;
+        SDL_Window*		m_window = NULL;
         
         //The surface contained by the window
-        SDL_Surface* screenSurface = NULL;
+        SDL_Surface*	m_screenSurface = NULL;
+		
+		SDL_GLContext	m_context;
     };
 }
 

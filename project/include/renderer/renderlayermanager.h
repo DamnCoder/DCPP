@@ -67,9 +67,13 @@ namespace dc
 		
 		~CRenderLayerManager();
 		
+		CRenderLayerManager(const CRenderLayerManager& copy) = delete;
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
+		void operator= (const CRenderLayerManager& copy) = delete;
 		
 		// ===========================================================
 		// Methods

@@ -26,6 +26,7 @@ namespace dc
     void CRenderLayer::Add(CRendererComponent* newNode)
     {
 		ml_renderList.push_back(newNode);
+		printf("RenderLayer %d has %lu render components\n", LayerId(), ml_renderList.size());
     }
     
     void CRenderLayer::Remove(CRendererComponent* oldNode)

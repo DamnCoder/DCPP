@@ -47,7 +47,7 @@ namespace dc
 		// ===========================================================
 	public:
 		CSceneManager() {}
-		~CSceneManager() {}
+		~CSceneManager();
 		
 		CSceneManager(const CSceneManager& copy) = delete;
 		

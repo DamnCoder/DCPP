@@ -59,9 +59,17 @@ namespace dc
         
         virtual ~CComponent() {}
 		
+		CComponent(const CComponent& copy) = delete;
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
+		void operator= (const CComponent& copy) = delete;
+		// ===========================================================
+		// Methods for/from SuperClass/Interfaces
+		// ===========================================================
+	public:
 		virtual void Initialize() {}
 		virtual void Terminate() {}
 		

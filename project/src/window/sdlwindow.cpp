@@ -13,29 +13,43 @@ namespace dc
 {
     void CSDLWindow::Initialize()
     {
-        const int opCode = SDL_Init( SDL_INIT_VIDEO );
+        int opCode = SDL_Init( SDL_INIT_VIDEO );
         
-        assert(-1 < opCode && "SDL could not be initialized");
+        assert(-1 < opCode && "[CSDLWindow::Initialize] SDL could not be initialized");
+		
+		//Use OpenGL 3.1 core
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
         
         //Create window
-        window = SDL_CreateWindow(m_displayInfo.name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_displayInfo.width, m_displayInfo.height, SDL_WINDOW_SHOWN);
+        m_window = SDL_CreateWindow(m_displayInfo.name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_displayInfo.width, m_displayInfo.height, SDL_WINDOW_SHOWN);
         
-        assert(window && "SDL Window could not be created");
-        
+        assert(m_window && "[CSDLWindow::Initialize] SDL Window could not be created");
+		
+		//Create context
+		m_context = SDL_GL_CreateContext( m_window );
+		assert(m_window && "[CSDLWindow::Initialize] OpenGL context could not be created");
+		
+		//Use Vsync
+		opCode = SDL_GL_SetSwapInterval( 1 );
+		assert(-1 < opCode && "[CSDLWindow::Initialize] Unable to set VSync!");
+		
         //Get window surface
-        screenSurface = SDL_GetWindowSurface( window );
+        //m_screenSurface = SDL_GetWindowSurface( m_window );
         
         //Fill the surface white
-        SDL_FillRect(screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF));
+        //SDL_FillRect(m_screenSurface, NULL, SDL_MapRGB(m_screenSurface->format, 0xFF, 0xFF, 0xFF));
     }
     
     void CSDLWindow::Terminate()
     {
         //Destroy window
-        SDL_DestroyWindow(window);
-        
-        window = 0;
-        screenSurface = 0;
+        SDL_DestroyWindow(m_window);
+		
+		m_context = 0;
+        m_window = 0;
+        m_screenSurface = 0;
         
         //Quit SDL subsystems
         SDL_Quit();

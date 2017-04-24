@@ -16,9 +16,6 @@ namespace dc
 	void CSceneSubsystem::Initialize()
 	{
 		mp_sceneManager = new CSceneManager();
-		
-		mp_renderSubsystem = CApp::Instance().GetSubsystem<CRenderSubsystem>();
-		assert(mp_renderSubsystem && "To use the CSceneSubsystem you need to add CRenderSubsystem to your app!");
 	}
 	
 	void CSceneSubsystem::Terminate()
@@ -29,18 +26,26 @@ namespace dc
 	
 	void CSceneSubsystem::Run()
 	{
-		assert(mp_currentScene && "There is no current scene set");
-		mp_currentScene->Update();
+		if(mp_currentScene)
+		{
+			mp_currentScene->Update();
+		}
 	}
 	
 	void CSceneSubsystem::PrepareUpdate()
 	{
-		mp_currentScene->PrepareUpdate();
+		if(mp_currentScene)
+		{
+			mp_currentScene->PrepareUpdate();
+		}
 	}
 	
 	void CSceneSubsystem::FinishUpdate()
 	{
-		
+		if(mp_currentScene)
+		{
+			mp_currentScene->FinishUpdate();
+		}
 	}
 	
 	CScene* CSceneSubsystem::CreateScene(const char* name)

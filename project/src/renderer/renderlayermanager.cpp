@@ -44,10 +44,12 @@ namespace dc
 	
 	const unsigned int CRenderLayerManager::LayerIndex(const char* name) const
 	{
+		unsigned int i = 0;
+		
 		TLayerList::const_iterator first = m_layerList.begin();
 		TLayerList::const_iterator last = m_layerList.end();
-		unsigned int i = 0;
-		do
+		
+		while(first != last)
 		{
 			if(strcmp(*first, name) == 0)
 				return i;
@@ -55,7 +57,6 @@ namespace dc
 			++first;
 			++i;
 		}
-		while(first != last);
 		
 		return i;
 	}
@@ -71,7 +72,10 @@ namespace dc
 		return m_layerList.size();
 	}
 	
-	CRenderLayerManager::CRenderLayerManager()
+	CRenderLayerManager::CRenderLayerManager():
+		m_layerList(),
+		m_renderLayerMap(),
+		m_renderLayerList()
 	{
 		Add(DEFAULT_LAYER);
 	}
@@ -99,7 +103,9 @@ namespace dc
 		m_layerList.push_back(name);
 		
 		m_renderLayerMap[name] = renderLayer;
+		
 		m_renderLayerList.push_back(renderLayer);
+		renderLayer->LayerId(m_renderLayerList.size());
 	}
 	
 	void CRenderLayerManager::Remove(const char* name)

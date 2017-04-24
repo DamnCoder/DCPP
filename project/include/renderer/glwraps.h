@@ -42,12 +42,22 @@ namespace dc
 		ELEMENT_ARRAY	= GL_ELEMENT_ARRAY_BUFFER,
 		ARRAY			= GL_ARRAY_BUFFER,
 	};
-	//*
+	
+	enum EShaderType
+	{
+		VERTEX_SHADER	= GL_VERTEX_SHADER,
+		FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
+	};
+	
 	inline void DrawElements(const ETopology& topology, const unsigned int indexCount)
 	{
 		glDrawElements((GLenum)topology, (GLsizei)indexCount, GL_UNSIGNED_SHORT, 0);
 	}
-	//*/
+	
+	inline void ClearScreen()
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 }
 
 #endif

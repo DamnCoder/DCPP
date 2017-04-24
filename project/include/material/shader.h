@@ -42,7 +42,7 @@ namespace dc
 		
 		CShader(const CShader& copy) : m_shaderType (copy.Type()), m_shaderID (copy.Identifier()) {};
 		
-        ~CShader();
+		~CShader(){}
 		
 	public:
 		void operator= (const CShader& copy)
@@ -74,7 +74,7 @@ namespace dc
 	 * \class CShaderProgram
 	 * \brief shader program class.
 	 * \author Jorge López González
-	 * \version 0.9
+	 * \version 1.0
 	 * \date 20016
 	 *
 	 * Shader program abstraction.
@@ -90,6 +90,18 @@ namespace dc
 	public:
 		CShaderProgram() {}
 		~CShaderProgram() {}
+		
+		CShaderProgram(const CShaderProgram& copy):
+			m_programID (copy.m_programID),
+			m_shaderList(copy.m_shaderList)
+		{}
+		
+	public:
+		void operator= (const CShaderProgram& copy)
+		{
+			m_programID = copy.m_programID;
+			m_shaderList = copy.m_shaderList;
+		}
 		
 	public:
 		void Create();

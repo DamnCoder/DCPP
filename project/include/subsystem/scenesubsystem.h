@@ -13,8 +13,6 @@
 
 #include "scenes/scenemanager.h"
 
-#include "rendersubsystem.h"
-
 namespace dc
 {
 	// ===========================================================
@@ -48,8 +46,7 @@ namespace dc
 	public:
 		CSceneSubsystem():
 			mp_sceneManager(0),
-			mp_currentScene(0),
-			mp_renderSubsystem(0)
+			mp_currentScene(0)
 		{}
 		
 		CSceneSubsystem (const CSceneSubsystem& copy) = delete;
@@ -60,8 +57,8 @@ namespace dc
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
 	public:
-		void Initialize()	override;
-		void Terminate()	override;
+		void Initialize()		override;
+		void Terminate()		override;
 		
 		void Run()				override;
 		void PrepareUpdate()	override;
@@ -82,8 +79,6 @@ namespace dc
 		CSceneManager*		mp_sceneManager;
 		
 		CScene*				mp_currentScene;
-		
-		CRenderSubsystem*	mp_renderSubsystem;
 
 	};
 	

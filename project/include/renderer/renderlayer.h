@@ -43,6 +43,12 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
+		const unsigned int			LayerId()		const { return m_layerId; }
+		void LayerId(const unsigned int identifier)
+		{
+			m_layerId = identifier;
+		}
+		
 		const unsigned int			Count()			const { return ml_renderList.size(); }
 		const TRenderComponentList&	RenderList()	const { return ml_renderList; }
 		
@@ -50,15 +56,24 @@ namespace dc
 		// Constructors
 		// ===========================================================
     public:
-        CRenderLayer()
+		CRenderLayer():
+			m_layerId(0)
         {}
-        
+		
+		CRenderLayer(const unsigned int layerIdentifier):
+			m_layerId(layerIdentifier)
+		{}
+		
         ~CRenderLayer()
         {};
-        
+		
+		CRenderLayer(const CRenderLayer& copy) = delete;
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
+		void operator= (const CRenderLayer& copy) = delete;
 		
 		// ===========================================================
 		// Methods
@@ -87,6 +102,7 @@ namespace dc
 		// Fields
 		// ===========================================================
     private:
+		unsigned int			m_layerId;
         TRenderComponentList	ml_renderList;
     };
 	// ===========================================================
