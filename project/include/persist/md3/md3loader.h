@@ -20,12 +20,12 @@ namespace dc
 	
 	using TFloatArray = CArray<float>;
 	
-	class CLoadMD3
+	class CMD3Loader
 	{
 
 	public:
 
-		CLoadMD3();
+		CMD3Loader();
 		
 		CArray<CMesh*> Load(const char* modelPath);
 

@@ -23,9 +23,9 @@ namespace dc
 		template <typename T>
 		T* GetSubsystem();
 		
-		template <typename T, typename... Args>
-		void AddSubsystem(Args&&... args);
-
+	private:
+		ISubsystem* Find(const int subsystemID) const;
+	
 	public:
 		CSubsystemManager() {}
 		~CSubsystemManager() {}
@@ -40,11 +40,11 @@ namespace dc
 		void FinishUpdate()		override;
 
 	public:
+		template <typename T, typename... Args>
+		void AddSubsystem(Args&&... args);
+		
 		void Add(ISubsystem* subsystem);
 		void Add(IRunnableSubsystem* runnableSubsystem);
-		
-	private:
-		ISubsystem* Find(const int subsystemID) const;
 
 	private:
 		typedef std::vector<IRunnableSubsystem*> 			TRunnableSubsystemList;

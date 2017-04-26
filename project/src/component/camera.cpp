@@ -10,6 +10,8 @@
 
 #include <assert.h>
 
+#include "renderer/renderer.h"
+
 #include "gameobject.h"
 #include "transform.h"
 
@@ -23,6 +25,8 @@ namespace dc
 	void CCameraComponent::Initialize()
 	{
 		Configure(FOV_DEF, AR_DEF, NEAR_DEF, FAR_DEF);
+		
+		CRenderer::Pointer()->Camera(this);
 	}
 	
 	void CCameraComponent::Configure(const float fov, const float aspectRatio, const float near, const float far)

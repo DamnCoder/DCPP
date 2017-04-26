@@ -5,7 +5,7 @@
  *      Author: jorge
  */
 
-#include "loadmd3.h"
+#include "md3loader.h"
 //#include "gui/TextureManager.h"
 #include <cmath>
 #include <dirent.h>
@@ -16,7 +16,7 @@
 
 namespace dc
 {
-	CLoadMD3::CLoadMD3()
+	CMD3Loader::CMD3Loader()
 	{
 		memset(&m_Header, 0, sizeof(tMd3Header));
 
@@ -28,7 +28,7 @@ namespace dc
 		mp_Vertices = 0;
 	}
 
-	CArray<CMesh*> CLoadMD3::Load(const char* modelPath)
+	CArray<CMesh*> CMD3Loader::Load(const char* modelPath)
 	{
 		DIR *dp;
 
@@ -80,7 +80,7 @@ namespace dc
 		return meshesArray;
 	}
 	
-	CArray<CMesh*> CLoadMD3::ReadModel(FILE* filePtr, const tMd3Header& header)
+	CArray<CMesh*> CMD3Loader::ReadModel(FILE* filePtr, const tMd3Header& header)
 	{
 		int i = 0;
 		
@@ -156,7 +156,7 @@ namespace dc
 		return meshesArray;
 	}
 	
-	void CLoadMD3::AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int vertexNum)
+	void CMD3Loader::AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int vertexNum)
 	{
 		for(unsigned int i = 0; i<vertexNum; ++i)
 		{
@@ -174,7 +174,7 @@ namespace dc
 		}
 	}
 	
-	bool CLoadMD3::ImportMD3(tModel *pModel, const char *strFileName, const float scale)
+	bool CMD3Loader::ImportMD3(tModel *pModel, const char *strFileName, const float scale)
 	{
 		m_FilePointer = fopen(strFileName, "rb");
 
@@ -208,7 +208,7 @@ namespace dc
 	 * @param name
 	 * @return
 	 */
-	bool CLoadMD3::LoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& type)
+	bool CMD3Loader::LoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& type)
 	{
 		if(!path.c_str())
 			return false;
@@ -244,7 +244,7 @@ namespace dc
 		return true;
 	}
 
-	void CLoadMD3::ReadMD3Data(tModel *pModel, const float scale)
+	void CMD3Loader::ReadMD3Data(tModel *pModel, const float scale)
 	{
 		int i = 0;
 
@@ -328,7 +328,7 @@ namespace dc
 
 	}
 
-	void CLoadMD3::Adapt(tModel* pModel, const tMd3MeshHeader& meshHeader, const float scale)
+	void CMD3Loader::Adapt(tModel* pModel, const tMd3MeshHeader& meshHeader, const float scale)
 	{
 		int i = 0;
 
@@ -381,7 +381,7 @@ namespace dc
 		pModel->meshes.push_back(currentMesh);
 	}
 
-	CMesh* CLoadMD3::Adapt(const tMd3MeshHeader& meshHeader, const float scale)
+	CMesh* CMD3Loader::Adapt(const tMd3MeshHeader& meshHeader, const float scale)
 	{
 		CMesh* mesh = new CMesh("name");
 		//mesh->Initialize(meshHeader.numVerts, meshHeader.numFaces);
@@ -430,7 +430,7 @@ namespace dc
 		return mesh;
 	}
 	
-	void CLoadMD3::CleanUp()
+	void CMD3Loader::CleanUp()
 	{
 		fclose(m_FilePointer);
 	}

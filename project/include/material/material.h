@@ -18,13 +18,14 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using TPropertiesMap = std::map<const char*, IProperty*>;
 	
 	class CMaterial
 	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
+	private:
+		using TPropertiesMap = std::map<const char*, IProperty*>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -42,7 +43,7 @@ namespace dc
 		
 		IProperty*	GetProperty(const char* name);
 		
-		const bool Exists(const char* name) const;
+		const bool	Exists(const char* name) const;
 		
 		// ===========================================================
 		// Constructors
@@ -54,6 +55,7 @@ namespace dc
 		
 		~CMaterial()
 		{}
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
@@ -61,12 +63,17 @@ namespace dc
 		// ===========================================================
 		// Methods
 		// ===========================================================
-		void Activate();
+	public:
+		void Activate() const;
 		
-		void AddProperty(const char* name, IProperty* property);
+		void Deactivate() const;
 		
+		template<typename PT>
+		void AddProperty(const char* name, const PT& propertyType);
 		
-		
+	private:
+		void AddIProperty(const char* name, IProperty* property);
+
 		// ===========================================================
 		// Fields
 		// ===========================================================
@@ -78,6 +85,16 @@ namespace dc
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
+	// ===========================================================
+	template<typename PT>
+	void CMaterial::AddProperty(const char* name, const PT& propertyType)
+	{
+		AddIProperty(name, new CMaterialProperty<PT> (propertyType));
+	}
+
 }
 
 #endif /* material_hpp */

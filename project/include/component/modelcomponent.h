@@ -11,8 +11,7 @@
 
 #include "component.h"
 
-#include "renderer/vertexproperty.h"
-#include "renderer/vbo.h"
+#include "renderer/vao.h"
 
 #include "mesh/model.h"
 
@@ -21,9 +20,7 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using TVertexProperty2VBOMap	= std::map<const CVertexProperty*, TFloatVBO>;
-	using TMeshFVBOMap				= std::map<const CMesh*, TVertexProperty2VBOMap>;
-	using TMeshUintVBOMap			= std::map<const CMesh*, TUIntVBO>;
+	using TVAOMap					= std::map<const CMaterial*, CVAO>;
 	
 	class CModelComponent : public CComponent
 	{
@@ -46,13 +43,12 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const CModel*	Model() const	{ return mp_model; }
-		CModel*			Model()			{ return mp_model; }
+		const CModel*	Model() const		{ return mp_model; }
+		CModel*			Model()				{ return mp_model; }
 		
-		void Model(CModel* model) { mp_model = model; }
+		void			Model(CModel* model){ mp_model = model; }
 		
-		TUIntVBO&				IndexVBO(const CMesh* mesh);
-		TVertexProperty2VBOMap& DataVBOMap(const CMesh* mesh);
+		const CVAO&		VAO(const CMaterial* material) const;
 		
 		// ===========================================================
 		// Constructors
@@ -78,8 +74,7 @@ namespace dc
 		// ===========================================================
 		// Methods
 		// ===========================================================
-		
-		void Render();
+		void SwapMaterials(CMaterial* oldMaterial, CMaterial* newMaterial);
 		
 		// ===========================================================
 		// Fields
@@ -87,8 +82,7 @@ namespace dc
 	private:
 		CModel*				mp_model;
 		
-		TMeshFVBOMap		m_floatVBOMap;
-		TMeshUintVBOMap		m_uintVBOMap;
+		TVAOMap				m_vaoMap;
 	};
 	
 	// ===========================================================

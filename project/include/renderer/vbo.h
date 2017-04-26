@@ -6,8 +6,8 @@
 //
 //
 
-#ifndef vbo_hpp
-#define vbo_hpp
+#ifndef vbo_h
+#define vbo_h
 
 #include <vector>
 #include <map>
@@ -97,6 +97,9 @@ namespace dc
 	// ===========================================================
 	template<typename ArrayType>
 	using TVBOList = std::vector<CVBO<ArrayType>>;
+	
+	using TFloatVBOList = TVBOList<float>;
+	using TUIntVBOList = TVBOList<unsigned int>;
 	
 	using TUIntVBO = CVBO<unsigned int>;
 	using TFloatVBO = CVBO<float>;

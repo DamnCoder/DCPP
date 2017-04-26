@@ -1,32 +1,38 @@
 //
-//  renderlayer.h
-//  BitThemAll
+//  vao.h
+//  DCPPTest
 //
-//  Created by Jorge López González on 02/11/12.
-//  Copyright (c) 2012 Jorge López González. All rights reserved.
+//  Created by Jorge López on 26/4/17.
+//
 //
 
-#ifndef __renderlayer__
-#define __renderlayer__
+#ifndef vao_h
+#define vao_h
 
-#include "component/renderercomponent.h"
+#include <map>
 
-#include "renderer/vao.h"
+#include "mesh/mesh.h"
+
+#include "vertexproperty.h"
+#include "vbo.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using TRenderBatchMap = std::map<const CMaterial*, TVAOList>;
 	
-    /**
-     * \class RenderLayer
-     * \brief This class groups a subset of the graphic nodes for rendering
-     * \author Jorge Lopez Gonzalez
-     */
-    class CRenderLayer
-    {
+	using TBufferMap = std::map<const CVertexProperty*, TFloatVBO>;
+	
+	/**
+	 * \class
+	 * \brief
+	 * \author Jorge Lopez Gonzalez
+	 *
+	 * Description.
+	 */
+	class CVAO
+	{
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
@@ -34,6 +40,14 @@ namespace dc
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
+	public:
+		static CVAO Create(CMesh* mesh, const TVertexPropertyMap& vertexPropertyMap);
+		
+		static void	Submit(CVAO& vao);
+		
+		static void Activate(const CVAO& vao);
+		
+		static void Deactivate();
 		
 		// ===========================================================
 		// Inner and Anonymous Classes
@@ -43,69 +57,55 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const unsigned int			LayerId()		const { return m_layerId; }
-		void LayerId(const unsigned int identifier)
-		{
-			m_layerId = identifier;
-		}
+		const unsigned int	Id()		const { return m_id; }
 		
-		const unsigned int			Count()			const { return m_renderList.size(); }
-		const TRenderComponentList&	RenderList()	const { return m_renderList; }
+		const TUIntVBO&		IndexVBO()	const { return m_indexVBO; }
+		
+		const TBufferMap&	BufferMap()	const { return m_bufferMap; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
-    public:
-		CRenderLayer():
-			m_layerId(0)
-        {}
-		
-		CRenderLayer(const unsigned int layerIdentifier):
-			m_layerId(layerIdentifier)
+	public:
+		CVAO():
+			m_id (0)
 		{}
 		
-        ~CRenderLayer()
-        {};
+		CVAO(const unsigned int identifier, TUIntVBO indexVBO, TBufferMap bufferMap):
+			m_id (identifier),
+			m_indexVBO(indexVBO),
+			m_bufferMap(bufferMap)
+		{}
 		
-		CRenderLayer(const CRenderLayer& copy) = delete;
-		
+		~CVAO()
+		{}
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
-	public:
-		void operator= (const CRenderLayer& copy) = delete;
 		
 		// ===========================================================
 		// Methods
 		// ===========================================================
-    public:
-		void PrepareRender();
 		
-		void Render();
-		
-		void Finish();
-
-        void Add(CRendererComponent* renderComponent);
-
-        void Remove(CRendererComponent* oldRenderComponent);
-        
-        void Clear();
-
 		// ===========================================================
 		// Fields
 		// ===========================================================
-    private:
-		unsigned int			m_layerId;
-        TRenderComponentList	m_renderList;
-		TRenderBatchMap			m_renderBatchMap;
-    };
+	private:
+		unsigned int	m_id;
+		
+		TUIntVBO		m_indexVBO;
+		TBufferMap		m_bufferMap;
+	};
+	
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
+	using TVAOList = std::vector<CVAO>;
 	
 	// ===========================================================
 	// Template/Inline implementation
 	// ===========================================================
 }
 
-#endif /* defined(__renderlayer__) */
+
+#endif /* vao_hpp */

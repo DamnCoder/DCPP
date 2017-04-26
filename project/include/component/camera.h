@@ -52,29 +52,30 @@ namespace dc
 		// ===========================================================
 		// Getter & Setter
 		// ===========================================================
-		const math::ColorRGBf	BackgroundColor() const { return m_backgroundColor; }
-		void BackgroundColor(const math::ColorRGBf& color) { m_backgroundColor = color; }
+	public:
+		const math::ColorRGBf&	BackgroundColor() const { return m_backgroundColor; }
+		void					BackgroundColor(const math::ColorRGBf& color) { m_backgroundColor = color; }
 		
 		const float FOV() const { return m_fov; }
-		void FOV(const float fov)
+		void		FOV(const float fov)
 		{
 			Configure(fov, m_aspectRatio, m_near, m_far);
 		}
 		
 		const float AspectRatio() const { return m_aspectRatio; }
-		void AspectRatio(const float aspectRatio)
+		void		AspectRatio(const float aspectRatio)
 		{
 			Configure(m_fov, aspectRatio, m_near, m_far);
 		}
 		
 		const float Near() const { return m_near; }
-		void Near(const float near)
+		void		Near(const float near)
 		{
 			Configure(m_fov, m_aspectRatio, near, m_far);
 		}
 		
 		const float Far() const { return m_far; }
-		void Far(const float far)
+		void		Far(const float far)
 		{
 			Configure(m_fov, m_aspectRatio, m_near, far);
 		}
@@ -82,10 +83,10 @@ namespace dc
 		const math::Matrix4x4f	ModelViewProjection (const CTransform* modelTransform) const;
 		
 		const math::Matrix4x4f	ViewMatrix() const { return m_viewMatrix; }
-		void ViewMatrix(const math::Matrix4x4f& viewMatrix) { m_viewMatrix = viewMatrix; }
+		void					ViewMatrix(const math::Matrix4x4f& viewMatrix) { m_viewMatrix = viewMatrix; }
 		
 		const math::Matrix4x4f& ProjectionMatrix() const { return m_projectionMatrix; }
-		void ProjectionMatrix(const math::Matrix4x4f& projectionMatrix) { m_viewMatrix = projectionMatrix; }
+		void					ProjectionMatrix(const math::Matrix4x4f& projectionMatrix) { m_viewMatrix = projectionMatrix; }
 		
 		// ===========================================================
 		// Constructors

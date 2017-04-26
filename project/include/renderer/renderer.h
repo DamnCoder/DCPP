@@ -17,6 +17,8 @@
 
 #include "structures/singleton.h"
 
+#include "component/camera.h"
+
 namespace dc
 {
 	// ===========================================================
@@ -44,6 +46,8 @@ namespace dc
 	public:
 		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
 		
+		void Camera(CCameraComponent* camera) { mp_currentCamera = camera; }
+		
 		void AddVertexProperty(const char* name, const unsigned int size);
 		
 		const TVertexPropertyMap& VertexProperties() const;
@@ -69,19 +73,23 @@ namespace dc
 		// ===========================================================
 	public:
 		void Initialize();
+		
 		void Terminate();
 		
 		void Prepare();
 		
 		void Render();
 		
+		void Finish();
+		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		CRenderLayerManager*	mp_renderLayerMgr;
-		TVertexPropertyMap		m_vertexProperties;
+		CRenderLayerManager*			mp_renderLayerMgr;
+		TVertexPropertyMap				m_vertexProperties;
 		
+		CCameraComponent*				mp_currentCamera;
     };
 	
 	// ===========================================================

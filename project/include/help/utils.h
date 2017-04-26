@@ -55,14 +55,14 @@ private:
  * @return string, una cadena de caracteres
  */
 template <class C>
-std::string Data2string(const C& data)
+inline std::string Data2string(const C& data)
 {
 	std:: stringstream flow;
 	flow << data;
 	return(flow.str());
 }
 
-const bool IsInString(const std::string& strString, const std::string& strSubString)
+inline const bool IsInString(const std::string& strString, const std::string& strSubString)
 {
 	
 	if(strString.length() <= 0 || strSubString.length() <= 0)

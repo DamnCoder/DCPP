@@ -8,18 +8,31 @@
 
 #include "rendersubsystem.h"
 
+#include "app.h"
+
 namespace dc
 {
 	void CRenderSubsystem::Initialize()
 	{
 		mp_renderer = CRenderer::New();
 		mp_renderer->Initialize();
+		
+		mp_windowSubsystem = CApp::Instance().GetSubsystem<CWindowSubsystem>();
+	}
+	
+	void CRenderSubsystem::PrepareUpdate()
+	{
+		mp_renderer->Prepare();
 	}
 	
 	void CRenderSubsystem::Run()
 	{
-		mp_renderer->Prepare();
 		mp_renderer->Render();
+	}
+	
+	void CRenderSubsystem::FinishUpdate()
+	{
+		mp_windowSubsystem->Window()->SwapBuffers();
 	}
 	
 	void CRenderSubsystem::Terminate()

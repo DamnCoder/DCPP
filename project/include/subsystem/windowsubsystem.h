@@ -41,6 +41,8 @@ namespace dc
 		{
 			m_displayInfo = displayInfo;
 		}
+		
+		IWindow* Window() const { return mp_window; }
 
 		// ===========================================================
 		// Constructors

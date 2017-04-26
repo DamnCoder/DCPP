@@ -30,7 +30,7 @@ namespace dc
 
 		currentPath[sizeof(currentPath) - 1] = '\0'; /* not really required */
 
-		printf ("The current working directory is %s", currentPath);
+		printf ("The current working directory is %s\n", currentPath);
 		return std::string(currentPath);
 	}
 }

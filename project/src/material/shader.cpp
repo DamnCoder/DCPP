@@ -67,6 +67,7 @@ namespace dc
 			int charsWritten = 0;
 			char infoLog[infologLength];
             glGetShaderInfoLog(shaderID, infologLength, &charsWritten, infoLog);
+			printf("%s\n", infoLog);
             //general::CLog::getInstance()->log(HE_LogLevel::INFO,"Shader log:\n\n"+log);
             return false;
         }

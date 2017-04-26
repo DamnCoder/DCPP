@@ -29,9 +29,9 @@ namespace dc
     {
 		mp_renderLayerMgr = CRenderLayerManager::New();
 		
-		AddVertexProperty(CVertexProperty::IN_VERTEX, 3);
-		AddVertexProperty(CVertexProperty::IN_NORMAL, 3);
-		AddVertexProperty(CVertexProperty::IN_UV0, 2);
+		AddVertexProperty(CVertexProperty::IN_VERTEX, CVertexProperty::VERTEX_SIZE);
+		AddVertexProperty(CVertexProperty::IN_NORMAL, CVertexProperty::NORMAL_SIZE);
+		AddVertexProperty(CVertexProperty::IN_UV0, CVertexProperty::UV_SIZE);
     }
 	
     void CRenderer::Terminate()
@@ -50,12 +50,26 @@ namespace dc
 	
 	void CRenderer::Render()
 	{
-		ClearScreen();
+		if(mp_currentCamera)
+		{
+			ClearScreen(mp_currentCamera->BackgroundColor());
+		}
+		else
+		{
+			ClearScreen();
+		}
 		
 		for(auto renderLayer : mp_renderLayerMgr->RenderLayerList())
 		{
 			renderLayer->Render();
 		}
 	}
-
+	
+	void CRenderer::Finish()
+	{
+		for(auto renderLayer : mp_renderLayerMgr->RenderLayerList())
+		{
+			renderLayer->Finish();
+		}
+	}
 }

@@ -40,7 +40,7 @@ namespace dc
 	// Methods
 	// ===========================================================
 	
-	void CMaterial::Activate()
+	void CMaterial::Activate() const
 	{
 		for(const auto& mapEntry : m_propertiesMap)
 		{
@@ -48,7 +48,15 @@ namespace dc
 		}
 	}
 	
-	void CMaterial::AddProperty(const char* name, IProperty* property)
+	void CMaterial::Deactivate() const
+	{
+		for(const auto& mapEntry : m_propertiesMap)
+		{
+			mapEntry.second->Deactivate();
+		}
+	}
+	
+	void CMaterial::AddIProperty(const char* name, IProperty* property)
 	{
 		assert(name && property && "[CMaterial::AddProperty] Name or property, or both, are NULL!");
 		m_propertiesMap[name] = property;

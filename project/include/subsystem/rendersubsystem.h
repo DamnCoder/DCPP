@@ -11,8 +11,8 @@
 
 #include "runnablesubsystem.h"
 
+#include "windowsubsystem.h"
 #include "renderer/renderer.h"
-
 
 namespace dc
 {
@@ -58,8 +58,8 @@ namespace dc
 		void Terminate()		override;
 		
 		void Run()				override;
-		void PrepareUpdate()	override {}
-		void FinishUpdate()		override {}
+		void PrepareUpdate()	override;
+		void FinishUpdate()		override;
 
 		// ===========================================================
 		// Methods
@@ -69,11 +69,17 @@ namespace dc
 		// Fields
 		// ===========================================================
 	private:
-		CRenderer* mp_renderer;
+		CRenderer*			mp_renderer;
+		
+		CWindowSubsystem*	mp_windowSubsystem;
 	};
 	
 	// ===========================================================
 	// Class typedefs
+	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
 	// ===========================================================
 }
 

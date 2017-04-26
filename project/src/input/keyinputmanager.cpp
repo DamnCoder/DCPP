@@ -184,7 +184,9 @@ namespace dc
 		{
 			if(codeEntry.first == SDLK_UNKNOWN || codeEntry.first == keyEvent.keysym.sym)
 			{
-				codeEntry.second->Execute();
+				TKeySignal& signal = *codeEntry.second;
+				signal();
+				
 			}
 		}
 	}

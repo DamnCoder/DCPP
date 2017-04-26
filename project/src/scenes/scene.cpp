@@ -121,6 +121,9 @@ namespace dc
 		
 		// The Game Object is finally added into the scene, we call Awake
 		TComponentList& componentList = m_componentsMap[name];
+		
+		OnComponentsAdded(componentList);
+		
 		for(CComponent* component : newComponentList)
 		{
 			componentList.push_back(component);

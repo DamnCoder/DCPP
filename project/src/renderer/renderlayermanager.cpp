@@ -29,7 +29,8 @@ namespace dc
 		TLayerList::const_iterator first = m_layerList.begin();
 		TLayerList::const_iterator last = m_layerList.end();
 		unsigned int i = 0;
-		do
+		
+		while(first != last)
 		{
 			if(i == index)
 				return *first;
@@ -37,7 +38,6 @@ namespace dc
 			++first;
 			++i;
 		}
-		while(first != last);
 		
 		return "";
 	}
@@ -61,9 +61,14 @@ namespace dc
 		return i;
 	}
 	
+	const bool CRenderLayerManager::Exists(const char* name) const
+	{
+		return LayerIndex(name) < Count();
+	}
+	
 	CRenderLayer* CRenderLayerManager::Layer(const char* name)
 	{
-		assert(Exists(name) && "The render layer does not exist!");
+		assert(Exists(name) && "[CRenderLayerManager::Layer] The render layer does not exist!");
 		return m_renderLayerMap[name];
 	}
 	
@@ -96,9 +101,9 @@ namespace dc
 	
 	void CRenderLayerManager::Add(const char* name, CRenderLayer* renderLayer)
 	{
-		assert(name && renderLayer && "You are passing NULL pointers");
+		assert(name && renderLayer && "[CRenderLayerManager::Add] You are passing NULL pointers");
 		
-		assert(!Exists(name) && "You can't have duplicate layers");
+		assert(!Exists(name) && "[CRenderLayerManager::Add] You can't have duplicate layers");
 		
 		m_layerList.push_back(name);
 		
@@ -110,11 +115,11 @@ namespace dc
 	
 	void CRenderLayerManager::Remove(const char* name)
 	{
-		assert(name);
+		assert(name && "[CRenderLayerManager::Remove] You are passing NULL as a name!");
 
 		const unsigned int index = LayerIndex(name);
 		
-		assert(index < Count() && "You are trying to remove a non existent layer");
+		assert(index < Count() && "[CRenderLayerManager::Remove] You are trying to remove a non existent layer");
 		
 		m_layerList.erase(m_layerList.begin() + index);
 		
@@ -129,10 +134,4 @@ namespace dc
 		
 		delete renderLayer;
 	}
-	
-	const bool CRenderLayerManager::Exists(const char* name) const
-	{
-		return LayerIndex(name) < Count();
-	}
-
 }

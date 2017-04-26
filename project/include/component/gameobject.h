@@ -37,33 +37,30 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char*			Name()		const			{ return m_id; }
-		void				Name(const char* name)		{ m_id = name; }
+		const char*					Name()		const			{ return m_id; }
+		void						Name(const char* name)		{ m_id = name; }
 		
-		const char*			LayerName() const			{ return m_layer; }
-		void				LayerName(const char* name) { m_layer = name; }
+		const char*					LayerName() const			{ return m_layer; }
+		void						LayerName(const char* name) { m_layer = name; }
 		
-		const unsigned int	ComponentsNum(const char* compId) const;
+		const unsigned int			ComponentsNum(const char* compId) const;
+
+		const TComponentListTable&	ComponentsTable() const { return m_componentTable; }
 		
 		/**
 		 * Returns the first component of the specified type
 		 */
 		template<typename ComponentType>
-		ComponentType*	GetComponent() const;
+		ComponentType*				GetComponent() const;
 		
 		/**
 		 * Returns all the components of the specified type in an array
 		 */
 		template<typename ComponentType>
-		TComponentList	GetComponents() const;
+		std::vector<ComponentType*>	GetComponents() const;
 
-		const TComponentListTable&	ComponentsTable() const { return m_componentTable; }
-		
 	private:
-		const TComponentList* GetComponentList(const char* compId) const;
-		
-		template<typename ComponentType>
-		const TComponentList* GetComponentList() const;
+		const TComponentList&		GetComponents(const char* compId) const;
 		
 		// ===========================================================
 		// Constructors
@@ -94,33 +91,21 @@ namespace dc
 		// ===========================================================
 	public:
 		/**
-		 * Adds a previously created component
-		 */
-		CComponent* AddComponent(CComponent* component);
-		
-		/**
-		 * Removes the component from the GameObject and returns its ownership to the caller
-		 */
-		CComponent* RemoveComponent(const char* name);
-		CComponent* RemoveComponent(CComponent* component);
-		
-		/**
-		 * Removes the component from the GameObject and destroys it
-		 */
-		void DestroyComponent(CComponent* component);
-		
-		/**
 		 * Creates a component and adds it to the GameObject
 		 */
+		CComponent* AddComponent(CComponent* component);
+
 		template<typename ComponentType>
-		ComponentType* CreateComponent();
+		ComponentType* AddComponent();
 		
 		/**
 		 * Removes a component of the specified type from the GameObject and destroys it
 		 */
+		void RemoveComponent(const char* name);
+
 		template<typename ComponentType>
-		void DestroyComponent();
-		
+		void RemoveComponent();
+
 		// ===========================================================
 		// Fields
 		// ===========================================================
@@ -143,34 +128,29 @@ namespace dc
 	template<typename ComponentType>
 	ComponentType* CGameObject::GetComponent() const
 	{
-		CComponent* component = GetComponentList<ComponentType>()->front();
-		return component->CComponent::template DirectCast<ComponentType>();
+		ComponentType* component = GetComponents<ComponentType>().front();
+		return component;
 	}
 	
 	template<typename ComponentType>
-	TComponentList CGameObject::GetComponents() const
+	std::vector<ComponentType*> CGameObject::GetComponents() const
 	{
-		TComponentList& componentList = *GetComponentList<ComponentType>();
+		const TComponentList& componentList = GetComponents(ComponentType::TypeName());
 		
-		const unsigned int componentsCount = componentList.size();
-		TComponentList castedComponentList(componentsCount);
+		std::vector<ComponentType*> castedComponentList;
+		castedComponentList.reserve(componentList.size());
 		
-		for(const CComponent* component : componentList)
+		for(CComponent* component : componentList)
 		{
-			castedComponentList.push_back(component->DirectCast<ComponentType>());
+			ComponentType* castedComponent = component->DirectCast<ComponentType>();
+			castedComponentList.push_back(castedComponent);
 		}
 		
 		return castedComponentList;
 	}
 	
 	template<typename ComponentType>
-	const TComponentList* CGameObject::GetComponentList() const
-	{
-		return GetComponentList(ComponentType::TypeName());
-	}
-	
-	template<typename ComponentType>
-	ComponentType* CGameObject::CreateComponent()
+	ComponentType* CGameObject::AddComponent()
 	{
 		ComponentType* component = new ComponentType();
 		AddComponent(component);
@@ -178,7 +158,7 @@ namespace dc
 	}
 	
 	template<typename ComponentType>
-	void CGameObject::DestroyComponent()
+	void CGameObject::RemoveComponent()
 	{
 		CComponent* component = RemoveComponent(ComponentType::TypeName());
 		if(component)

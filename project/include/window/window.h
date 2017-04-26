@@ -55,6 +55,8 @@ namespace dc
     public:
         virtual void Initialize() = 0;
         virtual void Terminate() = 0;
+		
+		virtual void SwapBuffers() = 0;
         
     protected:
         TDisplayInfo m_displayInfo;

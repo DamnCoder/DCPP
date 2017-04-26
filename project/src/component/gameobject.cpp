@@ -16,27 +16,26 @@ namespace dc
 {
 	CGameObject::~CGameObject()
 	{
+		m_id = 0;
+		m_layer = 0;
 		SafeDelete(m_componentTable);
 	}
 	
 	const unsigned int CGameObject::ComponentsNum(const char* compId) const
 	{
-		return GetComponentList(compId)->size();
+		return GetComponents(compId).size();
 	}
 	
-	const TComponentList* CGameObject::GetComponentList(const char* compId) const
+	const TComponentList& CGameObject::GetComponents(const char* compId) const
 	{
 		const auto& componentsEntryIt = m_componentTable.find(compId);
-		if(componentsEntryIt != m_componentTable.end())
-		{
-			return &componentsEntryIt->second;
-		}
-		return 0;
+		assert(componentsEntryIt != m_componentTable.end() && "[CGameObject::GetComponents] You shouldn't be asking for Components that doesn't exist");
+		return componentsEntryIt->second;
 	}
 	
 	CComponent* CGameObject::AddComponent(CComponent* component)
 	{
-		assert(component && "Component is NULL");
+		assert(component && "[CGameObject::GetComponents] Component is NULL");
 		
 		component->GameObject(this);
 		TComponentList& componentList = m_componentTable[component->InstanceName()];
@@ -45,7 +44,7 @@ namespace dc
 		return component;
 	}
 	
-	CComponent* CGameObject::RemoveComponent(const char* name)
+	void CGameObject::RemoveComponent(const char* name)
 	{
 		TComponentListTable::iterator componentsEntryIt = m_componentTable.find(name);
 		if(componentsEntryIt != m_componentTable.end())
@@ -60,20 +59,7 @@ namespace dc
 				m_componentTable.erase(componentsEntryIt);
 			}
 			
-			return component;
+			delete component;
 		}
-		return 0;
-	}
-	
-	CComponent* CGameObject::RemoveComponent(CComponent* component)
-	{
-		return RemoveComponent(component->InstanceName());
-	}
-	
-	void CGameObject::DestroyComponent(CComponent* component)
-	{
-		CComponent* componentToRemove = RemoveComponent(component);
-		
-		SafeDelete(componentToRemove);
 	}
 }

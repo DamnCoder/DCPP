@@ -26,7 +26,9 @@ namespace dc
 		virtual ~IProperty() {}
 		
 	public:
-		virtual void Activate() = 0;
+		virtual void Activate() const = 0;
+		virtual void Deactivate() const = 0;
+		
 		virtual void CalculateOrder() = 0;
 	};
 	
@@ -59,31 +61,21 @@ namespace dc
 		// ===========================================================
 	public:
 		
-		const int	Order()		const { return m_order; }
+		const int	Order() const				{ return m_order; }
 		
-		const bool	Enabled()	const { return m_enabled;}
+		const bool	Enabled() const				{ return m_enabled;}
+		void		Enable(const bool enable)	{ m_enabled = enable; }
 		
-		void SetEnable(const bool enable) { m_enabled = enable; }
+		const int	Priority() const			{ return m_priority; }
+		void		Priority(const int priority)
+		{ m_priority = math::Clamp(priority, MIN_PRIO, MAX_PRIO); }
 		
-		const int	Priority()	const { return m_priority; }
+		const T&	Value() const			{ return m_value; }
+		void		Value(const T& value)	{ m_value = value; }
 		
-		void SetPriority(const int priority)
+		CSignal<void(const T&)>&	ActivationCallback()
 		{
-			m_priority = math::Clamp(priority, MIN_PRIO, MAX_PRIO);
-		}
-		
-		const T Value() const { return m_value; }
-		
-		void Value(const T value) { m_value = value; }
-		
-		void ActivationCallback(std::function<void(T)>& callback)
-		{
-			m_orderCallback.Connect(callback);
-		}
-		
-		void OrderCallback(std::function<int(T)>& callback)
-		{
-			m_orderCallback.Connect(callback);
+			return m_activationCallback;
 		}
 		
 		// ===========================================================
@@ -107,13 +99,15 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void Activate() override
+		void Activate() const override
 		{
 			if(Enabled())
 			{
 				m_activationCallback(m_value);
 			}
 		}
+		
+		void Deactivate() const override {}
 		
 		void CalculateOrder() override {}
 		// ===========================================================
@@ -128,9 +122,7 @@ namespace dc
 		
 		T					m_value;
 		
-		CSignal<void(T)>	m_activationCallback;
-		CSignal<int(T)>		m_orderCallback;
-		
+		CSignal<void(const T&)>	m_activationCallback;
 	};
 	
 	// ===========================================================

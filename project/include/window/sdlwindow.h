@@ -27,6 +27,8 @@ namespace dc
     public:
         void Initialize() override;
         void Terminate() override;
+		
+		void SwapBuffers() override;
         
     private:
         //The window we'll be rendering to

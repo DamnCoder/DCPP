@@ -22,14 +22,30 @@ namespace dc
 		
 		assert(mp_modelComponent && "[CRendererComponent::Initialize] You need a CModelComponent with a CRendererComponent");
 		
+		TMaterialArray materialArray = mp_modelComponent->Model()->Materials();
+		
+		for(CMaterial* material : materialArray)
+		{
+			AddMaterial(material);
+		}
+		
+		// We add ourselves to the render layer
 		CRenderLayer* renderLayer = CRenderer::Instance().RenderLayerManager()->Layer(GameObject()->LayerName());
 		renderLayer->Add(this);
+	}
+	
+	void CRendererComponent::Awake()
+	{
+		
 	}
 	
 	void CRendererComponent::Terminate()
 	{
 		CRenderLayer* renderLayer = CRenderer::Instance().RenderLayerManager()->Layer(GameObject()->LayerName());
 		renderLayer->Remove(this);
+		
+		mp_modelComponent = 0;
+		m_materialList.clear();
 	}
 	
 	void CRendererComponent::AddMaterial(CMaterial* material)
@@ -39,38 +55,16 @@ namespace dc
 		m_materialList.push_back(material);
 	}
 	
-	void CRendererComponent::Render()
+	void CRendererComponent::SetMaterial(const unsigned int index, CMaterial* material)
 	{
-		extern void DrawElements(const ETopology& topology, const unsigned int indexCount);
-
-		TMeshArray& meshArray = mp_modelComponent->Model()->MeshArray();
+		assert(material && "[CRendererComponent::SetMaterial] The material is NULL");
+		assert(index < m_materialList.size() && "[CRendererComponent::SetMaterial] The index is out of bounds!");
 		
-		for(CMesh* mesh : meshArray)
-		{
-			// Submission of VBO's
-			
-			TVertexProperty2VBOMap& dataVBOMap = mp_modelComponent->DataVBOMap(mesh);
-			for(const auto& dataVBOEntry : dataVBOMap)
-			{
-				const TFloatVBO& dataVBOArray = dataVBOEntry.second;
-				
-				TFloatVBO::Submit(dataVBOArray);
-			}
-			
-			TUIntVBO& indexVBO = mp_modelComponent->IndexVBO(mesh);
-			TUIntVBO::Submit(indexVBO);
-			
-			// Activation of VBO
-			for(const auto& dataVBOEntry : dataVBOMap)
-			{
-				const CVertexProperty* vertexProperty = dataVBOEntry.first;
-				const TFloatVBO& dataVBOArray = dataVBOEntry.second;
-				
-				CVertexProperty::Activate(vertexProperty->Id(), dataVBOArray.Id(), dataVBOArray.TypeSize());
-			}
-			
-			// Drawing
-			DrawElements(ETopology::TRIANGLES, mesh->IndexCount());
-		}
+		CMaterial* previousMaterial = m_materialList[index];
+		
+		m_materialList[index] = material;
+		
+		mp_modelComponent->SwapMaterials(previousMaterial, material);
 	}
+
 }

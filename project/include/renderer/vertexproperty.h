@@ -30,38 +30,27 @@ namespace dc
 		static const char* IN_UV0;
 		static const char* IN_COLOR;
 		
+		static const unsigned int VERTEX_SIZE;
+		static const unsigned int NORMAL_SIZE;
+		static const unsigned int UV_SIZE;
+		static const unsigned int COLOR_SIZE;
+		
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
-		static void Activate(const CVertexProperty& vertexProperty, const TFloatVBO& vbo)
+		static void Activate(const CVertexProperty& vertexProperty)
 		{
 			const GLuint attributeId = (GLuint)vertexProperty.Id();
 			glEnableVertexAttribArray(attributeId);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, (GLuint)vbo.Id());
+	
+			const GLint typeSize = (GLint)vertexProperty.Size();
 			glVertexAttribPointer(
 								  attributeId,				// attribute
-								  (GLint)vbo.TypeSize(),	// size
+								  typeSize,					// size
 								  GL_FLOAT,					// type
 								  GL_FALSE,					// normalized?
 								  0,						// stride
 								  (void*)0					// array buffer offset
-			);
-		}
-		
-		static void Activate(const unsigned int vertexPropertyId, const unsigned int vboId, const unsigned int elementSize)
-		{
-			const GLuint attributeId = (GLuint)vertexPropertyId;
-			glEnableVertexAttribArray(attributeId);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, (GLuint)vboId);
-			glVertexAttribPointer(
-								  attributeId,			// attribute
-								  (GLint)elementSize,	// size
-								  GL_FLOAT,				// type
-								  GL_FALSE,				// normalized?
-								  0,					// stride
-								  (void*)0				// array buffer offset
 			);
 		}
 		
@@ -74,19 +63,19 @@ namespace dc
 		{
 			if(strcmp(propertyName, IN_VERTEX) == 0)
 			{
-				return 3;
+				return VERTEX_SIZE;
 			}
 			else if(strcmp(propertyName, IN_NORMAL) == 0)
 			{
-				return 3;
+				return NORMAL_SIZE;
 			}
 			if(strcmp(propertyName, IN_UV0) == 0)
 			{
-				return 2;
+				return UV_SIZE;
 			}
 			if(strcmp(propertyName, IN_COLOR) == 0)
 			{
-				return 4;
+				return COLOR_SIZE;
 			}
 			return 0;
 		}

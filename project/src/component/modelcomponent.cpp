@@ -14,50 +14,26 @@
 
 namespace dc
 {
-	TUIntVBO& CModelComponent::IndexVBO(const CMesh* mesh)
+	const CVAO& CModelComponent::VAO(const CMaterial* material) const
 	{
-		assert(mesh && "[CModelComponent::IndexVBO] The mesh is NULL");
+		assert(material && "[CModelComponent::VAO] The material is NULL");
+		return m_vaoMap.at(material);
+	}
 
-		return m_uintVBOMap[mesh];
-	}
-	
-	TVertexProperty2VBOMap& CModelComponent::DataVBOMap(const CMesh* mesh)
-	{
-		assert(mesh && "[CModelComponent::DataVBO] The mesh is NULL");
-		return m_floatVBOMap[mesh];
-	}
-	
 	void CModelComponent::Initialize()
 	{
 		const TVertexPropertyMap& vertexPropertyMap = CRenderer::Pointer()->VertexProperties();
 
-		TMeshArray& meshArray = mp_model->MeshArray();
+		const TMaterialArray& materialArray = mp_model->Materials();
 		
-		for(CMesh* mesh : meshArray)
+		for(CMaterial* material : materialArray)
 		{
-			// Access to mesh index array
-			TUIntArray& indexArray = mesh->IndexArray();
-			TUIntVBO indexVBO = TUIntVBO::Create(indexArray, 1, EVBOTarget::ELEMENT_ARRAY, EVBOUsage::STREAM_DRAW);
+			CMesh* mesh = mp_model->Mesh(material);
 			
-			// Store of VBO for later use
-			m_uintVBOMap[mesh] = indexVBO;
+			CVAO vao = CVAO::Create(mesh, vertexPropertyMap);
+			CVAO::Submit(vao);
 			
-			
-			// To store VBOs for later use
-			TVertexProperty2VBOMap dataVBOMap = m_floatVBOMap[mesh];
-			
-			// Access to mesh data arrays
-			for(const auto& vertexPropertyEntry : vertexPropertyMap)
-			{
-				const char* propertyName = vertexPropertyEntry.first;
-				const CVertexProperty& vertexProperty = vertexPropertyEntry.second;
-				
-				const unsigned int elementNum = CVertexProperty::ElementNum(propertyName);
-				
-				TFloatArray& dataVBOArray = mesh->FloatDataArray(propertyName);
-				TFloatVBO dataVBO = TFloatVBO::Create(dataVBOArray, elementNum, EVBOTarget::ARRAY, EVBOUsage::STREAM_DRAW);
-				dataVBOMap[&vertexProperty] = dataVBO;
-			}
+			m_vaoMap[material] = vao;
 		}
 	}
 	
@@ -75,8 +51,19 @@ namespace dc
 		
 	}
 	
-	void CModelComponent::Render()
+	void CModelComponent::SwapMaterials(CMaterial* oldMaterial, CMaterial* newMaterial)
 	{
+		assert(oldMaterial && newMaterial && "[CModelComponent::SwapMaterials] One of the materials is NULL");
 		
+		TVAOMap::iterator it = m_vaoMap.find(oldMaterial);
+		
+		assert(it != m_vaoMap.end() && "[CModelComponent::SwapMaterials] The material you are trying to swap doesn't exist!");
+		
+		CVAO& vao = it->second;
+		m_vaoMap[newMaterial] = vao;
+		
+		m_vaoMap.erase(it);
+		
+		mp_model->SwapMaterials(oldMaterial, newMaterial);
 	}
 }

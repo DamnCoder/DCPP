@@ -18,6 +18,7 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	class CRenderSubsystem;
 	
 	class CSceneSubsystem : public IRunnableSubsystem
 	{
@@ -71,7 +72,7 @@ namespace dc
 		CScene* CreateScene(const char* name);
 		
 		void SetCurrentScene(const char* name);
-		
+
 		// ===========================================================
 		// Fields
 		// ===========================================================
@@ -79,6 +80,8 @@ namespace dc
 		CSceneManager*		mp_sceneManager;
 		
 		CScene*				mp_currentScene;
+		
+		CRenderSubsystem*	mp_renderSubsystem;
 
 	};
 	

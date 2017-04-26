@@ -11,10 +11,17 @@
 
 #include "app.h"
 
+#include "rendersubsystem.h"
+
+#include "renderer/renderer.h"
+
+#include "component/camera.h"
+
 namespace dc
 {
 	void CSceneSubsystem::Initialize()
 	{
+		mp_renderSubsystem = CApp::Instance().GetSubsystem<CRenderSubsystem>();
 		mp_sceneManager = new CSceneManager();
 	}
 	

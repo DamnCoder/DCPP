@@ -9,8 +9,23 @@
 #ifndef BitThemAll_glwraps_h
 #define BitThemAll_glwraps_h
 
-#include <OpenGL/gl.h>
+/* If using gl3.h */
+/* Ensure we are using opengl's core profile only */
+#define GL3_PROTOTYPES 1
+
+#include <OpenGL/gl3.h>
 #include <OpenGL/glext.h>
+
+/*
+ #ifdef __APPLE__
+ #define glGenVertexArrays glGenVertexArraysAPPLE
+ #define glBindVertexArray glBindVertexArrayAPPLE
+ #define glDeleteVertexArrays glDeleteVertexArraysAPPLE
+ #endif
+ */
+
+#include <math/vector3.h>
+#include <math/vector4.h>
 
 namespace dc
 {
@@ -54,9 +69,30 @@ namespace dc
 		glDrawElements((GLenum)topology, (GLsizei)indexCount, GL_UNSIGNED_SHORT, 0);
 	}
 	
+	inline void DrawArrays(const ETopology& topology, const unsigned int indexCount)
+	{
+		glDrawArrays((GLenum)topology,0, indexCount);
+	}
+	
+	inline void ClearScreen(const math::ColorRGBf& screenColor)
+	{
+		glClearColor(screenColor.r, screenColor.g, screenColor.b, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	
 	inline void ClearScreen()
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	
+	inline void ClearColor()
+	{
 		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	
+	inline void ClearDepth()
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 }
 

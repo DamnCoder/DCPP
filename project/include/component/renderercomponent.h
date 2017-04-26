@@ -43,7 +43,9 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		TMaterialList& MaterialList() { return m_materialList; }
+		const TMaterialList&	Materials()			const { return m_materialList; }
+		
+		CModelComponent*		ModelComponent()	const { return mp_modelComponent; }
 		
 		// ===========================================================
 		// Constructors
@@ -62,7 +64,7 @@ namespace dc
 		void Initialize() override;
 		void Terminate() override;
 		
-		void Awake() override {}
+		void Awake() override;
 		void Start() override {}
 		void Finish() override {}
 		void Sleep() override {}
@@ -72,7 +74,8 @@ namespace dc
 		// ===========================================================
 	public:
 		void AddMaterial(CMaterial* material);
-		void Render();
+		
+		void SetMaterial(const unsigned int index, CMaterial* material);
 		
 		// ===========================================================
 		// Fields

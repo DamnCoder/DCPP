@@ -53,6 +53,7 @@ namespace dc
 		const char*				LayerName(const unsigned int index) const;
 		const unsigned int		LayerIndex(const char* name) const;
 		
+		const bool				Exists(const char* name) const;
 		CRenderLayer*			Layer(const char* name);
 		
 		const unsigned int		Count() const;
@@ -84,8 +85,6 @@ namespace dc
 		
 		void Remove(const char* name);
 		
-		const bool Exists(const char* name) const;
-		
 		// ===========================================================
 		// Fields
 		// ===========================================================
@@ -97,6 +96,10 @@ namespace dc
 	
 	// ===========================================================
 	// Class typedefs
+	// ===========================================================
+	
+	// ===========================================================
+	// Template/Inline implementation
 	// ===========================================================
 }
 
