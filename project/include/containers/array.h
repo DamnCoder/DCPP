@@ -24,6 +24,8 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
+		const unsigned int GROW_NUM = 10;
+		
 		using iterator = T*;
 		using const_iterator = const T*;
 		
@@ -70,9 +72,9 @@ namespace dc
 		// ===========================================================
 	public:
 		CArray():
-			m_maxSize(0),
+			m_maxSize(GROW_NUM),
 			m_currentSize(0),
-			mp_data(0)
+			mp_data(new T[GROW_NUM])
 		{};
 		
 		CArray(const unsigned int maxSize):
@@ -144,7 +146,7 @@ namespace dc
 		 */
 		const T* At(const unsigned int index, const unsigned int dataLength) const
 		{
-			assert(IsInside(index + dataLength));
+			assert(IsInside(index + dataLength - 1));
 			T* outputData = new T[dataLength];
 			std::copy(mp_data + index, mp_data + index + dataLength, outputData);
 			return outputData;
@@ -159,14 +161,23 @@ namespace dc
 		
 		void Set(const unsigned int index, const T* data, const unsigned int dataLength)
 		{
-			assert(IsInside(index + dataLength));
+			unsigned int newLength = index + dataLength;
+			if(IsOutOfBounds(newLength))
+			{
+				unsigned int lengthAddition = newLength - m_maxSize;
+				Resize(lengthAddition);
+			}
 			std::copy(data, data + dataLength, mp_data+index);
 			m_currentSize = std::max<unsigned int>(m_currentSize, index + dataLength);
 		}
 		
 		void Append(const T& value)
 		{
-			assert(m_currentSize < m_maxSize);
+			unsigned int newLength = m_currentSize + 1;
+			if(IsOutOfBounds(newLength))
+			{
+				Resize(GROW_NUM);
+			}
 			mp_data[m_currentSize++] = value;
 		}
 		
