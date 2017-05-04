@@ -24,6 +24,8 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
+		const unsigned int GROW_NUM = 10;
+		
 		using iterator = T*;
 		using const_iterator = const T*;
 		
@@ -70,9 +72,9 @@ namespace dc
 		// ===========================================================
 	public:
 		CArray():
-			m_maxSize(0),
+			m_maxSize(GROW_NUM),
 			m_currentSize(0),
-			mp_data(0)
+			mp_data(new T[GROW_NUM])
 		{};
 		
 		CArray(const unsigned int maxSize):
@@ -166,7 +168,11 @@ namespace dc
 		
 		void Append(const T& value)
 		{
-			assert(m_currentSize < m_maxSize);
+			unsigned int newLength = m_currentSize + 1;
+			if(IsOutOfBounds(newLength))
+			{
+				Resize(GROW_NUM);
+			}
 			mp_data[m_currentSize++] = value;
 		}
 		
