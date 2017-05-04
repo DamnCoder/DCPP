@@ -7,6 +7,7 @@
 //
 
 #include "window/sdlwindow.h"
+
 #include <cassert>
 
 namespace dc
@@ -39,13 +40,7 @@ namespace dc
 		// Use Vsync
 		opCode = SDL_GL_SetSwapInterval( 1 );
 		assert(-1 < opCode && "[CSDLWindow::Initialize] Unable to set VSync!");
-		
-        //Get window surface
-        //m_screenSurface = SDL_GetWindowSurface( m_window );
-        
-        //Fill the surface white
-        //SDL_FillRect(m_screenSurface, NULL, SDL_MapRGB(m_screenSurface->format, 0xFF, 0xFF, 0xFF));
-    }
+	}
     
     void CSDLWindow::Terminate()
     {
@@ -57,7 +52,6 @@ namespace dc
 		
 		m_context = 0;
         m_window = 0;
-        m_screenSurface = 0;
         
         //Quit SDL subsystems
         SDL_Quit();

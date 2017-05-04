@@ -9,13 +9,13 @@
 #ifndef SDLWindow_hpp
 #define SDLWindow_hpp
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-
 #include "window.h"
+
+#include <SDL2/SDL.h>
 
 namespace dc
 {
+	
     class CSDLWindow : public IWindow
     {
     public:
@@ -32,10 +32,7 @@ namespace dc
         
     private:
         //The window we'll be rendering to
-        SDL_Window*		m_window = NULL;
-        
-        //The surface contained by the window
-        SDL_Surface*	m_screenSurface = NULL;
+        SDL_Window*		m_window;
 		
 		SDL_GLContext	m_context;
     };
