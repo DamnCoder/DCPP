@@ -13,12 +13,17 @@ namespace dc
 {
     struct TDisplayInfo
     {
+	public:
         unsigned int 	width;
         unsigned int 	height;
         unsigned int	bpp;
         const char* 	name;
         bool			fullscreen;
-        
+		
+	public:
+		const float AR() { return width / (float)height; }
+		
+	public:
         TDisplayInfo():
         	width(0),
 			height(0),
