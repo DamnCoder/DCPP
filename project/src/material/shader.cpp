@@ -8,7 +8,7 @@
 
 #include "shader.h"
 
-#include <OpenGL/gl.h>
+#include "renderer/glwraps.h"
 
 #include <assert.h>
 
@@ -20,7 +20,7 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
-	const bool CShader::CompilationSuccesful() const
+	const bool CShader::Compiled() const
 	{
 		int isCompiled;
 		glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &isCompiled);
@@ -29,7 +29,7 @@ namespace dc
 
     //------------------------------------------------------------//
 	
-	void CShader::Create(const char* shaderSrc)
+	void CShader::Create(char* src, const int size)
 	{
 		m_shaderID = glCreateShader(m_shaderType);
 		
@@ -37,7 +37,7 @@ namespace dc
 		// - number of elements in shader src array
 		// - array of shader src
 		// - lengths of each of the shader src
-		glShaderSource(m_shaderID, 1, &shaderSrc, NULL);
+		glShaderSource(m_shaderID, 1, &src, &size);
 	}
 	
 	//------------------------------------------------------------//
@@ -53,11 +53,11 @@ namespace dc
 	{
 		glCompileShader(m_shaderID);
 		PrintCompileInfoLog(m_shaderID);
-		assert(CompilationSuccesful() && "Shader compilation error");
+		assert(Compiled() && "Shader compilation error");
 	}
 	
     //------------------------------------------------------------//
-    bool CShader::PrintCompileInfoLog(GLuint shaderID)
+    bool CShader::PrintCompileInfoLog(const unsigned int shaderID)
     {
         int infologLength = 0;
         glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infologLength);
@@ -173,17 +173,44 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
+	void CShaderProgram::BindAttributeLocation(int index, const char* attribute)
+	{
+		// Bind attribute index 0 (coordinates) to in_Position and attribute index 1 (color) to in_Color
+		// Attribute locations must be setup before calling glLinkProgram
+		glBindAttribLocation(m_programID, index, attribute);
+	}
+	
+	//------------------------------------------------------------//
+	
 	void CShaderProgram::Link()
 	{
 		glLinkProgram(m_programID);
 		PrintLinkInfoLog(m_programID);
+		
+		int isLinked;
+		glGetProgramiv(m_programID, GL_LINK_STATUS, (int *)&isLinked);
+		
+		if (isLinked)
+		{
+			printf("Shader linked!\n");
+		}
+	}
+	
+	const int CShaderProgram::GetUniformHandle(const char* name)
+	{
+		GLint handle = glGetUniformLocation(m_programID, name);
+		if(handle != -1)
+		{
+			m_uniformMap[name] = handle;
+			return handle;
+		}
+		return -1;
 	}
 	
 	//------------------------------------------------------------//
 	
 	void CShaderProgram::PassFloat(const char* name, float value)
 	{
-		Activate();
 		GLint uniformLocation = glGetUniformLocation(m_programID, name);
 		if (uniformLocation != -1)
 		{
@@ -195,7 +222,6 @@ namespace dc
 	
 	void CShaderProgram::PassInteger(const char* name, int value)
 	{
-		Activate();
 		GLint uniformLocation = glGetUniformLocation(m_programID, name);
 		if (uniformLocation != -1)
 		{
@@ -207,7 +233,6 @@ namespace dc
 	
 	void CShaderProgram::PassVector3f(const char* name, const math::Vector3f& vector)
 	{
-		Activate();
 		GLint uniformLocation = glGetUniformLocation(m_programID, name);
 		if (uniformLocation !=-1)
 		{
@@ -219,7 +244,6 @@ namespace dc
 	
 	void CShaderProgram::PassVector4f(const char* name, const math::Vector4f& vector)
 	{
-		Activate();
 		GLint uniformLocation = glGetUniformLocation(m_programID, name);
 		if (uniformLocation != -1)
 		{
@@ -231,11 +255,9 @@ namespace dc
 	
 	void CShaderProgram::PassQuaternion(const char* name, const math::Quaternionf& quaternion)
 	{
-		Activate();
 		GLint uniformLocation = glGetUniformLocation(m_programID, name);
 		if (uniformLocation != -1)
 		{
-			
 			glUniform4fv(uniformLocation, 1, quaternion);
 		}
 	}
@@ -244,11 +266,12 @@ namespace dc
 	
 	void CShaderProgram::PassMatrix4x4f(const char* name, const math::Matrix4x4f& matrix)
 	{
-		Activate();
-		GLint v = glGetUniformLocation(m_programID, name);
-		if (v != -1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniformMatrix4fv(v, 1, GL_FALSE, matrix.m);
+			GLint uniformHandle = it->second;
+			const float* data = &matrix[0];
+			glUniformMatrix4fv(uniformHandle, 1, GL_FALSE, data);
 		}
 	}
 	
@@ -256,7 +279,6 @@ namespace dc
 	
 	void CShaderProgram::PassVector3fArray(const char* name, const math::Vector3f valor[], int size)
 	{
-		Activate();
 		GLint v = glGetUniformLocation(m_programID, name);
 		if (size>0 && v!=-1)
 		{
@@ -276,7 +298,6 @@ namespace dc
 	
 	void CShaderProgram::PassVector4fArray(const char* name, const math::Vector4f valor[], int size)
 	{
-		Activate();
 		GLint v = glGetUniformLocation(m_programID, name);
 		if (size>0 && v!=-1)
 		{
@@ -297,7 +318,6 @@ namespace dc
 	
 	void CShaderProgram::PassMat4x4fArray(const char* name, const math::Matrix4x4f valor[], int size)
 	{
-		Activate();
 		GLint v = glGetUniformLocation(m_programID, name);
 		if (size>0 && v!=-1)
 		{
@@ -318,7 +338,6 @@ namespace dc
 	
 	void CShaderProgram::PassQuaternionArray(const char* name, const math::Quaternionf valor[], int size)
 	{
-		Activate();
 		GLint v = glGetUniformLocation(m_programID, name);
 		if (size>0 && v!=-1)
 		{
@@ -337,7 +356,7 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
-	void CShaderProgram::PrintLinkInfoLog(const GLuint programID)
+	void CShaderProgram::PrintLinkInfoLog(const unsigned int programID)
 	{
 		int infologLength = 0;
 		int charsWritten  = 0;

@@ -9,13 +9,12 @@
 #ifndef __BitThemAll__shader__
 #define __BitThemAll__shader__
 
-#include <OpenGL/OpenGL.h>
+#include <map>
+#include <vector>
 
 #include "math/quaternion.h"
 #include "math/vector.h"
 #include "math/matrix.h"
-
-#include <vector>
 
 namespace dc
 {
@@ -32,13 +31,13 @@ namespace dc
     class CShader
     {
 	public:
-		const GLuint Identifier() const { return m_shaderID; }
-		const GLenum Type() const { return m_shaderType; }
+		const unsigned int	Identifier()	const { return m_shaderID; }
+		const unsigned int	Type()			const { return m_shaderType; }
 		
-		const bool CompilationSuccesful() const;
+		const bool			Compiled()		const;
 		
     public:
-		CShader(const GLenum type) : m_shaderType (type) {};
+		CShader(const unsigned int type) : m_shaderType (type) {};
 		
 		CShader(const CShader& copy) : m_shaderType (copy.Type()), m_shaderID (copy.Identifier()) {};
 		
@@ -57,17 +56,17 @@ namespace dc
 		}
 		
 	public:
-		void Create(const char* shaderSrc);
+		void Create(char* src, const int size);
 		void Destroy();
 		
 		void Compile();
 
     private:
-        bool PrintCompileInfoLog(GLuint obj);
+        bool PrintCompileInfoLog(const unsigned int obj);
         
     private:
-		GLenum			m_shaderType;
-		GLuint			m_shaderID;
+		unsigned int	m_shaderType;
+		unsigned int	m_shaderID;
     };
 	
 	/**
@@ -83,6 +82,7 @@ namespace dc
 	{
 	public:
 		using TShaderList = std::vector<CShader>;
+		using TUniformMap = std::map<const char*, int>;
 		
 	public:
 		const bool CorrectlyLinked() const;
@@ -118,7 +118,12 @@ namespace dc
 		void Activate() const;
 		void Deactivate() const;
 		
+		void BindAttributeLocation(int index, const char* attribute);
+		
 		void Link();
+		
+	public:
+		const int GetUniformHandle(const char* name);
 		
 	public:
 		void PassFloat	(const char* name, float value);
@@ -135,11 +140,12 @@ namespace dc
 		void PassMat4x4fArray	(const char* name, const math::Matrix4x4f value[], int size);
 		
 	private:
-		void PrintLinkInfoLog(const GLuint obj);
+		void PrintLinkInfoLog(const unsigned int obj);
 		
 	private:
-		GLuint		m_programID;
-		TShaderList	m_shaderList;
+		unsigned int	m_programID;
+		TShaderList		m_shaderList;
+		TUniformMap		m_uniformMap;
 	};
 }
 
