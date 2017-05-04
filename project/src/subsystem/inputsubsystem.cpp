@@ -82,10 +82,9 @@ namespace dc
 
 	void CInputSubsystem::Terminate()
 	{
-		for(CKeyInputManager* inputManager : m_inputManagerList)
-		{
-			SafeDelete(inputManager);
-		}
+		SafeDelete(mp_keyInputManager);
+		SafeDelete(mp_mouseInputManager);
+		
 		m_inputManagerList.clear();
 
 		mp_keyInputManager = 0;
