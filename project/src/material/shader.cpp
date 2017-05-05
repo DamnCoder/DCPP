@@ -9,6 +9,7 @@
 #include "shader.h"
 
 #include "renderer/glwraps.h"
+#include "renderer/renderer.h"
 
 #include <assert.h>
 
@@ -175,7 +176,7 @@ namespace dc
 	
 	void CShaderProgram::BindAttributeLocation(int index, const char* attribute)
 	{
-		// Bind attribute index 0 (coordinates) to in_Position and attribute index 1 (color) to in_Color
+		// Bind attribute to an specified index 
 		// Attribute locations must be setup before calling glLinkProgram
 		glBindAttribLocation(m_programID, index, attribute);
 	}
@@ -184,6 +185,16 @@ namespace dc
 	
 	void CShaderProgram::Link()
 	{
+		// Bind attribute locations first
+		const TVertexPropertyMap& vertexPropertyMap = CRenderer::Instance().VertexProperties();
+		
+		for(auto& entry : vertexPropertyMap)
+		{
+			const CVertexProperty& vertexProperty = entry.second;
+			BindAttributeLocation(vertexProperty.Id(), vertexProperty.Name());
+		}
+		
+		// Linking
 		glLinkProgram(m_programID);
 		PrintLinkInfoLog(m_programID);
 		

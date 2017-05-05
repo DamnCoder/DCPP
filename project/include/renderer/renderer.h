@@ -46,7 +46,8 @@ namespace dc
 	public:
 		CRenderLayerManager* RenderLayerManager() const { return mp_renderLayerMgr; }
 		
-		void Camera(CCameraComponent* camera) { mp_currentCamera = camera; }
+		CCameraComponent*	Camera() const						{ return mp_currentCamera; }
+		void				Camera(CCameraComponent* camera)	{ mp_currentCamera = camera; }
 		
 		void AddVertexProperty(const char* name, const unsigned int size);
 		

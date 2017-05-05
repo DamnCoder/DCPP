@@ -31,7 +31,8 @@ namespace dc
 		
 		AddVertexProperty(CVertexProperty::IN_VERTEX, CVertexProperty::VERTEX_SIZE);
 		AddVertexProperty(CVertexProperty::IN_NORMAL, CVertexProperty::NORMAL_SIZE);
-		AddVertexProperty(CVertexProperty::IN_UV0, CVertexProperty::UV_SIZE);
+		AddVertexProperty(CVertexProperty::IN_UV0	, CVertexProperty::UV_SIZE);
+		AddVertexProperty(CVertexProperty::IN_COLOR	, CVertexProperty::COLOR_SIZE);
     }
 	
     void CRenderer::Terminate()

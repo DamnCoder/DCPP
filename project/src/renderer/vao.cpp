@@ -17,9 +17,6 @@ namespace dc
 		GLuint identifier;
 		glGenVertexArrays(1, &identifier);
 		
-		// Access to mesh index array
-		TUIntVBO indexVBO = TUIntVBO::Create(mesh->IndexArray(), 1, EVBOTarget::ELEMENT_ARRAY, EVBOUsage::STREAM_DRAW);
-		
 		TBufferMap bufferMap;
 		// Access to mesh data arrays and relate them to the vertex properties
 		for(const auto& vertexPropertyEntry : vertexPropertyMap)
@@ -34,6 +31,9 @@ namespace dc
 			
 			bufferMap[&vertexProperty] = dataVBO;
 		}
+		
+		// Access to mesh index array
+		TUIntVBO indexVBO = TUIntVBO::Create(mesh->IndexArray(), 1, EVBOTarget::ELEMENT_ARRAY, EVBOUsage::STREAM_DRAW);
 		
 		return CVAO(identifier, indexVBO, bufferMap);
 	}

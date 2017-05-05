@@ -10,6 +10,8 @@
 
 #include <assert.h>
 
+#include "help/deletehelp.h"
+
 namespace dc
 {
 	// ===========================================================
@@ -34,6 +36,11 @@ namespace dc
 		
 		TPropertiesMap::const_iterator it = m_propertiesMap.find(name);
 		return it != m_propertiesMap.end();
+	}
+	
+	CMaterial::~CMaterial()
+	{
+		SafeDelete(m_propertiesMap);
 	}
 	
 	// ===========================================================

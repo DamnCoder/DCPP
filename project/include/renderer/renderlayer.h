@@ -18,7 +18,7 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	using TRenderBatchMap = std::map<const CMaterial*, TVAOList>;
+	using TRenderBatchMap = std::map<CMaterial*, std::vector<CRendererComponent*>>;
 	
     /**
      * \class RenderLayer

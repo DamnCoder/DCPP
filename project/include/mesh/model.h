@@ -45,9 +45,10 @@ namespace dc
 	public:
 		void					MeshArray(TMeshArray& meshArray) { m_meshArray = meshArray; }
 		
-		const TMeshArray&		MeshArray() const { return m_meshArray; }
+		const TMeshArray&		MeshArray() const	{ return m_meshArray; }
 		
-		const TMaterialArray&	Materials() const { return m_materialArray; }
+		const TMaterialArray&	Materials() const	{ return m_materialArray; }
+		TMaterialArray&			Materials()			{ return m_materialArray; }
 		
 		CMesh* Mesh(CMaterial* material);
 		

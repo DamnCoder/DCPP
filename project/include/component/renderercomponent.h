@@ -43,9 +43,10 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const TMaterialList&	Materials()			const { return m_materialList; }
+		const TMaterialList&	Materials()			const	{ return m_materialList; }
+		TMaterialList&			Materials()					{ return m_materialList; }
 		
-		CModelComponent*		ModelComponent()	const { return mp_modelComponent; }
+		CModelComponent*		ModelComponent()	const	{ return mp_modelComponent; }
 		
 		// ===========================================================
 		// Constructors

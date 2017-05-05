@@ -53,8 +53,7 @@ namespace dc
 			m_name(name)
 		{}
 		
-		~CMaterial()
-		{}
+		~CMaterial();
 		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
@@ -69,7 +68,7 @@ namespace dc
 		void Deactivate() const;
 		
 		template<typename PT>
-		void AddProperty(const char* name, const PT& propertyType);
+		void AddProperty(const char* name, const PT& propertyType, void(*activationCallback)(const PT&), void(*deactivationCallback)(const PT&));
 		
 	private:
 		void AddIProperty(const char* name, IProperty* property);
@@ -90,9 +89,13 @@ namespace dc
 	// Template/Inline implementation
 	// ===========================================================
 	template<typename PT>
-	void CMaterial::AddProperty(const char* name, const PT& propertyType)
+	void CMaterial::AddProperty(const char* name, const PT& propertyType, void(*activationCallback)(const PT&), void(*deactivationCallback)(const PT&))
 	{
-		AddIProperty(name, new CMaterialProperty<PT> (propertyType));
+		CMaterialProperty<PT>* property = new CMaterialProperty<PT> (propertyType);
+		property->ActivationSignal().Connect(activationCallback);
+		property->DeactivationSignal().Connect(deactivationCallback);
+		property->Enable(true);
+		AddIProperty(name, property);
 	}
 
 }

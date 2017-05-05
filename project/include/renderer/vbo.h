@@ -51,7 +51,7 @@ namespace dc
 		const EVBOUsage				Usage()			const { return m_usage; }
 		const CArray<ArrayType>&	DataArray()		const { return m_dataArray; }
 		const unsigned int			TypeSize()		const { return m_typeSize; }
-		const size_t				MemorySize()	const { return m_dataArray.Size() * sizeof(ArrayType) * m_typeSize; }
+		const size_t				MemorySize()	const { return m_dataArray.Size() * sizeof(ArrayType); }
 		
 		// ===========================================================
 		// Constructors
@@ -61,8 +61,7 @@ namespace dc
 			m_id(0),
 			m_typeSize(0),
 			m_target(EVBOTarget::ARRAY),
-			m_usage(EVBOUsage::STREAM_DRAW),
-			m_dataArray(0)
+			m_usage(EVBOUsage::STREAM_DRAW)
 		{}
 		
 		CVBO (const unsigned int identifier, const EVBOTarget target, const EVBOUsage usage, CArray<ArrayType> dataArray, const unsigned int typeSize):
@@ -130,7 +129,8 @@ namespace dc
 	void CVBO<ArrayType>::Submit(const CVBO<ArrayType>& vbo)
 	{
 		glBindBuffer(vbo.Target(), (GLuint)vbo.Id());
-		glBufferData(vbo.Target(), (GLsizeiptr)vbo.MemorySize(), vbo.DataArray(), vbo.Usage());
+		printf("Size %zu\n", vbo.MemorySize());
+		glBufferData(vbo.Target(), vbo.MemorySize(), vbo.DataArray().Data(), vbo.Usage());
 	}
 	
 	template<typename ArrayType>

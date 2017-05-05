@@ -45,7 +45,7 @@ namespace dc
 	
 	void CTransform::Reset()
 	{
-		m_matrix.Identity();
+		m_matrix.Identify();
 		mp_root = 0;
 		mp_parent = 0;
 		ml_childs.clear();
