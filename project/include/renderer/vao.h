@@ -77,12 +77,26 @@ namespace dc
 			m_bufferMap(bufferMap)
 		{}
 		
+		CVAO(const CVAO& vao):
+			m_id(vao.m_id),
+			m_indexVBO(vao.m_indexVBO),
+			m_bufferMap(vao.m_bufferMap)
+		{
+			
+		}
+		
 		~CVAO()
 		{}
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
-		
+	public:
+		void operator= (const CVAO& vao)
+		{
+			m_id = vao.m_id;
+			m_indexVBO = vao.m_indexVBO;
+			m_bufferMap = vao.m_bufferMap;
+		}
 		// ===========================================================
 		// Methods
 		// ===========================================================

@@ -66,15 +66,32 @@ namespace dc
 		
 		CVBO (const unsigned int identifier, const EVBOTarget target, const EVBOUsage usage, CArray<ArrayType> dataArray, const unsigned int typeSize):
 			m_id(identifier),
-			m_typeSize(0),
+			m_typeSize(typeSize),
 			m_target(target),
 			m_usage(usage),
 			m_dataArray(dataArray)
 		{}
 
+		CVBO (const CVBO<ArrayType>& vbo):
+			m_id(vbo.m_id),
+			m_typeSize(vbo.m_typeSize),
+			m_target(vbo.m_target),
+			m_usage(vbo.m_usage),
+			m_dataArray(vbo.m_dataArray)
+		{}
+		
 		// ===========================================================
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
+	public:
+		void operator= (const CVBO<ArrayType>& vbo)
+		{
+			m_id = vbo.m_id;
+			m_typeSize = vbo.m_typeSize;
+			m_target = vbo.m_target;
+			m_usage = vbo.m_usage;
+			m_dataArray = vbo.m_dataArray;
+		}
 		
 		// ===========================================================
 		// Methods
@@ -128,8 +145,7 @@ namespace dc
 	inline
 	void CVBO<ArrayType>::Submit(const CVBO<ArrayType>& vbo)
 	{
-		glBindBuffer(vbo.Target(), (GLuint)vbo.Id());
-		printf("Size %zu\n", vbo.MemorySize());
+		glBindBuffer(vbo.Target(), vbo.Id());
 		glBufferData(vbo.Target(), vbo.MemorySize(), vbo.DataArray().Data(), vbo.Usage());
 	}
 	

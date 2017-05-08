@@ -14,8 +14,11 @@ namespace dc
 {
 	CVAO CVAO::Create(CMesh* mesh, const TVertexPropertyMap& vertexPropertyMap)
 	{
+		printf("Generating VAO for %s\n", mesh->Name());
 		GLuint identifier;
 		glGenVertexArrays(1, &identifier);
+		
+		printf("VAO ID %d\n", identifier);
 		
 		TBufferMap bufferMap;
 		// Access to mesh data arrays and relate them to the vertex properties
@@ -27,14 +30,18 @@ namespace dc
 			TFloatArray& dataVBOArray = mesh->FloatDataArray(propertyName);
 			const unsigned int elementNum = vertexProperty.Size();
 			
-			TFloatVBO dataVBO = TFloatVBO::Create(dataVBOArray, elementNum, EVBOTarget::ARRAY, EVBOUsage::STREAM_DRAW);
+			TFloatVBO dataVBO = TFloatVBO::Create(dataVBOArray, elementNum, EVBOTarget::ARRAY, EVBOUsage::STATIC_DRAW);
+			
+			printf("Property %s\n", propertyName);
+			printf("Num of elements %u with type size %u\n", dataVBO.DataArray().Size(), dataVBO.TypeSize());
 			
 			bufferMap[&vertexProperty] = dataVBO;
 		}
 		
 		// Access to mesh index array
-		TUIntVBO indexVBO = TUIntVBO::Create(mesh->IndexArray(), 1, EVBOTarget::ELEMENT_ARRAY, EVBOUsage::STREAM_DRAW);
-		
+		TUIntVBO indexVBO = TUIntVBO::Create(mesh->IndexArray(), 1, EVBOTarget::ELEMENT_ARRAY, EVBOUsage::STATIC_DRAW);
+		printf("Indices\n");
+		printf("Num of elements %u with type size %u\n", indexVBO.DataArray().Size(), indexVBO.TypeSize());
 		return CVAO(identifier, indexVBO, bufferMap);
 	}
 	
@@ -49,6 +56,7 @@ namespace dc
 			const CVertexProperty& vertexProperty = *dataVBOEntry.first;
 			const TFloatVBO& dataVBOArray = dataVBOEntry.second;
 			
+			printf("%s\n", vertexProperty.Name());
 			TFloatVBO::Submit(dataVBOArray);
 			CVertexProperty::Activate(vertexProperty);
 		}
