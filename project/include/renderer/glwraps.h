@@ -66,7 +66,7 @@ namespace dc
 	
 	inline void DrawElements(const ETopology& topology, const unsigned int indexCount)
 	{
-		glDrawElements((GLenum)topology, (GLsizei)indexCount, GL_UNSIGNED_SHORT, 0);
+		glDrawElements(topology, indexCount, GL_UNSIGNED_INT, 0);
 	}
 	
 	inline void DrawArrays(const ETopology& topology, const unsigned int indexCount)

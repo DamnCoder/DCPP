@@ -28,7 +28,7 @@ namespace dc
 			}
 		}
 	}
-	
+
 	/*
 	 I need access to the camera's projection and view matrix
 	 
@@ -37,9 +37,9 @@ namespace dc
 	void CRenderLayer::Render()
 	{
 		CCameraComponent* camera = CRenderer::Instance().Camera();
-		math::Matrix4x4f projectionMatrix = camera->ProjectionMatrix();
-		math::Matrix4x4f viewMatrix = camera->ViewMatrix();
-		
+		const math::Matrix4x4f& projectionMatrix = camera->ProjectionMatrix();
+		const math::Matrix4x4f& viewMatrix = camera->ViewMatrix();
+
 		math::Matrix4x4f VP = projectionMatrix * viewMatrix;
 		math::Matrix4x4f modelMatrix;
 		math::Matrix4x4f MVP;
@@ -55,17 +55,10 @@ namespace dc
 			{
 				CGameObject* gameObject = renderComponent->GameObject();
 				CTransform* transform = gameObject->GetComponent<CTransform>();
-				//modelMatrix = transform->LocalMatrix();
 				modelMatrix = transform->WorldMatrix();
 				
 				MVP = VP * modelMatrix;
-				
-				math::Vector3f forward = viewMatrix.Forward();
-				
-				math::Vector3f position = modelMatrix.Translation();
-				printf("Camera forward [%f, %f, %f]\n", forward.x, forward.y, forward.z);
-				printf("position %s [%f, %f, %f]\n", gameObject->Name(), position.x, position.y, position.z);
-				
+
 				IProperty* property = material->GetProperty("ShaderProgram");
 				if(property)
 				{
