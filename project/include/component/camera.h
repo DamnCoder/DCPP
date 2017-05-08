@@ -86,7 +86,7 @@ namespace dc
 		void					ViewMatrix(const math::Matrix4x4f& viewMatrix) { m_viewMatrix = viewMatrix; }
 		
 		const math::Matrix4x4f& ProjectionMatrix() const { return m_projectionMatrix; }
-		void					ProjectionMatrix(const math::Matrix4x4f& projectionMatrix) { m_viewMatrix = projectionMatrix; }
+		void					ProjectionMatrix(const math::Matrix4x4f& projectionMatrix) { m_projectionMatrix = projectionMatrix; }
 		
 		// ===========================================================
 		// Constructors

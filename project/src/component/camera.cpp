@@ -24,8 +24,6 @@ namespace dc
 	
 	void CCameraComponent::Initialize()
 	{
-		Configure(FOV_DEF, AR_DEF, NEAR_DEF, FAR_DEF);
-		
 		CRenderer::Pointer()->Camera(this);
 	}
 	
