@@ -93,7 +93,8 @@ namespace dc
 		
 		CShaderProgram(const CShaderProgram& copy):
 			m_programID (copy.m_programID),
-			m_shaderList(copy.m_shaderList)
+			m_shaderList(copy.m_shaderList),
+			m_uniformMap(copy.m_uniformMap)
 		{}
 		
 	public:
@@ -101,6 +102,7 @@ namespace dc
 		{
 			m_programID = copy.m_programID;
 			m_shaderList = copy.m_shaderList;
+			m_uniformMap = copy.m_uniformMap;
 		}
 		
 	public:
@@ -123,7 +125,7 @@ namespace dc
 		void Link();
 		
 	public:
-		const int GetUniformHandle(const char* name);
+		const void CreateUniform(const char* name);
 		
 	public:
 		void PassFloat	(const char* name, float value);

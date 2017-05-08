@@ -207,25 +207,27 @@ namespace dc
 		}
 	}
 	
-	const int CShaderProgram::GetUniformHandle(const char* name)
+	const void CShaderProgram::CreateUniform(const char* name)
 	{
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		assert(it == m_uniformMap.end() && "[CShaderProgram::CreateUniform] The uniform you try to create already exist");
+		
 		GLint handle = glGetUniformLocation(m_programID, name);
-		if(handle != -1)
-		{
-			m_uniformMap[name] = handle;
-			return handle;
-		}
-		return -1;
+		
+		assert(handle != -1 && "[CShaderProgram::CreateUniform] Can't access the uniform location");
+		
+		m_uniformMap[name] = handle;
 	}
 	
 	//------------------------------------------------------------//
 	
 	void CShaderProgram::PassFloat(const char* name, float value)
 	{
-		GLint uniformLocation = glGetUniformLocation(m_programID, name);
-		if (uniformLocation != -1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniform1f(uniformLocation, value);
+			GLint uniformHandle = it->second;
+			glUniform1f(uniformHandle, value);
 		}
 	}
 	
@@ -233,10 +235,11 @@ namespace dc
 	
 	void CShaderProgram::PassInteger(const char* name, int value)
 	{
-		GLint uniformLocation = glGetUniformLocation(m_programID, name);
-		if (uniformLocation != -1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniform1i(uniformLocation, value);
+			GLint uniformHandle = it->second;
+			glUniform1i(uniformHandle, value);
 		}
 	}
 	
@@ -244,10 +247,11 @@ namespace dc
 	
 	void CShaderProgram::PassVector3f(const char* name, const math::Vector3f& vector)
 	{
-		GLint uniformLocation = glGetUniformLocation(m_programID, name);
-		if (uniformLocation !=-1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniform3fv(uniformLocation, 1, vector);
+			GLint uniformHandle = it->second;
+			glUniform3fv(uniformHandle, 1, vector);
 		}
 	}
 	
@@ -255,10 +259,11 @@ namespace dc
 	
 	void CShaderProgram::PassVector4f(const char* name, const math::Vector4f& vector)
 	{
-		GLint uniformLocation = glGetUniformLocation(m_programID, name);
-		if (uniformLocation != -1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniform4fv(uniformLocation, 1, vector);
+			GLint uniformHandle = it->second;
+			glUniform4fv(uniformHandle, 1, vector);
 		}
 	}
 	
@@ -266,10 +271,11 @@ namespace dc
 	
 	void CShaderProgram::PassQuaternion(const char* name, const math::Quaternionf& quaternion)
 	{
-		GLint uniformLocation = glGetUniformLocation(m_programID, name);
-		if (uniformLocation != -1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end())
 		{
-			glUniform4fv(uniformLocation, 1, quaternion);
+			GLint uniformHandle = it->second;
+			glUniform4fv(uniformHandle, 1, quaternion);
 		}
 	}
 	
@@ -290,9 +296,11 @@ namespace dc
 	
 	void CShaderProgram::PassVector3fArray(const char* name, const math::Vector3f valor[], int size)
 	{
-		GLint v = glGetUniformLocation(m_programID, name);
-		if (size>0 && v!=-1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end() && 0 < size)
 		{
+			GLint uniformHandle = it->second;
+
 			float lp[size*3];
 			int pos = 0;
 			for (int i = 0; i< size; ++i)
@@ -301,7 +309,7 @@ namespace dc
 				lp[pos++] = valor[i].y;
 				lp[pos++] = valor[i].z;
 			}
-			glUniform3fv(v, size, lp);
+			glUniform3fv(uniformHandle, size, lp);
 		}
 	}
 	
@@ -309,9 +317,11 @@ namespace dc
 	
 	void CShaderProgram::PassVector4fArray(const char* name, const math::Vector4f valor[], int size)
 	{
-		GLint v = glGetUniformLocation(m_programID, name);
-		if (size>0 && v!=-1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end() && 0 < size)
 		{
+			GLint uniformHandle = it->second;
+			
 			float lp[size * 4];
 			int pos = 0;
 			for (int i = 0; i< size; ++i)
@@ -321,7 +331,7 @@ namespace dc
 				lp[pos++] = valor[i].z;
 				lp[pos++] = valor[i].w;
 			}
-			glUniform4fv(v, size, lp);
+			glUniform4fv(uniformHandle, size, lp);
 		}
 	}
 	
@@ -329,9 +339,11 @@ namespace dc
 	
 	void CShaderProgram::PassMat4x4fArray(const char* name, const math::Matrix4x4f valor[], int size)
 	{
-		GLint v = glGetUniformLocation(m_programID, name);
-		if (size>0 && v!=-1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end() && 0 < size)
 		{
+			GLint uniformHandle = it->second;
+			
 			float lp[size * 16];
 			int pos = 0;
 			for (int i = 0; i< size; ++i)
@@ -341,7 +353,7 @@ namespace dc
 					lp[pos++] = valor[i].m[j];
 				}
 			}
-			glUniformMatrix4fv(v, size, GL_FALSE, lp);
+			glUniformMatrix4fv(uniformHandle, size, GL_FALSE, lp);
 		}
 	}
 	
@@ -349,9 +361,11 @@ namespace dc
 	
 	void CShaderProgram::PassQuaternionArray(const char* name, const math::Quaternionf valor[], int size)
 	{
-		GLint v = glGetUniformLocation(m_programID, name);
-		if (size>0 && v!=-1)
+		TUniformMap::iterator it = m_uniformMap.find(name);
+		if (it != m_uniformMap.end() && 0 < size)
 		{
+			GLint uniformHandle = it->second;
+			
 			float lp[size * 4];
 			int pos = 0;
 			for (int i = 0; i< size; ++i)
@@ -361,7 +375,7 @@ namespace dc
 				lp[pos++] = valor[i].z;
 				lp[pos++] = valor[i].w;
 			}
-			glUniform4fv(v, size, lp);
+			glUniform4fv(uniformHandle, size, lp);
 		}
 	}
 	
