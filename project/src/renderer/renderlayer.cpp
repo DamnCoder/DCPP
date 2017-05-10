@@ -66,7 +66,7 @@ namespace dc
 				{
 					CShaderProgram& shaderProgram = shaderProperty->Value();
 					shaderProgram.PassMatrix4x4f("MVP", MVP);
-					shaderProgram.PassInteger("TextureSampler", texture->Value().Id());
+					shaderProgram.PassInteger("TextureSampler", 0);
 				}
 				
 				const CVAO& vao = renderComponent->ModelComponent()->VAO(material);
