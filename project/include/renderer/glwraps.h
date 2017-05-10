@@ -64,6 +64,32 @@ namespace dc
 		FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
 	};
 	
+	enum EPixelFormat
+	{
+		RGB = GL_RGB,
+		BGR = GL_BGR,
+		RGBA = GL_RGBA,
+		BGRA = GL_BGRA
+	};
+	
+	enum EWrap
+	{
+		REPEAT = GL_REPEAT,
+		MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
+		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+		CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
+	};
+	
+	enum EFiltering
+	{
+		NEAREST = GL_NEAREST,
+		LINEAR = GL_LINEAR,
+		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
+	};
+	
 	inline void DrawElements(const ETopology& topology, const unsigned int indexCount)
 	{
 		glDrawElements(topology, indexCount, GL_UNSIGNED_INT, 0);
