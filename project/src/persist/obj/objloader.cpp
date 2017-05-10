@@ -93,7 +93,7 @@ namespace dc
 					   &vertexIndex[1], &uvIndex[1], &normalIndex[1],
 					   &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
 				
-				// Find common vertices and merge them
+				// Here we store the faces and if there is some duplicated we remove it
 				for(unsigned int i=0; i<3; ++i)
 				{
 					TPackedIndex packedIndex(vertexIndex[i]-1, uvIndex[i]-1, normalIndex[i]-1);
@@ -167,14 +167,12 @@ namespace dc
 				index = face.ivn;
 			}
 			
-			printf("%d %d %d\n", face.iv, face.ivt, face.ivn);
+			//printf("%d %d %d\n", face.iv, face.ivt, face.ivn);
 			
 			indexArray.Append(index);
 			
 			const math::Vector3f& v = tempVertexArray[face.iv];
 			vertexArray.Set(index*3, v, 3);
-			//const float* vArray = vertexArray.At(index, 3);
-			//printf("V %f %f %f\n", vArray[0], vArray[1], vArray[2]);
 			
 			const math::Vector2f& vt = tempUVArray[face.ivt];
 			uvArray.Set(index*2, vt, 2);
@@ -183,37 +181,8 @@ namespace dc
 			normalArray.Set(index*3, vn, 3);
 			
 			colorArray.Set(index*4, math::ColorRGBAf::White(), 4);
-			//printf("VT %d %f %f\n", index, vt[0], vt[1]);
-		}
-		/*
-		for(int i=0; i<vertexArray.Size(); i+=3)
-		{
-			const float* vArray = vertexArray.At(i, 3);
-			printf("V %f %f %f\n", vArray[0], vArray[1], vArray[2]);
-			delete[] vArray;
-		}
-		
-		for(int i=0; i<uvArray.Size(); i+=2)
-		{
-			const float* vArray = uvArray.At(i, 2);
-			printf("VT %f %f\n", vArray[0], vArray[1]);
-			delete[] vArray;
 		}
 
-		for(int i=0; i<normalArray.Size(); i+=3)
-		{
-			const float* vArray = normalArray.At(i, 3);
-			printf("VN %f %f %f\n", vArray[0], vArray[1], vArray[2]);
-			delete[] vArray;
-		}
-		
-		for(int i=0; i<colorArray.Size(); i+=4)
-		{
-			const float* vArray = colorArray.At(i, 4);
-			printf("VC %f %f %f %f\n", vArray[0], vArray[1], vArray[2], vArray[3]);
-			delete[] vArray;
-		}
-		*/
 		printf("Buffers size %u\n", vertexArray.Size()/3);
 		printf("Num indices %u\n", indexArray.Size());
 
