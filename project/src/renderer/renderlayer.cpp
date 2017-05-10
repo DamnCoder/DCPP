@@ -59,11 +59,14 @@ namespace dc
 				
 				MVP = VP * modelMatrix;
 
-				IProperty* property = material->GetProperty("ShaderProgram");
-				if(property)
+				auto* texture = material->GetTypedProperty<CTexture>("Texture");
+				
+				auto* shaderProperty = material->GetTypedProperty<CShaderProgram>("ShaderProgram");
+				if(shaderProperty && texture)
 				{
-					CMaterialProperty<CShaderProgram>* shaderProperty = static_cast<CMaterialProperty<CShaderProgram>*>(property);
-					shaderProperty->Value().PassMatrix4x4f("MVP", MVP);
+					CShaderProgram& shaderProgram = shaderProperty->Value();
+					shaderProgram.PassMatrix4x4f("MVP", MVP);
+					shaderProgram.PassInteger("TextureSampler", texture->Value().Id());
 				}
 				
 				const CVAO& vao = renderComponent->ModelComponent()->VAO(material);
