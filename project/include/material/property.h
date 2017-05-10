@@ -15,6 +15,7 @@
 #include "signals/signal.h"
 
 #include "material/shader.h"
+#include "material/texture.h"
 
 namespace dc
 {
@@ -33,14 +34,24 @@ namespace dc
 		virtual void Deactivate() const = 0;
 	};
 	
-	inline void ActivateShader(const CShaderProgram& program)
+	inline void Activate(const CShaderProgram& program)
 	{
 		program.Activate();
 	}
 	
-	inline void DeactivateShader(const CShaderProgram& program)
+	inline void Deactivate(const CShaderProgram& program)
 	{
 		program.Deactivate();
+	}
+	
+	inline void Activate(const CTexture& texture)
+	{
+		CTexture::Activate(texture);
+	}
+	
+	inline void Deactivate(const CTexture& texture)
+	{
+		CTexture::Deactivate();
 	}
 	
 	/**
@@ -61,9 +72,6 @@ namespace dc
 		
 		using TPropertySignal = CSignal<void(const T&)>;
 		
-		const int MIN_PRIO = 0;
-		const int MAX_PRIO = 9;
-		
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
@@ -77,13 +85,8 @@ namespace dc
 		// ===========================================================
 	public:
 		
-		const int			Order() const					{ return m_order; }
-		
 		const bool			Enabled() const					{ return m_enabled;}
 		void				Enable(const bool enable)		{ m_enabled = enable; }
-		
-		const int			Priority() const				{ return m_priority; }
-		void				Priority(const int priority)	{ m_priority = math::Clamp(priority, MIN_PRIO, MAX_PRIO); }
 		
 		T&					Value()							{ return m_value; }
 		const T&			Value() const					{ return m_value; }
@@ -98,8 +101,6 @@ namespace dc
 	public:
 		CMaterialProperty(const T& property):
 			m_enabled(false),
-			m_priority(0),
-			m_order(0),
 			m_value(property)
 		{}
 		
@@ -136,8 +137,6 @@ namespace dc
 	protected:
 		
 		bool			m_enabled;
-		int				m_priority;
-		int				m_order;
 		
 		T				m_value;
 		

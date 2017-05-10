@@ -39,11 +39,14 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char* Name() const { return m_name; }
+		const char*				Name() const { return m_name; }
 		
-		IProperty*	GetProperty(const char* name);
+		template<typename PT>
+		CMaterialProperty<PT>*	GetTypedProperty(const char* name);
 		
-		const bool	Exists(const char* name) const;
+		IProperty*				GetProperty(const char* name);
+		
+		const bool				Exists(const char* name) const;
 		
 		// ===========================================================
 		// Constructors
@@ -89,6 +92,18 @@ namespace dc
 	// Template/Inline implementation
 	// ===========================================================
 	template<typename PT>
+	CMaterialProperty<PT>*	CMaterial::GetTypedProperty(const char* name)
+	{
+		IProperty* property = GetProperty(name);
+		if(property)
+		{
+			return static_cast<CMaterialProperty<PT>*>(property);
+		}
+		return 0;
+	}
+	
+	template<typename PT>
+	inline
 	void CMaterial::AddProperty(const char* name, const PT& propertyType, void(*activationCallback)(const PT&), void(*deactivationCallback)(const PT&))
 	{
 		CMaterialProperty<PT>* property = new CMaterialProperty<PT> (propertyType);
