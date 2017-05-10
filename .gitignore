@@ -7,3 +7,4 @@ utilities/CMakeConfigure/CMakeConfigure/obj
 CMakeLists.txt
 externals
 utilities/NewClassProject
+CMakeConfigureProject.userprefs
