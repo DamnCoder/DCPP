@@ -5,8 +5,6 @@ namespace CMakeConfigure
 {
 	public static class CMakeHelper
 	{
-		public static readonly string EXTERNAL_KEY = "#[EXTERNAL_PROJECTS]";
-
 		public static void AddWhereKeys(List<string> cmakeLineList, Dictionary<string, List<string>> newLinesTable)
 		{
 			for (int i = 0; i < cmakeLineList.Count; ++i) 
@@ -65,9 +63,21 @@ namespace CMakeConfigure
 			return "INCLUDE_DIRECTORIES("+path+")";
 		}
 
-		public static string AddSubdirectory(string path)
+		public static List<string> AddMultipleSubdirectory(List<string> nameList)
 		{
-			return "ADD_SUBDIRECTORY("+path+")";
+			List<string> subdirectoryLines = new List<string>();
+
+			foreach(string name in nameList)
+			{
+				subdirectoryLines.Add(AddSubdirectory(name));
+			}
+			return subdirectoryLines;
+		}
+
+		public static string AddSubdirectory(string name)
+		{
+			return 	"ADD_SUBDIRECTORY(${EXTERNALS_PATH}/"+name+"/project ${PROJECT_BINARY_DIR}/"+name+")\n"+
+					"INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/"+name+"/project/include)\n";
 		}
 	}
 }
