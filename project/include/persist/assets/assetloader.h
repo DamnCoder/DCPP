@@ -1,14 +1,19 @@
 //
-//	textureloader
+//	assetloader
 //	DCPP
 //
-//	Created by Jorge López González on 09/05/2017 12:08:52.
+//	Created by Jorge López González on 25/05/2017 14:39:16.
 //
 
-#ifndef CTEXTURELOADER_H
-#define CTEXTURELOADER_H
+#ifndef CASSETLOADER_H
+#define CASSETLOADER_H
 
-#include "material/texture.h"
+#include "assets/assetmanager.h"
+
+#include <rapidjson/rapidjson.h>
+#include <rapidjson/document.h>
+
+using namespace rapidjson;
 
 namespace dc
 {
@@ -16,13 +21,13 @@ namespace dc
 	// External Enums / Typedefs for global usage
 	// ===========================================================
 	/**
-	 * \class CTextureLoader
+	 * \class CAssetLoader
 	 * \brief
 	 * \author Jorge López González
 	 *
 	 * Description.
 	 */
-class CTextureLoader
+class CAssetLoader
 {
 	// ===========================================================
 	// Constant / Enums / Typedefs internal usage
@@ -44,10 +49,10 @@ class CTextureLoader
 	// Constructors
 	// ===========================================================
 public:
-	CTextureLoader()
+	CAssetLoader()
 	{}
 
-	~CTextureLoader()
+	~CAssetLoader()
 	{}
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
@@ -56,8 +61,11 @@ public:
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	CTexture* Load(const char* path);
-
+public:
+	void Load(const char* path, CAssetManager& assetManager);
+	
+private:
+	void ReadTextures(rapidjson::Document& document, CAssetManager& assetManager);
 	// ===========================================================
 	// Fields
 	// ===========================================================
@@ -72,4 +80,4 @@ public:
 	// ===========================================================
 }
 
-#endif /* CTEXTURELOADER_H */
+#endif /* CASSETLOADER_H */

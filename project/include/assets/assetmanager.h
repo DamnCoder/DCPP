@@ -1,14 +1,18 @@
 //
-//	textureloader
+//	assetmanager
 //	DCPP
 //
-//	Created by Jorge López González on 09/05/2017 12:08:52.
+//	Created by Jorge López González on 25/05/2017 14:13:35.
 //
 
-#ifndef CTEXTURELOADER_H
-#define CTEXTURELOADER_H
+#ifndef CASSETMANAGER_H
+#define CASSETMANAGER_H
 
-#include "material/texture.h"
+#include <unordered_map>
+
+#include "material/shadermanager.h"
+#include "material/texturemanager.h"
+#include "mesh/meshmanager.h"
 
 namespace dc
 {
@@ -16,18 +20,18 @@ namespace dc
 	// External Enums / Typedefs for global usage
 	// ===========================================================
 	/**
-	 * \class CTextureLoader
+	 * \class CAssetManager
 	 * \brief
 	 * \author Jorge López González
 	 *
 	 * Description.
 	 */
-class CTextureLoader
+class CAssetManager
 {
 	// ===========================================================
 	// Constant / Enums / Typedefs internal usage
 	// ===========================================================
-	
+
 	// ===========================================================
 	// Static fields / methods
 	// ===========================================================
@@ -39,15 +43,20 @@ class CTextureLoader
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
+public:
+	TMeshManager&			MeshManager()		{ return m_meshManager; }
+	TTextureManager&		TextureManager()	{ return m_textureManager; }
+	TShaderManager&			ShaderManager()		{ return m_shaderManager; }
+	TShaderProgramManager&	ShaderProgManager()	{ return m_shaderProgManager; }
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 public:
-	CTextureLoader()
+	CAssetManager()
 	{}
 
-	~CTextureLoader()
+	~CAssetManager()
 	{}
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
@@ -56,11 +65,15 @@ public:
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	CTexture* Load(const char* path);
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
+private:
+	TMeshManager			m_meshManager;
+	TTextureManager			m_textureManager;
+	TShaderManager			m_shaderManager;
+	TShaderProgramManager	m_shaderProgManager;
 };
 
 	// ===========================================================
@@ -72,4 +85,4 @@ public:
 	// ===========================================================
 }
 
-#endif /* CTEXTURELOADER_H */
+#endif /* CASSETMANAGER_H */

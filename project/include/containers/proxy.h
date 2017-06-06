@@ -34,7 +34,7 @@ namespace dc
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
 	private:
-		using TProxyPair	= std::pair<int, T>;
+		using TProxyPair	= std::pair<int, T*>;
 		using TProxyMap		= std::map<const char*, TProxyPair>;
 		
 		// ===========================================================
@@ -72,11 +72,12 @@ namespace dc
 		// ===========================================================
 		
     public:
-		void		Add(const char* key, T element);
-		T&			Get(const char* key);
+		void		Add(const char* key, T* element);
+		T&			GetRef(const char* key);
+		T*			GetPtr(const char* key);
 		
         template<typename ST>
-		ST			GetTyped(const char* key);
+		ST*			GetTyped(const char* key);
 		
 		void		Remove(const char* key);
 		void		Clear();
@@ -101,14 +102,21 @@ namespace dc
 	// ===========================================================
 	template<typename T>
 	inline
-	void CProxy<T>::Add(const char* key, T element)
+	void CProxy<T>::Add(const char* key, T* element)
 	{
 		m_proxy[key] = TProxyPair(1, element);
 	}
 	
 	template<typename T>
 	inline
-	T& CProxy<T>::Get(const char* key)
+	T& CProxy<T>::GetRef(const char* key)
+	{
+		return *GetPtr(key);
+	}
+
+	template<typename T>
+	inline
+	T* CProxy<T>::GetPtr(const char* key)
 	{
 		typename TProxyMap::iterator it = m_proxy.find(key);
 		
@@ -124,11 +132,11 @@ namespace dc
 	}
 	
 	template<typename T>
-	template<typename SpecializedType>
+	template<typename ST>
 	inline
-	SpecializedType CProxy<T>::GetTyped(const char* key)
+	ST* CProxy<T>::GetTyped(const char* key)
 	{
-		return static_cast<SpecializedType>(Get(key));
+		return static_cast<ST*>(GetPtr(key));
 	}
 	
 	template<typename T>
@@ -147,7 +155,9 @@ namespace dc
 		// If the reference counter reaches zero, we destroy the element
 		if(elementTuple->first == 0)
 		{
-			DeleteProxyPair(elementTuple);
+			m_proxy.erase(key);
+			delete elementTuple->second;
+			elementTuple->second = 0;
 		}
 	}
 	
@@ -160,7 +170,9 @@ namespace dc
 		end = m_proxy.end();
 		for(; it!=end; ++it)
 		{
-			DeleteProxyPair(it->second);
+			// We destroy the element stored
+			delete it->second;
+			it->second = 0;
 		}
 		
 		m_proxy.clear();
@@ -173,15 +185,6 @@ namespace dc
 		typename TProxyMap::const_iterator it, end; it = m_proxy.find(key);
 		assert(it != m_proxy.end());
 		return it->second;
-	}
-	
-	template<typename T>
-	inline
-	void CProxy<T>::DeleteProxyPair(TProxyPair& elementTuple)
-	{
-		// We destroy the element stored
-		delete elementTuple->second;
-		elementTuple->second = 0;
 	}
 }
 

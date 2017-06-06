@@ -56,6 +56,7 @@ INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 
 #[PRJ_INCLUDE]
 INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(include/assets)
 INCLUDE_DIRECTORIES(include/component)
 INCLUDE_DIRECTORIES(include/containers)
 INCLUDE_DIRECTORIES(include/dir)
@@ -72,6 +73,7 @@ INCLUDE_DIRECTORIES(include/structures)
 INCLUDE_DIRECTORIES(include/subsystem)
 INCLUDE_DIRECTORIES(include/types)
 INCLUDE_DIRECTORIES(include/window)
+INCLUDE_DIRECTORIES(include/persist/assets)
 INCLUDE_DIRECTORIES(include/persist/md3)
 INCLUDE_DIRECTORIES(include/persist/obj)
 INCLUDE_DIRECTORIES(include/persist/shader)
@@ -80,6 +82,7 @@ INCLUDE_DIRECTORIES(include/persist/texture)
 #[PRJ_HEADER_FILES]
 SET(HEADERS
 	include/app.h
+	include/assets/assetmanager.h
 	include/component/camera.h
 	include/component/component.h
 	include/component/gameobject.h
@@ -103,13 +106,16 @@ SET(HEADERS
 	include/material/material.h
 	include/material/property.h
 	include/material/shader.h
+	include/material/shadermanager.h
 	include/material/texture.h
 	include/material/texturemanager.h
 	include/mesh/mesh.h
+	include/mesh/meshmanager.h
 	include/mesh/model.h
 	include/mesh/vertices.h
 	include/nodes/graphicnode.h
 	include/persist/meshloader.h
+	include/persist/assets/assetloader.h
 	include/persist/md3/animationloader.h
 	include/persist/md3/md3loader.h
 	include/persist/md3/md3model.h
@@ -152,6 +158,7 @@ SET(HEADERS
 #[PRJ_SOURCE_FILES]
 SET(SOURCES
 	src/app.cpp
+	src/assets/assetmanager.cpp
 	src/component/camera.cpp
 	src/component/component.cpp
 	src/component/gameobject.cpp
@@ -171,6 +178,7 @@ SET(SOURCES
 	src/mesh/model.cpp
 	src/nodes/graphicnode.cpp
 	src/persist/meshloader.cpp
+	src/persist/assets/assetloader.cpp
 	src/persist/md3/animationloader.cpp
 	src/persist/md3/md3loader.cpp
 	src/persist/md3/md3model.cpp
@@ -215,6 +223,10 @@ INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/dcpp_math/project/include)
 
 ADD_SUBDIRECTORY(${EXTERNALS_PATH}/stb_image/project ${PROJECT_BINARY_DIR}/stb_image)
 INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/stb_image/project/include)
+
+ADD_SUBDIRECTORY(${EXTERNALS_PATH}/rapidjson/project ${PROJECT_BINARY_DIR}/rapidjson)
+INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/rapidjson/project/include)
+
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
 	${SDL2_LIBRARY}

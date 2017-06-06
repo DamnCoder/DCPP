@@ -11,7 +11,7 @@
 
 #include "component.h"
 
-#include "math/matrix.h"
+#include <math/matrix.h>
 
 namespace dc
 {

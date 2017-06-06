@@ -12,6 +12,8 @@
 #include <map>
 #include <vector>
 
+#include "renderer/vertexproperty.h"
+
 #include "math/quaternion.h"
 #include "math/vector.h"
 #include "math/matrix.h"
@@ -120,9 +122,9 @@ namespace dc
 		void Activate() const;
 		void Deactivate() const;
 		
-		void BindAttributeLocation(int index, const char* attribute);
+		void BindAttributeLocation(const int index, const char* attribute);
 		
-		void Link();
+		void Link(const TVertexPropertyMap& vertexPropertyMap);
 		
 	public:
 		const void CreateUniform(const char* name);

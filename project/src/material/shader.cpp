@@ -9,7 +9,6 @@
 #include "shader.h"
 
 #include "renderer/glwraps.h"
-#include "renderer/renderer.h"
 
 #include <assert.h>
 
@@ -142,7 +141,7 @@ namespace dc
 	
 	void CShaderProgram::AttachAll()
 	{
-		for(CShader& shader : m_shaderList)
+		for(const CShader& shader : m_shaderList)
 		{
 			glAttachShader(m_programID, shader.Identifier());
 		}
@@ -152,7 +151,7 @@ namespace dc
 	
 	void CShaderProgram::DetachAll()
 	{
-		for(CShader& shader : m_shaderList)
+		for(const CShader& shader : m_shaderList)
 		{
 			glDetachShader(m_programID, shader.Identifier());
 		}
@@ -174,7 +173,7 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
-	void CShaderProgram::BindAttributeLocation(int index, const char* attribute)
+	void CShaderProgram::BindAttributeLocation(const int index, const char* attribute)
 	{
 		// Bind attribute to an specified index 
 		// Attribute locations must be setup before calling glLinkProgram
@@ -183,12 +182,10 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
-	void CShaderProgram::Link()
+	void CShaderProgram::Link(const TVertexPropertyMap& vertexPropertyMap)
 	{
 		// Bind attribute locations first
-		const TVertexPropertyMap& vertexPropertyMap = CRenderer::Instance().VertexProperties();
-		
-		for(auto& entry : vertexPropertyMap)
+		for(const auto& entry : vertexPropertyMap)
 		{
 			const CVertexProperty& vertexProperty = entry.second;
 			BindAttributeLocation(vertexProperty.Id(), vertexProperty.Name());

@@ -1,29 +1,18 @@
 //
-//	textureloader
+//	assetmanager
 //	DCPP
 //
-//	Created by Jorge López González on 09/05/2017 12:08:52.
+//	Created by Jorge López González on 25/05/2017 14:13:35.
 //
 
-#ifndef CTEXTURELOADER_H
-#define CTEXTURELOADER_H
-
-#include "material/texture.h"
+#include "assetmanager.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
-	/**
-	 * \class CTextureLoader
-	 * \brief
-	 * \author Jorge López González
-	 *
-	 * Description.
-	 */
-class CTextureLoader
-{
+
 	// ===========================================================
 	// Constant / Enums / Typedefs internal usage
 	// ===========================================================
@@ -43,12 +32,7 @@ class CTextureLoader
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-public:
-	CTextureLoader()
-	{}
 
-	~CTextureLoader()
-	{}
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
@@ -56,12 +40,10 @@ public:
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	CTexture* Load(const char* path);
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
-};
 
 	// ===========================================================
 	// Class typedefs
@@ -71,5 +53,3 @@ public:
 	// Template/Inline implementation
 	// ===========================================================
 }
-
-#endif /* CTEXTURELOADER_H */

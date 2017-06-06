@@ -45,7 +45,7 @@ namespace dc
 		const bool			Exists(const CGameObject* gameObject);
 		
 		template<typename CT>
-		std::vector<CT*> GetSceneComponents();
+		std::vector<CT*>	GetSceneComponents();
 		
 		// ===========================================================
 		// Constructors

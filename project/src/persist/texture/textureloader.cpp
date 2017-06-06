@@ -46,9 +46,11 @@ namespace dc
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	CTexture CTextureLoader::Load(const char* path)
+	CTexture* CTextureLoader::Load(const char* path)
 	{
-		/* load an image file directly as a new OpenGL texture */
+		// This is needed to provide OpenGL with the texture flipped, which is the way OpenGL expects it
+		stbi_set_flip_vertically_on_load(true);
+		
 		int width, height, bpp;
 		int channels = 3;
 		unsigned char* textureData = stbi_load(path, &width, &height, &bpp, channels);
@@ -79,7 +81,7 @@ namespace dc
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		
-		return CTexture(textureID, width, height, EPixelFormat::RGB, EWrap::REPEAT, EFiltering::LINEAR, EFiltering::LINEAR_MIPMAP_LINEAR);
+		return new CTexture(textureID, width, height, EPixelFormat::RGB, EWrap::REPEAT, EFiltering::LINEAR, EFiltering::LINEAR_MIPMAP_LINEAR);
 	}
 	/*
 	CTexture CTextureLoader::Load(const char* path)
