@@ -5,5 +5,5 @@ utilities/Debug
 utilities/Release
 utilities/CMakeConfigure/CMakeConfigure/obj
 externals
-utilities/NewClassProject
 CMakeConfigureProject.userprefs
+utilities/NewClassProject/NewClass/obj

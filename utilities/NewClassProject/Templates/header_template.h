@@ -5,18 +5,18 @@
 //	Created by #AUTHOR on #DATE.
 //
 
-#ifndef #CLASS_NAME
-#define #CLASS_NAME
+#ifndef #CLASS_GUARD
+#define #CLASS_GUARD
 
-namespace #NAMESPACE_NAME
+namespace #NAMESPACE
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
 	/**
-	 * \class
+	 * \class #CLASS_NAME
 	 * \brief
-	 * \author Jorge Lopez Gonzalez
+	 * \author #AUTHOR
 	 *
 	 * Description.
 	 */
@@ -69,4 +69,4 @@ public:
 	// ===========================================================
 }
 
-#endif /* #CLASS_NAME */
+#endif /* #CLASS_GUARD */
