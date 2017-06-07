@@ -1,39 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
-
-# MACROS
-MACRO(SOURCE_GROUP_BY_FOLDER FILE_GROUP)
-
-	SET(SOURCE_GROUP_DELIMITER "/")
-	SET(last_dir "")
-	SET(files "")
-
-	FOREACH(file ${FILE_GROUP})
-
-		#FILE(RELATIVE_PATH relative_file ${ROOT_CPP_PATH} ${file})
-		#GET_FILENAME_COMPONENT(dir "${relative_file}" PATH)
-		GET_FILENAME_COMPONENT(dir "${file}" PATH)
-		#MESSAGE(STATUS ${dir})
-
-		IF (NOT "${dir}" STREQUAL "${last_dir}")
-			
-			IF (files)
-				SOURCE_GROUP("${last_dir}" FILES ${files})
-			ENDIF (files)
-			
-			SET(files "")
-
-		ENDIF (NOT "${dir}" STREQUAL "${last_dir}")
-		
-		SET(files ${files} ${file})
-		SET(last_dir "${dir}")
-
-	ENDFOREACH(file)
-
-	IF (files)
-		SOURCE_GROUP("${last_dir}" FILES ${files})
-	ENDIF (files)
-
-ENDMACRO(SOURCE_GROUP_BY_FOLDER)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 
 #[PROJECT_NAME]
 PROJECT(DCPP)
@@ -45,7 +10,13 @@ SET(CMAKE_BUILD_TYPE Debug)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake_modules)
+SET(CMAKE_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/../cmake_include)
 SET(EXTERNALS_PATH ${PROJECT_SOURCE_DIR}/../externals)
+
+INCLUDE(${CMAKE_INCLUDE_PATH}/CMake-Include.txt)
+
+INCLUDE("CMake-DCPPMath.txt")
+INCLUDE("CMake-DCPPSignals.txt")
 
 # FindSDL2.cmake
 FIND_PACKAGE(SDL2 REQUIRED)
@@ -215,23 +186,18 @@ SOURCE_GROUP_BY_FOLDER("${SOURCES}")
 SOURCE_GROUP_BY_FOLDER("${HEADERS}")
 
 #[EXTERNAL_PROJECTS]
-ADD_SUBDIRECTORY(${EXTERNALS_PATH}/dcpp_signals/project ${PROJECT_BINARY_DIR}/dcpp_signals)
-INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/dcpp_signals/project/include)
-
-ADD_SUBDIRECTORY(${EXTERNALS_PATH}/dcpp_math/project ${PROJECT_BINARY_DIR}/dcpp_math)
-INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/dcpp_math/project/include)
-
 ADD_SUBDIRECTORY(${EXTERNALS_PATH}/stb_image/project ${PROJECT_BINARY_DIR}/stb_image)
 INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/stb_image/project/include)
 
 ADD_SUBDIRECTORY(${EXTERNALS_PATH}/rapidjson/project ${PROJECT_BINARY_DIR}/rapidjson)
 INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/rapidjson/project/include)
 
-
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
 	${SDL2_LIBRARY}
 	${OPENGL_LIBRARIES}
 )
+
+ADD_DEPENDENCIES(${PROJECT_NAME} DCPPMath DCPPSignals)
 
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 11
