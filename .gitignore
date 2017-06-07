@@ -4,6 +4,5 @@ build_xcode
 utilities/Debug
 utilities/Release
 utilities/CMakeConfigure/CMakeConfigure/obj
-externals
 CMakeConfigureProject.userprefs
 utilities/NewClassProject/NewClass/obj
