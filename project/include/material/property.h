@@ -11,8 +11,8 @@
 
 #include <functional>
 
-#include "math/dcmath.h"
-#include "signals/signal.h"
+#include <math/dcmath.h>
+#include <signals/signal.h>
 
 #include "material/shader.h"
 #include "material/texture.h"
