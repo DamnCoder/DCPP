@@ -1,0 +1,12 @@
+[submodule "externals/dcpp_math"]
+	path = externals/dcpp_math
+	url = https://github.com/DamnCoder/dcpp_math.git
+[submodule "externals/dcpp_signals"]
+	path = externals/dcpp_signals
+	url = https://github.com/DamnCoder/dcpp_signals.git
+[submodule "utilities/CMakeConfigure"]
+	path = utilities/CMakeConfigure
+	url = https://DamnCoder@github.com/DamnCoder/CMakeConfigure.git
+[submodule "utilities/NewClassProject"]
+	path = utilities/NewClassProject
+	url = https://DamnCoder@github.com/DamnCoder/NewClassProject.git
