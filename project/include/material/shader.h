@@ -83,7 +83,7 @@ namespace dc
 	class CShaderProgram
 	{
 	public:
-		using TShaderList = std::vector<CShader>;
+		using TShaderList = std::vector<CShader*>;
 		using TUniformMap = std::map<const char*, int>;
 		
 	public:
@@ -111,8 +111,8 @@ namespace dc
 		void Create();
 		void Destroy();
 		
-		void Add(const CShader& shader);
-		void Remove(CShader& shader);
+		void Add(CShader* shader);
+		void Remove(CShader* shader);
 		
 		void Compile();
 		

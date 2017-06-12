@@ -10,6 +10,8 @@
 
 #include "assets/assetmanager.h"
 
+#include <string>
+
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
 
@@ -66,9 +68,15 @@ public:
 	
 private:
 	void ReadTextures(rapidjson::Document& document, CAssetManager& assetManager);
+	
+	void ReadShaders(rapidjson::Document& document, CAssetManager& assetManager);
+	
 	// ===========================================================
 	// Fields
 	// ===========================================================
+	
+private:
+	std::string m_rootPath;
 };
 
 	// ===========================================================

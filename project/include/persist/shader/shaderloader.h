@@ -54,7 +54,7 @@ namespace dc
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
 	public:
-		CShader Load(const char* filePath, const int type);
+		CShader* Load(const char* filePath, const int type);
 		
 		// ===========================================================
 		// Methods

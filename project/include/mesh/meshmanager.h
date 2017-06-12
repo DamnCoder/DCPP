@@ -13,7 +13,7 @@
 
 namespace dc
 {
-	using TMeshManager = CProxy<CMesh*>;
+	using TMeshManager = CProxy<CMesh>;
 }
 
 #endif /* MESHMANAGER_H */

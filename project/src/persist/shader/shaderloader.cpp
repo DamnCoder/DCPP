@@ -10,7 +10,7 @@
 
 namespace dc
 {
-	CShader CShaderLoader::Load(const char* filePath, const int type)
+	CShader* CShaderLoader::Load(const char* filePath, const int type)
 	{
 		FILE* fp = fopen(filePath, "r");
 		
@@ -45,8 +45,8 @@ namespace dc
 		}
 		
 		/* do your work here, buffer is a string contains the whole text */
-		CShader shader(type);
-		shader.Create(buffer, lSize);
+		CShader* shader = new CShader(type);
+		shader->Create(buffer, lSize);
 		
 		//printf("%s\n", buffer);
 		

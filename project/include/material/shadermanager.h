@@ -14,7 +14,7 @@
 
 namespace dc
 {
-	using TShaderManager = CProxy<CShader*>;
-	using TShaderProgramManager = CProxy<CShaderProgram*>;
+	using TShaderManager = CProxy<CShader>;
+	using TShaderProgramManager = CProxy<CShaderProgram>;
 }
 #endif /* CSHADERMANAGER_H */

@@ -99,9 +99,9 @@ namespace dc
 	{
 		DetachAll();
 		
-		for(CShader& shader : m_shaderList)
+		for(CShader* shader : m_shaderList)
 		{
-			shader.Destroy();
+			shader->Destroy();
 		}
 		
 		m_shaderList.clear();
@@ -111,14 +111,14 @@ namespace dc
 	
 	//------------------------------------------------------------//
 	
-	void CShaderProgram::Add(const CShader& shader)
+	void CShaderProgram::Add(CShader* shader)
 	{
 		m_shaderList.push_back(shader);
 	}
 	
 	//------------------------------------------------------------//
 	
-	void CShaderProgram::Remove(CShader& shader)
+	void CShaderProgram::Remove(CShader* shader)
 	{
 		TShaderList::iterator it = std::find(m_shaderList.begin(), m_shaderList.end(), shader);
 		
@@ -131,9 +131,9 @@ namespace dc
 	
 	void CShaderProgram::Compile()
 	{
-		for(CShader& shader : m_shaderList)
+		for(CShader* shader : m_shaderList)
 		{
-			shader.Compile();
+			shader->Compile();
 		}
 	}
 	
@@ -141,9 +141,9 @@ namespace dc
 	
 	void CShaderProgram::AttachAll()
 	{
-		for(const CShader& shader : m_shaderList)
+		for(const CShader* shader : m_shaderList)
 		{
-			glAttachShader(m_programID, shader.Identifier());
+			glAttachShader(m_programID, shader->Identifier());
 		}
 	}
 	
@@ -151,9 +151,9 @@ namespace dc
 	
 	void CShaderProgram::DetachAll()
 	{
-		for(const CShader& shader : m_shaderList)
+		for(const CShader* shader : m_shaderList)
 		{
-			glDetachShader(m_programID, shader.Identifier());
+			glDetachShader(m_programID, shader->Identifier());
 		}
 	}
 	
