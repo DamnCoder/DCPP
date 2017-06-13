@@ -1,9 +1,11 @@
 #!/bin/sh
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-FILE_OUTPUT="${DIR}/../project"
-TEMPLATES_PATH="${DIR}../utilities/NewClassProject/Templates"
 
-cd $DIR/../utilities/NewClassProject/NewClass/bin/Debug
+cd ${DIR}
+cd ..
 
-mono NewClass.exe $TEMPLATES_PATH $FILE_OUTPUT assetloader DCPP "Jorge López González" CAssetLoader dc persist/assets
+FILE_OUTPUT="./project"
+TEMPLATES_PATH="./utilities/NewClassProject/Templates"
+
+mono ./utilities/NewClassProject/NewClass/bin/Debug/NewClass.exe $TEMPLATES_PATH $FILE_OUTPUT timesubsystem DCPP "Jorge López González" CTimeSubsystem dc subsystem

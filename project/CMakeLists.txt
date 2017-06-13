@@ -9,8 +9,7 @@ SET(CMAKE_BUILD_TYPE Debug)
 # Set the output folders where the program will be created
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-#SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake_modules)
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../cmake_modules")
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake_modules)
 SET(CMAKE_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/../cmake_include)
 SET(EXTERNALS_PATH ${PROJECT_SOURCE_DIR}/../externals)
 
@@ -66,6 +65,7 @@ SET(HEADERS
 	include/help/deletehelp.h
 	include/help/filemanager.h
 	include/help/functor.h
+	include/help/timer.h
 	include/help/utils.h
 	include/input/inputdefs.h
 	include/input/inputmanagerfactory.h
@@ -117,6 +117,7 @@ SET(HEADERS
 	include/subsystem/scenesubsystem.h
 	include/subsystem/subsystem.h
 	include/subsystem/subsystemmanager.h
+	include/subsystem/timesubsystem.h
 	include/subsystem/windowsubsystem.h
 	include/types/rtti.h
 	include/window/sdlwindow.h
@@ -135,6 +136,7 @@ SET(SOURCES
 	src/component/renderercomponent.cpp
 	src/component/transform.cpp
 	src/help/filemanager.cpp
+	src/help/timer.cpp
 	src/input/inputmanagerfactory.cpp
 	src/input/keyinputmanager.cpp
 	src/input/mouseinputmanager.cpp
@@ -148,14 +150,14 @@ SET(SOURCES
 	src/nodes/graphicnode.cpp
 	src/persist/meshloader.cpp
 	src/persist/assets/assetloader.cpp
-	src/persist/md3/animationloader.cpp
+	src/persist/md3/AnimationLoader.cpp
 	src/persist/md3/md3loader.cpp
 	src/persist/md3/md3model.cpp
 	src/persist/md3/skinmodel.cpp
 	src/persist/obj/objloader.cpp
 	src/persist/shader/shaderloader.cpp
 	src/persist/texture/textureloader.cpp
-	src/physics/boundingbox.cpp
+	src/physics/BoundingBox.cpp
 	src/renderer/renderbatch.cpp
 	src/renderer/renderer.cpp
 	src/renderer/renderlayer.cpp
@@ -170,6 +172,7 @@ SET(SOURCES
 	src/subsystem/rendersubsystem.cpp
 	src/subsystem/scenesubsystem.cpp
 	src/subsystem/subsystemmanager.cpp
+	src/subsystem/timesubsystem.cpp
 	src/subsystem/windowsubsystem.cpp
 	src/window/sdlwindow.cpp
 	src/window/windowfactory.cpp
@@ -196,9 +199,9 @@ INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/stb_image/project/include)
 ADD_SUBDIRECTORY(${EXTERNALS_PATH}/rapidjson/project ${PROJECT_BINARY_DIR}/rapidjson)
 INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/rapidjson/project/include)
 
+
 ADD_SUBDIRECTORY(${EXTERNALS_PATH}/pathie ${PROJECT_BINARY_DIR}/pathie)
 INCLUDE_DIRECTORIES(${EXTERNALS_PATH}/pathie/include)
-
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
 	${SDL2_LIBRARY}
