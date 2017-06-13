@@ -11,6 +11,9 @@
 
 #include <persist/texture/textureloader.h>
 #include <persist/shader/shaderloader.h>
+#include <persist/obj/objloader.h>
+
+#include <pathie.hpp>
 
 namespace dc
 {
@@ -93,6 +96,7 @@ namespace dc
 		
 		ReadTextures(document, assetManager);
 		ReadShaders(document, assetManager);
+		ReadMeshes(document, assetManager);
 		
 		fclose(fp);
 		free(buffer);
@@ -100,29 +104,32 @@ namespace dc
 	
 	void CAssetLoader::ReadTextures(Document& document, CAssetManager& assetManager)
 	{
-		const char* TEXTURE_KEY = "texture";
+		const char* ASSET_GROUP_KEY = "texture";
 		const char* FOLDER_KEY = "folder";
 		const char* ASSETS_KEY = "assets";
 		
 		assert(document.IsObject());
-		assert(document.HasMember(TEXTURE_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
 		
 		CTextureLoader loader;
 
-		auto& textureObject = document[TEXTURE_KEY];
+		auto& assetGroupObj = document[ASSET_GROUP_KEY];
 		
-		const std::string folder = textureObject[FOLDER_KEY].GetString();
-		printf("Folder for textures %s\n", folder.c_str());
+		const std::string folder = assetGroupObj[FOLDER_KEY].GetString();
 		
-		const std::string textureFolder = m_rootPath+"/"+folder+"/";
+		Pathie::Path assetPath(m_rootPath);
+		assetPath.append(folder);
 		
-		auto& assetsObj = textureObject[ASSETS_KEY];
+		printf("Current dir %s\n", assetPath.c_str());
+		
+		auto& assetsObj = assetGroupObj[ASSETS_KEY];
 		for(auto& assetsEntry : assetsObj.GetObject())
 		{
 			const char* fileName = assetsEntry.name.GetString();
 			const char* fileType = assetsEntry.value.GetString();
 			
-			const std::string filePath = textureFolder + fileName;
+			Pathie::Path filePath(assetPath);
+			filePath.append(fileName);
 			
 			printf("file: %s, type: %s\n", filePath.c_str(), fileType);
 			
@@ -136,16 +143,16 @@ namespace dc
 	
 	void CAssetLoader::ReadShaders(Document& document, CAssetManager& assetManager)
 	{
-		const char* TEXTURE_KEY = "shader";
+		const char* ASSET_GROUP_KEY = "shader";
 		const char* FOLDER_KEY = "folder";
 		const char* ASSETS_KEY = "assets";
 		
 		assert(document.IsObject());
-		assert(document.HasMember(TEXTURE_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
 		
 		CShaderLoader loader;
 		
-		auto& textureObject = document[TEXTURE_KEY];
+		auto& textureObject = document[ASSET_GROUP_KEY];
 		
 		const std::string folder = textureObject[FOLDER_KEY].GetString();
 		printf("Folder for textures %s\n", folder.c_str());
@@ -177,5 +184,48 @@ namespace dc
 		}
 		
 		printf("All shaders loaded\n");
+	}
+	
+	void CAssetLoader::ReadMeshes(rapidjson::Document& document, CAssetManager& assetManager)
+	{
+		const char* ASSET_GROUP_KEY = "mesh";
+		const char* FOLDER_KEY = "folder";
+		const char* ASSETS_KEY = "assets";
+		
+		assert(document.IsObject());
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
+
+		auto& assetGroupObj = document[ASSET_GROUP_KEY];
+		
+		const std::string folder = assetGroupObj[FOLDER_KEY].GetString();
+		
+		Pathie::Path assetPath(m_rootPath);
+		assetPath.append(folder);
+		
+		printf("Current dir %s\n", assetPath.c_str());
+		
+		auto& assetsObj = assetGroupObj[ASSETS_KEY];
+		for(auto& assetsEntry : assetsObj.GetObject())
+		{
+			const char* fileName = assetsEntry.name.GetString();
+			const char* fileType = assetsEntry.value.GetString();
+			
+			Pathie::Path filePath(assetPath);
+			filePath.append(fileName);
+			
+			CMesh* mesh = 0;
+			if(strcmp(fileType, "OBJ") == 0)
+			{
+				CObjLoader loader;
+				CArray<CMesh*> meshArray = loader.Load(filePath.c_str());
+				mesh = meshArray[0];
+			}
+			
+			printf("file: %s, type: %s\n", filePath.c_str(), fileType);
+			
+			assetManager.MeshManager().Add(fileName, mesh);
+		}
+		
+		printf("All meshes loaded\n");
 	}
 }

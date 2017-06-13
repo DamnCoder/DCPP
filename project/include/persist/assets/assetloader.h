@@ -71,6 +71,8 @@ private:
 	
 	void ReadShaders(rapidjson::Document& document, CAssetManager& assetManager);
 	
+	void ReadMeshes(rapidjson::Document& document, CAssetManager& assetManager);
+	
 	// ===========================================================
 	// Fields
 	// ===========================================================

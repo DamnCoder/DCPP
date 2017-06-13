@@ -112,7 +112,6 @@ namespace dc
 		property->Enable(true);
 		AddIProperty(name, property);
 	}
-
 }
 
 #endif /* material_hpp */
