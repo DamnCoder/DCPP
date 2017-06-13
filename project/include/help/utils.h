@@ -44,6 +44,14 @@ private:
     const T* mp_searchedElement;
 };
 
+struct cmp_c_str
+{
+	const bool operator()(const char* a, const char* b) const
+	{
+		return std::strcmp(a, b) < 0;
+	}
+};
+
 //-----------------------------------------------------------------------
 // COMMON FUNCTIONS
 //-----------------------------------------------------------------------

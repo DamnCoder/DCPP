@@ -12,6 +12,7 @@
 
 #include <map>
 #include <utility>
+#include "help/utils.h"
 
 namespace dc
 {
@@ -35,7 +36,7 @@ namespace dc
 		// ===========================================================
 	private:
 		using TProxyPair	= std::pair<int, T*>;
-		using TProxyMap		= std::map<const char*, TProxyPair>;
+		using TProxyMap		= std::map<const char*, TProxyPair, cmp_c_str>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -125,10 +126,10 @@ namespace dc
 		TProxyPair& tuple = it->second;
 		
 		// First element corresponds to the reference counter
-		tuple->first += 1;
+		tuple.first += 1;
 		
 		// Second element is the pointer to the object stored
-		return tuple->second;
+		return tuple.second;
 	}
 	
 	template<typename T>
