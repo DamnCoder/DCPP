@@ -11,37 +11,50 @@
 #include "md3structs.h"
 #include "md3model.h"
 
+#include "containers/array.h"
+
 namespace dc
 {
+	class CGameObject;
 	class CMesh;
-	
-	template<typename T>
-	class CArray;
-	
-	using TFloatArray = CArray<float>;
 	
 	class CMD3Loader
 	{
+	private:
+		const size_t UV_SIZE = sizeof(float) * 2;
+		const size_t TRIANGLE_SIZE = sizeof(unsigned int) * 3;
+		const size_t VERTEX_SIZE = sizeof(tMd3Vertex);
 
 	public:
-
 		CMD3Loader();
 		
-		CArray<CMesh*> Load(const char* modelPath);
-
-		bool ImportMD3(tModel *pModel, const char *strFileName, const float scale);
-		bool LoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& name);
+	public:
+		CGameObject* Load(const char* pathToModel);
+		
+	private:
+		const bool ValidateHeader(const tMd3Header& header) const;
+		const bool CheckMagicToken(const char* token) const;
+		
+		CArray<CMesh*> ReadMD3(const char* md3FilePath);
+		
+		CArray<CMesh*> ReadModel(FILE* filePtr, const tMd3Header& header);
+		CMesh* CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset);
+		void AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int numElements);
+		
+	public:
+		bool OldImportMD3(tModel *pModel, const char *strFileName, const float scale);
+		bool OldLoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& name);
 
 	private:
-
-		void ReadMD3Data(tModel *pModel, const float scale);
+		void OldReadMD3Data(tModel *pModel, const float scale);
 		void Adapt(tModel *pModel, const tMd3MeshHeader& meshHeader, const float scale);
 		CMesh* Adapt(const tMd3MeshHeader& meshHeader, const float scale);
 		void CleanUp();
 		
-		CArray<CMesh*> ReadModel(FILE* filePtr, const tMd3Header& header);
-		void AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int numElements);
+		
 
+		
+	private:
 		FILE*			m_FilePointer;
 
 		tMd3Header		m_Header;			// The header data

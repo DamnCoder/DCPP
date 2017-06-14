@@ -7,10 +7,15 @@
 
 #include "md3loader.h"
 //#include "gui/TextureManager.h"
+
 #include <cmath>
 #include <dirent.h>
-#include "help/utils.h"
 
+#include <pathie.hpp>
+
+#include <component/gameobject.h>
+
+#include "help/utils.h"
 #include "renderer/vertexproperty.h"
 #include "mesh/mesh.h"
 
@@ -28,49 +33,83 @@ namespace dc
 		mp_Vertices = 0;
 	}
 
-	CArray<CMesh*> CMD3Loader::Load(const char* modelPath)
+	const bool CMD3Loader::ValidateHeader(const tMd3Header& header) const
 	{
-		DIR *dp;
-
-		struct dirent *ep;
-		dp = opendir ("./");
-
-		if (dp != NULL)
+		if(CheckMagicToken(header.ident))
 		{
-			do
-			{
-				ep = readdir (dp);
-				if(ep)
-				{
-					puts (ep->d_name);
-				}
-			}
-			while (ep);
-
-			(void) closedir (dp);
+			printf("[CMD3Loader::Load] Invalid MD3 file: No magic token found in file\n");
+			return false;
 		}
-		else
-			perror ("Couldn't open the directory");
-
+		
+		if(header.version != 15)
+		{
+			printf("[CMD3Loader::Load] Invalid MD3 file: Version not recognized\n");
+			return false;
+		}
+		
+		if(!header.numMeshes)
+		{
+			printf("[CMD3Loader::Load] Invalid MD3 file: Num meshes is 0\n");
+			return false;
+		}
+		
+		return true;
+	}
+	
+	const bool CMD3Loader::CheckMagicToken(const char* token) const
+	{
+		return strcmp(token, "IDP3") == 0 || strcmp(token, "3PDI") == 0;
+	}
+	
+	CGameObject* CMD3Loader::Load(const char* pathToModel)
+	{
+		Pathie::Path modelPath(pathToModel);
+		
+		if(modelPath.size() == 0)
+		{
+			printf("[CMD3Loader::Load] File not found: %s!\n", pathToModel);
+			return 0;
+		}
+		
+		if(modelPath.is_file())
+		{
+			printf("[CMD3Loader::Load] To load MD3 it is needed only the folder with all the files\n");
+			return 0;
+		}
+		
+		Pathie::Path lowerPath = modelPath.join("lower.md3");
+		CArray<CMesh*> lower = ReadMD3(lowerPath.c_str());
+		
+		Pathie::Path upperPath = modelPath.join("upper.md3");
+		CArray<CMesh*> upper = ReadMD3(upperPath.c_str());
+		
+		Pathie::Path headPath = modelPath.join("head.md3");
+		CArray<CMesh*> head = ReadMD3(headPath.c_str());
+		
+		return new CGameObject("MD3Model");
+	}
+	
+	CArray<CMesh*> CMD3Loader::ReadMD3(const char* md3FilePath)
+	{
 		// read binary file (rb)
-		FILE* filePtr = fopen(modelPath, "rb");
+		FILE* filePtr = fopen(md3FilePath, "rb");
 		
 		if(!filePtr)
 		{
-			printf("File not found: %s!\n", modelPath);
+			printf("[CMD3Loader::Load] File not found: %s!\n", md3FilePath);
 			return 0;
 		}
 		
 		tMd3Header header;
 		fread(&header, 1, sizeof(tMd3Header), filePtr);
 		
-		const char* meshIdentifier = header.ident;
-		
-		if((meshIdentifier[0] != 'I' || meshIdentifier[1] != 'D' || meshIdentifier[2] != 'P' || meshIdentifier[3] != '3') || header.version != 15)
+		if(!ValidateHeader(header))
 		{
-			printf("Invalid file format (Version not 15): %s!\n", modelPath);
+			printf("[CMD3Loader::Load] Invalid MD3 file %s\n", md3FilePath);
 			return 0;
 		}
+		
+		printf("[CMD3Loader::ReadMD3] Start reading %s\n", md3FilePath);
 		
 		CArray<CMesh*> meshesArray = ReadModel(filePtr, header);
 		
@@ -82,8 +121,6 @@ namespace dc
 	
 	CArray<CMesh*> CMD3Loader::ReadModel(FILE* filePtr, const tMd3Header& header)
 	{
-		int i = 0;
-		
 		tMd3Frame* frames = new tMd3Frame [header.numFrames];
 		tMd3Tag* pTags = new tMd3Tag [header.numFrames * header.numTags];
 		
@@ -96,64 +133,62 @@ namespace dc
 		
 		CArray<CMesh*> meshesArray(header.numMeshes);
 
-		// Faces
-		// Shaders
-		// UV
-		// Vertex
-
 		tMd3MeshHeader meshHeader;
 		
-		// Information to read the binary data
-		auto uvSize = sizeof(float) * 2;
-		auto triangleSize = sizeof(unsigned int) * 3;
-		auto vertexSize = sizeof(tMd3Vertex);
-		
-		int meshOffset = header.ofsMesh;
-		for (i = 0; i < header.numMeshes; i++)
+		int accumMeshOffset = header.ofsMesh;
+		for (int i = 0; i < header.numMeshes; i++)
 		{
 			// Read the mesh header
-			fseek(filePtr, meshOffset, SEEK_SET);
+			fseek(filePtr, accumMeshOffset, SEEK_SET);
 			fread(&meshHeader, sizeof(tMd3MeshHeader), 1, filePtr);
 			
-			CMesh* mesh = new CMesh(meshHeader.name);
-			
-			// Initialize structures to hold the information of the mesh
-			TFloatArray vertexArray(meshHeader.numVerts * 3);
-			TFloatArray normalArray(meshHeader.numVerts * 3);
-			TFloatArray uvCoordArray(meshHeader.numVerts * 2);
-			TUIntArray	indexArray(meshHeader.numFaces * 3);
-			
-			// Materials
-			mp_Skins     = new tMd3Shader [meshHeader.numShaders];
-			fread(mp_Skins, sizeof(tMd3Shader), meshHeader.numShaders, filePtr);
-			
-			// Indices
-			fseek(filePtr, meshOffset + meshHeader.ofsFaces, SEEK_SET);
-			fread(indexArray, triangleSize, meshHeader.numFaces, filePtr);
-			
-			// UVs
-			fseek(filePtr, meshOffset + meshHeader.ofsUV, SEEK_SET);
-			fread(uvCoordArray, uvSize, meshHeader.numVerts, filePtr);
-			
-			// Vertex, they need an adaptation
-			tMd3Vertex md3VertexArray[meshHeader.numVerts];
-			
-			fseek(filePtr, meshOffset + meshHeader.ofsVert, SEEK_SET);
-			fread(md3VertexArray, vertexSize, meshHeader.numVerts, filePtr);
-			
-			AdaptVertices(md3VertexArray, &vertexArray, &normalArray, meshHeader.numVerts);
-			
-			// Assign the arrays to the mesh
-			mesh->FloatDataArray(CVertexProperty::IN_VERTEX, vertexArray);
-			mesh->FloatDataArray(CVertexProperty::IN_NORMAL, normalArray);
-			mesh->FloatDataArray(CVertexProperty::IN_UV0, uvCoordArray);
-			mesh->IndexArray(indexArray);
+			CMesh* mesh = CreateMesh(filePtr, meshHeader, accumMeshOffset);
+			meshesArray.Append(mesh);
 			
 			// Set the offset to read the next mesh if there is any
-			meshOffset += meshHeader.ofsEnd;
+			accumMeshOffset += meshHeader.ofsEnd;
 		}
 		
 		return meshesArray;
+	}
+	
+	CMesh* CMD3Loader::CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset)
+	{
+		CMesh* mesh = new CMesh(meshHeader.name);
+		
+		// Initialize structures to hold the information of the mesh
+		TFloatArray vertexArray(meshHeader.numVerts * 3);
+		TFloatArray normalArray(meshHeader.numVerts * 3);
+		TFloatArray uvCoordArray(meshHeader.numVerts * 2);
+		TUIntArray	indexArray(meshHeader.numFaces * 3);
+		
+		// Materials
+		mp_Skins     = new tMd3Shader [meshHeader.numShaders];
+		fread(mp_Skins, sizeof(tMd3Shader), meshHeader.numShaders, filePtr);
+		
+		// Indices
+		fseek(filePtr, meshOffset + meshHeader.ofsFaces, SEEK_SET);
+		fread(indexArray, TRIANGLE_SIZE, meshHeader.numFaces, filePtr);
+		
+		// UVs
+		fseek(filePtr, meshOffset + meshHeader.ofsUV, SEEK_SET);
+		fread(uvCoordArray, UV_SIZE, meshHeader.numVerts, filePtr);
+		
+		// Vertex, they need an adaptation
+		tMd3Vertex md3VertexArray[meshHeader.numVerts];
+		
+		fseek(filePtr, meshOffset + meshHeader.ofsVert, SEEK_SET);
+		fread(md3VertexArray, VERTEX_SIZE, meshHeader.numVerts, filePtr);
+		
+		AdaptVertices(md3VertexArray, &vertexArray, &normalArray, meshHeader.numVerts);
+		
+		// Assign the arrays to the mesh
+		mesh->FloatDataArray(CVertexProperty::IN_VERTEX, vertexArray);
+		mesh->FloatDataArray(CVertexProperty::IN_NORMAL, normalArray);
+		mesh->FloatDataArray(CVertexProperty::IN_UV0, uvCoordArray);
+		mesh->IndexArray(indexArray);
+		
+		return mesh;
 	}
 	
 	void CMD3Loader::AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int vertexNum)
@@ -174,7 +209,7 @@ namespace dc
 		}
 	}
 	
-	bool CMD3Loader::ImportMD3(tModel *pModel, const char *strFileName, const float scale)
+	bool CMD3Loader::OldImportMD3(tModel *pModel, const char *strFileName, const float scale)
 	{
 		m_FilePointer = fopen(strFileName, "rb");
 
@@ -186,15 +221,13 @@ namespace dc
 
 		fread(&m_Header, 1, sizeof(tMd3Header), m_FilePointer);
 
-		char *ID = m_Header.ident;
-
-		if((ID[0] != 'I' || ID[1] != 'D' || ID[2] != 'P' || ID[3] != '3') || m_Header.version != 15)
+		if(CheckMagicToken(m_Header.ident) || m_Header.version != 15)
 		{
 			printf("Invalid file format (Version not 15): %s!\n", strFileName);
 			return false;
 		}
 
-		ReadMD3Data(pModel, scale);
+		OldReadMD3Data(pModel, scale);
 
 		CleanUp();
 
@@ -208,7 +241,7 @@ namespace dc
 	 * @param name
 	 * @return
 	 */
-	bool CMD3Loader::LoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& type)
+	bool CMD3Loader::OldLoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& type)
 	{
 		if(!path.c_str())
 			return false;
@@ -244,7 +277,7 @@ namespace dc
 		return true;
 	}
 
-	void CMD3Loader::ReadMD3Data(tModel *pModel, const float scale)
+	void CMD3Loader::OldReadMD3Data(tModel *pModel, const float scale)
 	{
 		int i = 0;
 
@@ -434,5 +467,4 @@ namespace dc
 	{
 		fclose(m_FilePointer);
 	}
-
 }
