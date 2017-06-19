@@ -228,6 +228,7 @@ namespace Pathie {
     void find(std::function<bool (const Path& entry)> func) const;
 
     /// Return the path as a raw std::string.
+	std::string& strRef();
     std::string str() const;
 	const char* c_str() const;
     /// Assign the given string to the underlying path.
@@ -270,6 +271,7 @@ namespace Pathie {
     Path join(const std::string& path) const;
     Path sub_ext(std::string new_extension) const;
 	void append(const std::string& folder);
+	void prepend(const std::string& text);
 
     /// Platform-independant C fopen().
     FILE* fopen(const char* mode);

@@ -24,7 +24,7 @@
 #define PATHIE_VERSION_MAJOR "0"
 #define PATHIE_VERSION_MINOR "0"
 #define PATHIE_VERSION_PATCH "1"
-#define PATHIE_VERSION_GIT "99979b4"
+#define PATHIE_VERSION_GIT "357e7d2"
 
 // Compiler chaos. Compilers targetting MacOS for unknown reasons
 // don’t set __unix__, although that’s a BSD derivative, and BSD

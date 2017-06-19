@@ -206,6 +206,11 @@ void Path::sanitize()
  */
 ///@{
 
+std::string& Path::strRef()
+{
+	return m_path;
+}
+
 /**
  * Returns a copy of the underlying `std::string`. This is always
  * encoded in UTF-8, regardless of the operating system.
@@ -3397,6 +3402,12 @@ Path Path::join(const std::string& str) const
 void Path::append(const std::string& folder)
 {
 	m_path += "/" + folder;
+	sanitize();
+}
+
+void Path::prepend(const std::string &text)
+{
+	m_path = text + "/" + m_path;
 	sanitize();
 }
 
