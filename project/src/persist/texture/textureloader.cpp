@@ -55,12 +55,17 @@ namespace dc
 		int channels = 3;
 		unsigned char* textureData = stbi_load(path, &width, &height, &bpp, channels);
 		
+		if(!textureData)
+		{
+			printf("[CTextureLoader::Load] No texture to load in %s\n", path);
+			return 0;
+		}
 		
 		// Create one OpenGL texture
 		GLuint textureID;
 		glGenTextures(1, &textureID);
 		
-		glActiveTexture(GL_TEXTURE0);
+		//glActiveTexture(GL_TEXTURE0);
 		// "Bind" the newly created texture : all future texture functions will modify this texture
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		
@@ -71,7 +76,7 @@ namespace dc
 		// Do something with it...
 		stbi_image_free( textureData );
 		
-		printf("Texture %s with size [%d, %d] is loaded\n", path, width, height);
+		printf("[CTextureLoader::Load] Texture %s with size [%d, %d] is loaded\n", path, width, height);
 		
 		// Texture configuration
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
