@@ -10,15 +10,22 @@
 
 #include <unordered_map>
 
+//#include "structures/proxy.h"
+
+#include "material/materialmanager.h"
 #include "material/shadermanager.h"
 #include "material/texturemanager.h"
 #include "mesh/meshmanager.h"
+
+#include "component/gameobject.h"
 
 namespace dc
 {
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	using TGameObjectManager = CProxy<CGameObject>;
+	
 	/**
 	 * \class CAssetManager
 	 * \brief
@@ -48,6 +55,8 @@ public:
 	TTextureManager&		TextureManager()	{ return m_textureManager; }
 	TShaderManager&			ShaderManager()		{ return m_shaderManager; }
 	TShaderProgramManager&	ShaderProgManager()	{ return m_shaderProgManager; }
+	TMaterialManager&		MaterialManager()	{ return m_materialManager; }
+	TGameObjectManager&		GameObjectManager()	{ return m_goManager; }
 
 	// ===========================================================
 	// Constructors
@@ -74,6 +83,9 @@ private:
 	TTextureManager			m_textureManager;
 	TShaderManager			m_shaderManager;
 	TShaderProgramManager	m_shaderProgManager;
+	TMaterialManager		m_materialManager;
+	TGameObjectManager		m_goManager;
+	
 };
 
 	// ===========================================================
