@@ -27,9 +27,9 @@ namespace dc
 	class CMD3Loader
 	{
 	private:
-		const size_t UV_SIZE = sizeof(float) * 2;
-		const size_t TRIANGLE_SIZE = sizeof(unsigned int) * 3;
-		const size_t VERTEX_SIZE = sizeof(tMd3Vertex);
+		const size_t MD3_UV_SIZE = sizeof(tMd3TexCoord);
+		const size_t MD3_TRIANGLE_SIZE = sizeof(tMd3Face);
+		const size_t MD3_VERTEX_STRUCT_SIZE = sizeof(tMd3Vertex);
 
 	private:
 		const bool ValidateHeader(const tMd3Header& header) const;
@@ -46,7 +46,7 @@ namespace dc
 		
 		CGameObject*	CreateMD3GO(FILE* filePtr, const tMd3Header& header, const TSkinMap& skinMap, const char* name);
 		CMesh*			CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset);
-		void			AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int numElements);
+		void			AdaptVertices(const tMd3Vertex& md3Vertex, TFloatArray& vertexArray, TFloatArray& normalArray, const unsigned int currentVertexSize);
 		TTransformList	FindTags(const CTransform* md3Transform);
 		void			Link(CGameObject* lower, CGameObject* upper);
 		

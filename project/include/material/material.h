@@ -51,6 +51,9 @@ namespace dc
 		
 		const bool				Exists(const std::string& name) const;
 		
+		const TPropertiesList&	Properties() const { return m_propertiesList; }
+		
+		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
@@ -69,6 +72,8 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
+		const bool Equals(const CMaterial* material);
+		
 		void Activate() const;
 		
 		void Deactivate() const;
@@ -105,7 +110,8 @@ namespace dc
 	// Template/Inline implementation
 	// ===========================================================
 	template<typename PT>
-	CMaterialProperty<PT>*	CMaterial::GetTypedProperty(const std::string& name)
+	inline
+	CMaterialProperty<PT>* CMaterial::GetTypedProperty(const std::string& name)
 	{
 		IProperty* property = GetProperty(name);
 		if(property)

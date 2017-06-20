@@ -88,6 +88,7 @@ public:
 	// Methods
 	// ===========================================================
 public:
+	const bool Equals(const CTexture* texture) const;
 	void Activate();
 	void Deactivate();
 

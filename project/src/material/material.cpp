@@ -46,6 +46,27 @@ namespace dc
 	// ===========================================================
 	// Methods
 	// ===========================================================
+	const bool CMaterial::Equals(const CMaterial* material)
+	{
+		if(Properties().size() != material->Properties().size())
+		{
+			return false;
+		}
+		
+		for(auto* matProp1 : Properties())
+		{
+			for(auto* matProp2 : material->Properties())
+			{
+				if(!matProp1->Equals(matProp2))
+				{
+					return false;
+				}
+				
+			}
+		}
+		return true;
+	}
+	
 	
 	void CMaterial::Activate() const
 	{

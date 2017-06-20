@@ -50,7 +50,7 @@ namespace dc
 		const TMaterialArray&	Materials() const	{ return m_materialArray; }
 		TMaterialArray&			Materials()			{ return m_materialArray; }
 		
-		CMesh* Mesh(CMaterial* material);
+		CMesh*					Mesh(CMaterial* material);
 		
 		// ===========================================================
 		// Constructors

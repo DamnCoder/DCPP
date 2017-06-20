@@ -55,7 +55,7 @@ namespace dc
 			for(CRendererComponent* renderComponent : renderBatch)
 			{
 				CGameObject* gameObject = renderComponent->GameObject();
-				printf("Rendering %s\n", gameObject->Name().c_str());
+				
 				CTransform* transform = gameObject->GetComponent<CTransform>();
 				modelMatrix = transform->WorldMatrix();
 				
@@ -70,6 +70,8 @@ namespace dc
 					shaderProgram->PassMatrix4x4f("MVP", MVP);
 					shaderProgram->PassInteger("TextureSampler", 0);
 				}
+				
+				printf("Rendering %s\n", renderComponent->ModelComponent()->Model()->Mesh(material)->Name().c_str());
 				
 				const CVAO& vao = renderComponent->ModelComponent()->VAO(material);
 				CVAO::Activate(vao);

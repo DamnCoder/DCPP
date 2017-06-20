@@ -91,7 +91,8 @@ namespace dc
 		static CShaderProgram* Create(CShader* vertexShader, CShader* fragmentShader);
 		
 	public:
-		const bool CorrectlyLinked() const;
+		const unsigned int	Id() const { return m_programID; };
+		const bool			CorrectlyLinked() const;
 		
 	public:
 		CShaderProgram() {}
@@ -112,6 +113,7 @@ namespace dc
 		}
 		
 	public:
+		const bool Equals(const CShaderProgram* shaderProg) const;
 		void Create();
 		void Destroy();
 		

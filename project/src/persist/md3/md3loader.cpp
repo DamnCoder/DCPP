@@ -73,6 +73,8 @@ namespace dc
 		CGameObject* upper = ReadMD3(pathToModel, "upper.md3");
 		CGameObject* head = ReadMD3(pathToModel, "head.md3");
 		
+		lower->Transform()->Rotate(math::Vector3f(90.f, 0.f, 0.f));
+		
 		rootTransform->Add(lower->Transform());
 		Link(lower, upper);
 		Link(upper, head);
@@ -217,9 +219,13 @@ namespace dc
 		CMesh* mesh = new CMesh(meshHeader.name);
 		
 		// Initialize structures to hold the information of the mesh
+		float uvArray[meshHeader.numVerts * 2];
+		unsigned int iArray[meshHeader.numFaces * 3];
+		
 		TFloatArray vertexArray(meshHeader.numVerts * 3);
 		TFloatArray normalArray(meshHeader.numVerts * 3);
 		TFloatArray uvCoordArray(meshHeader.numVerts * 2);
+		TFloatArray colorArray(meshHeader.numVerts * 4);
 		TUIntArray	indexArray(meshHeader.numFaces * 3);
 		
 		// Materials
@@ -234,45 +240,50 @@ namespace dc
 		
 		// Indices
 		fseek(filePtr, meshOffset + meshHeader.ofsFaces, SEEK_SET);
-		fread(indexArray, TRIANGLE_SIZE, meshHeader.numFaces, filePtr);
+		fread(iArray, MD3_TRIANGLE_SIZE, meshHeader.numFaces, filePtr);
+		indexArray.Append(iArray, meshHeader.numFaces * 3);
 		
 		// UVs
 		fseek(filePtr, meshOffset + meshHeader.ofsUV, SEEK_SET);
-		fread(uvCoordArray, UV_SIZE, meshHeader.numVerts, filePtr);
+		fread(uvArray, MD3_UV_SIZE, meshHeader.numVerts, filePtr);
+		uvCoordArray.Append(uvArray, meshHeader.numVerts * 2);
 		
 		// Vertex, they need an adaptation
 		tMd3Vertex md3VertexArray[meshHeader.numVerts];
 		
 		fseek(filePtr, meshOffset + meshHeader.ofsVert, SEEK_SET);
-		fread(md3VertexArray, VERTEX_SIZE, meshHeader.numVerts, filePtr);
+		fread(md3VertexArray, MD3_VERTEX_STRUCT_SIZE, meshHeader.numVerts, filePtr);
 		
-		AdaptVertices(md3VertexArray, &vertexArray, &normalArray, meshHeader.numVerts);
+		unsigned int currentVertexSize = 0;
+		for(unsigned int i = 0; i<meshHeader.numVerts; ++i)
+		{
+			const tMd3Vertex& md3Vertex = md3VertexArray[i];
+			AdaptVertices(md3Vertex, vertexArray, normalArray, currentVertexSize);
+			colorArray.Set(i*4, math::ColorRGBAf::White(), 4);
+			currentVertexSize = vertexArray.Size();
+		}
 		
 		// Assign the arrays to the mesh
 		mesh->FloatDataArray(CVertexProperty::IN_VERTEX, vertexArray);
 		mesh->FloatDataArray(CVertexProperty::IN_NORMAL, normalArray);
+		mesh->FloatDataArray(CVertexProperty::IN_COLOR, colorArray);
 		mesh->FloatDataArray(CVertexProperty::IN_UV0, uvCoordArray);
 		mesh->IndexArray(indexArray);
 		
 		return mesh;
 	}
 	
-	void CMD3Loader::AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int vertexNum)
+	void CMD3Loader::AdaptVertices(const tMd3Vertex& md3Vertex, TFloatArray& vertexArray, TFloatArray& normalArray, const unsigned int currentVertexSize)
 	{
-		for(unsigned int i = 0; i<vertexNum; ++i)
-		{
-			const tMd3Vertex& md3Vertex = md3VertexArray[i];
+		// We need to scale up the vertex coordinates and in the process we transform them into float
+		vertexArray.Set(currentVertexSize, md3Vertex.coord[0] * MD3_SCALE_FACTOR);
+		vertexArray.Set(currentVertexSize + 1, md3Vertex.coord[1] * MD3_SCALE_FACTOR);
+		vertexArray.Set(currentVertexSize + 2, md3Vertex.coord[2] * MD3_SCALE_FACTOR);
 
-			// We need to scale up the vertex coordinates and in the process we transform them into float
-			vertexArray->Set(i, md3Vertex.coord[0] * MD3_SCALE_FACTOR);
-			vertexArray->Set(i + 1, md3Vertex.coord[1] * MD3_SCALE_FACTOR);
-			vertexArray->Set(i + 2, md3Vertex.coord[2] * MD3_SCALE_FACTOR);
-			
-			// We need to decode the normal because it comes expressed as polar coordinates
-			math::Vector3f normal;
-			normal.FromPolarAngles(md3Vertex.normal[0], md3Vertex.normal[1]);
-			normalArray->Append(normal, 3);
-		}
+		// We need to decode the normal because it comes expressed as polar coordinates
+		math::Vector3f normal;
+		normal.FromPolarAngles(md3Vertex.normal[0], md3Vertex.normal[1]);
+		normalArray.Append(normal, 3);
 	}
 	
 	void CMD3Loader::Link(CGameObject* lower, CGameObject* upper)

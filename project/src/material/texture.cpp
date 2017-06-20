@@ -41,6 +41,10 @@ namespace dc
 	// ===========================================================
 	// Methods
 	// ===========================================================
+	const bool CTexture::Equals(const CTexture* texture) const
+	{
+		return m_id == texture->Id();
+	}
 	
 	void CTexture::Activate()
 	{

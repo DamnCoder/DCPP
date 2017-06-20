@@ -100,11 +100,20 @@ namespace dc
 		return shaderProg;
 	}
 	
+	//------------------------------------------------------------//
+	
 	const bool CShaderProgram::CorrectlyLinked() const
 	{
 		int linked;
 		glGetProgramiv(m_programID, GL_LINK_STATUS, &linked);
 		return (linked == GL_TRUE);
+	}
+	
+	//------------------------------------------------------------//
+	
+	const bool CShaderProgram::Equals(const CShaderProgram* shaderProg) const
+	{
+		return m_programID == shaderProg->Id();
 	}
 	
 	//------------------------------------------------------------//

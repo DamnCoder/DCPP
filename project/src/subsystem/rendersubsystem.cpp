@@ -32,6 +32,7 @@ namespace dc
 	
 	void CRenderSubsystem::FinishUpdate()
 	{
+		mp_renderer->Finish();
 		mp_windowSubsystem->Window()->SwapBuffers();
 	}
 	

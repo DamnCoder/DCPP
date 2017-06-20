@@ -33,6 +33,7 @@ namespace dc
 		virtual ~IProperty() {}
 		
 	public:
+		virtual const bool Equals(const IProperty* property) const = 0;
 		virtual void Activate() const = 0;
 		virtual void Deactivate() const = 0;
 		
@@ -66,7 +67,7 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		T*		Value()			{ return m_value; }
+		T*		Value() const	{ return m_value; }
 		void	Value(T* value)	{ m_value = value; }
 		
 		// ===========================================================
@@ -93,6 +94,8 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
+		const bool Equals(const IProperty* property) const override;
+		
 		void Activate() const override;
 		void Deactivate() const override;
 		
@@ -111,6 +114,19 @@ namespace dc
 	// ===========================================================
 	// Template/Inline implementation
 	// ===========================================================
+	
+	template<typename T>
+	const bool CMaterialProperty<T>::Equals(const IProperty* property) const
+	{
+		const auto* typedProperty = static_cast<const CMaterialProperty<T>*>(property);
+		if(!typedProperty)
+		{
+			return false;
+		}
+		
+		const T* value = typedProperty->Value();
+		return m_value->Equals(value);
+	}
 	
 	template<typename T>
 	void CMaterialProperty<T>::Activate() const
@@ -136,11 +152,17 @@ namespace dc
 	
 	class CPropertyEnabler
 	{
+		const int Property() const { return m_property; }
 	public:
 		CPropertyEnabler(const int property): m_property(property)
 		{}
 		
 	public:
+		const bool Equals(const CPropertyEnabler* propertyEnabler) const
+		{
+			return m_property == propertyEnabler->Property();
+		}
+		
 		void Activate()
 		{
 			Enable(m_property);
@@ -158,10 +180,18 @@ namespace dc
 	class CBlending
 	{
 	public:
+		const EBlendMode& Mode() const { return m_mode; }
+		
+	public:
 		CBlending(const EBlendMode& mode) : m_mode (mode)
 		{}
 		
 	public:
+		const bool Equals(const CBlending* blending) const
+		{
+			return m_mode == blending->Mode();
+		}
+		
 		void Activate()
 		{
 			EnableBlending(m_mode);
