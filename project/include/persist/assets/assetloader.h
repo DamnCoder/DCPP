@@ -73,6 +73,8 @@ private:
 	
 	void ReadMeshes(rapidjson::Document& document, CAssetManager& assetManager);
 	
+	void ReadMD3(rapidjson::Document& document, CAssetManager& assetManager);
+	
 	// ===========================================================
 	// Fields
 	// ===========================================================

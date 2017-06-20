@@ -73,6 +73,7 @@ SET(HEADERS
 	include/input/mouseinputmanager.h
 	include/input/sdlkeyinputmanager.h
 	include/material/material.h
+	include/material/materialmanager.h
 	include/material/property.h
 	include/material/shader.h
 	include/material/shadermanager.h
@@ -88,8 +89,8 @@ SET(HEADERS
 	include/persist/md3/animationloader.h
 	include/persist/md3/md3loader.h
 	include/persist/md3/md3model.h
+	include/persist/md3/md3skinloader.h
 	include/persist/md3/md3structs.h
-	include/persist/md3/skinloader.h
 	include/persist/obj/objloader.h
 	include/persist/shader/shaderloader.h
 	include/persist/texture/textureloader.h
@@ -106,7 +107,6 @@ SET(HEADERS
 	include/scenes/scenemanager.h
 	include/structures/composedstate.h
 	include/structures/node.h
-	include/structures/proxy.h
 	include/structures/singleton.h
 	include/structures/state.h
 	include/subsystem/appsubsystem.h
@@ -150,14 +150,14 @@ SET(SOURCES
 	src/nodes/graphicnode.cpp
 	src/persist/meshloader.cpp
 	src/persist/assets/assetloader.cpp
-	src/persist/md3/AnimationLoader.cpp
+	src/persist/md3/animationloader.cpp
 	src/persist/md3/md3loader.cpp
 	src/persist/md3/md3model.cpp
-	src/persist/md3/skinmodel.cpp
+	src/persist/md3/md3skinloader.cpp
 	src/persist/obj/objloader.cpp
 	src/persist/shader/shaderloader.cpp
 	src/persist/texture/textureloader.cpp
-	src/physics/BoundingBox.cpp
+	src/physics/boundingbox.cpp
 	src/renderer/renderbatch.cpp
 	src/renderer/renderer.cpp
 	src/renderer/renderlayer.cpp

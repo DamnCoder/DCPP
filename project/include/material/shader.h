@@ -11,6 +11,7 @@
 
 #include <map>
 #include <vector>
+#include <string>
 
 #include "renderer/vertexproperty.h"
 
@@ -84,7 +85,10 @@ namespace dc
 	{
 	public:
 		using TShaderList = std::vector<CShader*>;
-		using TUniformMap = std::map<const char*, int>;
+		using TUniformMap = std::map<std::string, int>;
+		
+	public:
+		static CShaderProgram* Create(CShader* vertexShader, CShader* fragmentShader);
 		
 	public:
 		const bool CorrectlyLinked() const;

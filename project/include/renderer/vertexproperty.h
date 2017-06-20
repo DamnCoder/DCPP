@@ -38,47 +38,11 @@ namespace dc
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
-		static void Activate(const CVertexProperty& vertexProperty)
-		{
-			const GLuint attributeId = (GLuint)vertexProperty.Id();
-			glEnableVertexAttribArray(attributeId);
-	
-			const GLint typeSize = (GLint)vertexProperty.Size();
-			glVertexAttribPointer(
-								  attributeId,				// attribute
-								  typeSize,					// size
-								  GL_FLOAT,					// type
-								  GL_FALSE,					// normalized?
-								  0,						// stride
-								  (void*)0					// array buffer offset
-			);
-		}
+		static void Activate(const CVertexProperty& vertexProperty);
 		
-		static void Deactivate(const CVertexProperty& vertexProperty)
-		{
-			glDisableVertexAttribArray(vertexProperty.Id());
-		}
+		static void Deactivate(const CVertexProperty& vertexProperty);
 		
-		static const unsigned int ElementNum(const char* propertyName)
-		{
-			if(strcmp(propertyName, IN_VERTEX) == 0)
-			{
-				return VERTEX_SIZE;
-			}
-			else if(strcmp(propertyName, IN_NORMAL) == 0)
-			{
-				return NORMAL_SIZE;
-			}
-			if(strcmp(propertyName, IN_UV0) == 0)
-			{
-				return UV_SIZE;
-			}
-			if(strcmp(propertyName, IN_COLOR) == 0)
-			{
-				return COLOR_SIZE;
-			}
-			return 0;
-		}
+		static const unsigned int ElementNum(const char* propertyName);
 		
 		// ===========================================================
 		// Inner and Anonymous Classes

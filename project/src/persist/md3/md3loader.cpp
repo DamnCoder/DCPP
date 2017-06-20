@@ -11,28 +11,15 @@
 #include <cmath>
 #include <dirent.h>
 
-#include <pathie.hpp>
-
-#include <component/gameobject.h>
+#include "component/gameobject.h"
+#include "component/modelcomponent.h"
+#include "component/renderercomponent.h"
 
 #include "help/utils.h"
 #include "renderer/vertexproperty.h"
-#include "mesh/mesh.h"
 
 namespace dc
 {
-	CMD3Loader::CMD3Loader()
-	{
-		memset(&m_Header, 0, sizeof(tMd3Header));
-
-		m_FilePointer = 0;
-		mp_Skins = NULL;
-		mp_TexCoords = NULL;
-		mp_Triangles = NULL;
-		mp_Frames = NULL;
-		mp_Vertices = 0;
-	}
-
 	const bool CMD3Loader::ValidateHeader(const tMd3Header& header) const
 	{
 		if(CheckMagicToken(header.ident))
@@ -58,39 +45,47 @@ namespace dc
 	
 	const bool CMD3Loader::CheckMagicToken(const char* token) const
 	{
-		return strcmp(token, "IDP3") == 0 || strcmp(token, "3PDI") == 0;
+		return strcmp(token, "IDP3") == 0;
 	}
 	
-	CGameObject* CMD3Loader::Load(const char* pathToModel)
+	CGameObject* CMD3Loader::Load(const Pathie::Path& pathToModel)
 	{
-		Pathie::Path modelPath(pathToModel);
-		
-		if(modelPath.size() == 0)
+		if(pathToModel.size() == 0)
 		{
-			printf("[CMD3Loader::Load] File not found: %s!\n", pathToModel);
+			printf("[CMD3Loader::Load] File not found: %s!\n", pathToModel.c_str());
 			return 0;
 		}
 		
-		if(modelPath.is_file())
+		// We need the path to all the files, not the file
+		if(pathToModel.is_file())
 		{
 			printf("[CMD3Loader::Load] To load MD3 it is needed only the folder with all the files\n");
 			return 0;
 		}
 		
-		Pathie::Path lowerPath = modelPath.join("lower.md3");
-		CArray<CMesh*> lower = ReadMD3(lowerPath.c_str());
+		const char* modelName = pathToModel.basename().c_str();
+		printf("The model name is %s\n", modelName);
 		
-		Pathie::Path upperPath = modelPath.join("upper.md3");
-		CArray<CMesh*> upper = ReadMD3(upperPath.c_str());
+		CGameObject* md3MultipartModel = new CGameObject(modelName);
+		CTransform* rootTransform = md3MultipartModel->Transform();
 		
-		Pathie::Path headPath = modelPath.join("head.md3");
-		CArray<CMesh*> head = ReadMD3(headPath.c_str());
+		CGameObject* lower = ReadMD3(pathToModel, "lower.md3");
+		CGameObject* upper = ReadMD3(pathToModel, "upper.md3");
+		CGameObject* head = ReadMD3(pathToModel, "head.md3");
 		
-		return new CGameObject("MD3Model");
+		rootTransform->Add(lower->Transform());
+		Link(lower, upper);
+		Link(upper, head);
+		
+		return md3MultipartModel;
 	}
 	
-	CArray<CMesh*> CMD3Loader::ReadMD3(const char* md3FilePath)
+	CGameObject* CMD3Loader::ReadMD3(const Pathie::Path& modelPath, const char* filename)
 	{
+		Pathie::Path filePath = modelPath.join(filename);
+		
+		const char* md3FilePath = filePath.c_str();
+		
 		// read binary file (rb)
 		FILE* filePtr = fopen(md3FilePath, "rb");
 		
@@ -109,47 +104,112 @@ namespace dc
 			return 0;
 		}
 		
+		char* filenameNoExt = GetFileExtension(filename);
 		printf("[CMD3Loader::ReadMD3] Start reading %s\n", md3FilePath);
 		
-		CArray<CMesh*> meshesArray = ReadModel(filePtr, header);
+		CSkinLoader skinLoader(m_assetManager);
+		TSkinMap skinMap = skinLoader.Load(modelPath, filenameNoExt);
 		
+		CGameObject* md3GO = CreateMD3GO(filePtr, header, skinMap, filenameNoExt);
+		printf("[CMD3Loader::ReadMD3] GO name %s\n", md3GO->Name().c_str());
+		
+		free(filenameNoExt);
 		fclose(filePtr);
 		filePtr = 0;
 		
-		return meshesArray;
+		return md3GO;
 	}
 	
-	CArray<CMesh*> CMD3Loader::ReadModel(FILE* filePtr, const tMd3Header& header)
+	CGameObject* CMD3Loader::CreateMD3GO(FILE* filePtr, const tMd3Header& header, const TSkinMap& skinMap, const char* name)
 	{
+		CGameObject* md3GO = new CGameObject(name);
+		CModelComponent* modelComponent = md3GO->AddComponent<CModelComponent>();
+		md3GO->AddComponent<CRendererComponent>();
+		
+		CTransform* md3Transform = md3GO->Transform();
+		
 		tMd3Frame* frames = new tMd3Frame [header.numFrames];
-		tMd3Tag* pTags = new tMd3Tag [header.numFrames * header.numTags];
-		
 		fread(frames, sizeof(tMd3Frame), header.numFrames, filePtr);
-		fread(pTags, sizeof(tMd3Tag), header.numFrames * header.numTags, filePtr);
 		
-		printf("Number of frames for animation: %d\n", header.numFrames);
-		printf("Number of link points for the model: %d\n", header.numTags);
-		printf("Number of meshes: %d\n", header.numMeshes);
+		for(int i=0; i< header.numFrames; ++i)
+		{
+			//CBoundingBox bb = CBoundingBox(mp_Frames[i].minBounds, mp_Frames[i].maxBounds);
+			//CBoundingSphere bs = CBoundingSphere(mp_Frames[i].localOrigin, mp_Frames[i].radius);
+		}
+
+		// Tags processing
+		tMd3Tag tagArray[header.numTags];
+		fread(&tagArray, sizeof(tMd3Tag), header.numTags, filePtr);
+
+		// We create a game object for every tag, then whe will add it as child of the model game object
+		for (int i = 0; i <header.numTags; ++i)
+		{
+			tMd3Tag& tag = tagArray[i];
+			CGameObject* tagGO = new CGameObject(tag.name);
+			CTransform* tagTrans = tagGO->Transform();
+			
+			math::Matrix4x4f m;
+			m.m11 = tag.axis[0][0]; m.m12 = tag.axis[0][1]; m.m13 = tag.axis[0][2];
+			m.m21 = tag.axis[1][0]; m.m22 = tag.axis[1][1]; m.m23 = tag.axis[1][2];
+			m.m31 = tag.axis[2][0]; m.m32 = tag.axis[2][1]; m.m33 = tag.axis[2][2];
+			
+			m.Translate(tag.origin);
+			
+			tagTrans->LocalMatrix(m);
+			
+			md3Transform->Add(tagTrans);
+			printf("Created tag %s in md3 %s\n", tagGO->Name().c_str(), name);
+		}
+		
+		//printf("Number of frames for animation: %d\n", header.numFrames);
+		//printf("Number of link points for the model: %d\n", header.numTags);
+		//printf("Number of meshes: %d\n", header.numMeshes);
+
+		CModel* md3Model = new CModel();
 		
 		CArray<CMesh*> meshesArray(header.numMeshes);
 
 		tMd3MeshHeader meshHeader;
 		
 		int accumMeshOffset = header.ofsMesh;
-		for (int i = 0; i < header.numMeshes; i++)
+		for (int i = 0; i < header.numMeshes; ++i)
 		{
 			// Read the mesh header
 			fseek(filePtr, accumMeshOffset, SEEK_SET);
 			fread(&meshHeader, sizeof(tMd3MeshHeader), 1, filePtr);
 			
 			CMesh* mesh = CreateMesh(filePtr, meshHeader, accumMeshOffset);
-			meshesArray.Append(mesh);
+			
+			CShader* vertexShader = m_assetManager.ShaderManager().Get("mvp_tex.vert");
+			CShader* fragmentShader = m_assetManager.ShaderManager().Get("textured.frag");
+			
+			CShaderProgram* shaderProg = CShaderProgram::Create(vertexShader, fragmentShader);
+			
+			CTexture* texture = 0;
+			TSkinMap::const_iterator it = skinMap.find(mesh->Name());
+			if(it != skinMap.end())
+			{
+				const std::string& textureName = it->second;
+				texture = m_assetManager.TextureManager().Get(textureName);
+			}
+			
+			CMaterial* material = new CMaterial(mesh->Name()+"_Material");
+			material->AddProperty<CShaderProgram>("ShaderProgram", shaderProg);
+			material->AddProperty<CTexture>("Texture", texture);
+			material->AddProperty("Blending", EBlendMode::NORMAL);
+			
+			m_assetManager.MaterialManager().Add(material->Name(), material);
+
+			md3Model->Add(material, mesh);
+			
 			
 			// Set the offset to read the next mesh if there is any
 			accumMeshOffset += meshHeader.ofsEnd;
 		}
 		
-		return meshesArray;
+		modelComponent->Model(md3Model);
+		
+		return md3GO;
 	}
 	
 	CMesh* CMD3Loader::CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset)
@@ -163,8 +223,14 @@ namespace dc
 		TUIntArray	indexArray(meshHeader.numFaces * 3);
 		
 		// Materials
-		mp_Skins     = new tMd3Shader [meshHeader.numShaders];
-		fread(mp_Skins, sizeof(tMd3Shader), meshHeader.numShaders, filePtr);
+		tMd3Shader skinArray[meshHeader.numShaders];
+		fread(&skinArray, sizeof(tMd3Shader), meshHeader.numShaders, filePtr);
+		for(int i=0; i<meshHeader.numShaders; ++i)
+		{
+			//const tMd3Shader& shader = skinArray[i];
+			//printf("Shader name: %s\n", shader.name);
+			//printf("Shader index: %d\n", shader.shaderIndex);
+		}
 		
 		// Indices
 		fseek(filePtr, meshOffset + meshHeader.ofsFaces, SEEK_SET);
@@ -209,262 +275,36 @@ namespace dc
 		}
 	}
 	
-	bool CMD3Loader::OldImportMD3(tModel *pModel, const char *strFileName, const float scale)
+	void CMD3Loader::Link(CGameObject* lower, CGameObject* upper)
 	{
-		m_FilePointer = fopen(strFileName, "rb");
-
-		if(!m_FilePointer)
-		{
-			printf("Unable to find the file: %s!\n", strFileName);
-			return false;
-		}
-
-		fread(&m_Header, 1, sizeof(tMd3Header), m_FilePointer);
-
-		if(CheckMagicToken(m_Header.ident) || m_Header.version != 15)
-		{
-			printf("Invalid file format (Version not 15): %s!\n", strFileName);
-			return false;
-		}
-
-		OldReadMD3Data(pModel, scale);
-
-		CleanUp();
-
-		return true;
-	}
-	
-	/**
-	 * Lee el archivo .skin y carga el skin de un modelo
-	 * @param pModel
-	 * @param path
-	 * @param name
-	 * @return
-	 */
-	bool CMD3Loader::OldLoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& type)
-	{
-		if(!path.c_str())
-			return false;
+		TTransformList lowerTagList = FindTags(lower->Transform());
+		TTransformList upperTagList = FindTags(upper->Transform());
 		
-		std::ifstream fin(path.c_str());
-		
-		if(fin.fail())
-			return false;
-		
-		std::string strLine;
-		while(getline(fin, strLine))
+		for(auto* lowerTag : lowerTagList)
 		{
-			for(int i = 0; i < pModel->numMeshes; i++)
+			printf("[CMD3Loader::Link] Looking for tag %s\n", lowerTag->GameObject()->Name().c_str());
+			CGameObject* tagGO = upper->FindChild(lowerTag->GameObject()->Name());
+			if(tagGO)
 			{
-				//extern const bool IsInString(const std::string& strString, const std::string& strSubString);
-				// Asociamos un material a una malla
-				if(IsInString(strLine, pModel->meshes[i].name) )
-				{
-					std::string texturePath = (std::string)"./" + strLine.substr(strLine.find(",")+1, strLine.size());
-					
-					tMaterial material;
-					strcpy(material.type, type.c_str());
-					strcpy(material.filename, texturePath.c_str());
-					//material.textureId = (int)CTextureCache::instance().loadTexture(texturePath);
-					
-					skin->materials[pModel->meshes[i].name] = material;
-					
-				}
+				printf("[CMD3Loader::Link] Link %s\n", tagGO->Name().c_str());
+				upper->Transform()->Remove(tagGO->Transform());
+				
+				lowerTag->Add(upper->Transform());
 			}
 		}
-		
-		fin.close();
-		return true;
-	}
-
-	void CMD3Loader::OldReadMD3Data(tModel *pModel, const float scale)
-	{
-		int i = 0;
-
-		mp_Frames = new tMd3Frame [m_Header.numFrames];
-		fread(mp_Frames, sizeof(tMd3Frame), m_Header.numFrames, m_FilePointer);
-		
-		for(int i=0; i< m_Header.numFrames; ++i)
-		{
-			tBoundingVolumes volume;
-			volume.bb = CBoundingBox(mp_Frames[i].minBounds, mp_Frames[i].maxBounds);
-			volume.bs = CBoundingSphere(mp_Frames[i].localOrigin, mp_Frames[i].radius);
-			pModel->volumes.push_back(volume);
-		}
-
-		tMd3Tag* pTags = new tMd3Tag [m_Header.numFrames * m_Header.numTags];
-		fread(pTags, sizeof(tMd3Tag), m_Header.numFrames * m_Header.numTags, m_FilePointer);
-
-		// Convertimos los tags del formato MD3 a unos tags propios que usan cuaternios
-		for (i = 0; i <(m_Header.numFrames * m_Header.numTags); i++)
-			pModel->tags.push_back(new tQuatTag(pTags[i]));
-
-		delete [] pTags;
-
-
-		pModel->numTags = m_Header.numTags;
-
-		pModel->pLinks = (const tModel**) malloc(sizeof(tModel) * m_Header.numTags);
-
-		for (i = 0; i < m_Header.numTags; i++)
-			pModel->pLinks[i] = NULL;
-
-		long meshOffset = ftell(m_FilePointer);
-
-		tMd3MeshHeader meshHeader;
-
-		for (i = 0; i < m_Header.numMeshes; i++)
-		{
-			fseek(m_FilePointer, meshOffset, SEEK_SET);
-			fread(&meshHeader, sizeof(tMd3MeshHeader), 1, m_FilePointer);
-
-			mp_Skins     = new tMd3Shader [meshHeader.numShaders];
-			mp_TexCoords = new tMd3TexCoord [meshHeader.numVerts];
-			mp_Triangles = new tMd3Face [meshHeader.numFaces];
-			mp_Vertices  = new tMd3Vertex [meshHeader.numVerts * meshHeader.numFrames];
-
-			fread(mp_Skins, sizeof(tMd3Shader), meshHeader.numShaders, m_FilePointer);
-
-			fseek(m_FilePointer, meshOffset + meshHeader.ofsFaces, SEEK_SET);
-
-			fread(mp_Triangles, sizeof(tMd3Face), meshHeader.numFaces, m_FilePointer);
-			
-			for(unsigned int i = 0; i<meshHeader.numFaces; ++i)
-			{
-				printf("%d ", mp_Triangles[i].indices[0]);
-				printf("%d ", mp_Triangles[i].indices[1]);
-				printf("%d ", mp_Triangles[i].indices[2]);
-				printf("\n");
-			}
-			printf("\n");
-
-			fseek(m_FilePointer, meshOffset + meshHeader.ofsUV, SEEK_SET);
-			fread(mp_TexCoords, sizeof(tMd3TexCoord), meshHeader.numVerts, m_FilePointer);
-
-			fseek(m_FilePointer, meshOffset + meshHeader.ofsVert, SEEK_SET);
-			fread(mp_Vertices, sizeof(tMd3Vertex), meshHeader.numFrames * meshHeader.numVerts, m_FilePointer);
-
-			Adapt(pModel, meshHeader, scale);
-
-			delete [] mp_Skins;
-			delete [] mp_TexCoords;
-			delete [] mp_Triangles;
-			delete [] mp_Vertices;
-			
-			mp_Skins     = 0;
-			mp_TexCoords = 0;
-			mp_Triangles = 0;
-			mp_Vertices  = 0;
-
-			meshOffset += meshHeader.ofsEnd;
-		}
-
-	}
-
-	void CMD3Loader::Adapt(tModel* pModel, const tMd3MeshHeader& meshHeader, const float scale)
-	{
-		int i = 0;
-
-		pModel->numMeshes++;
-
-		tMesh currentMesh;
-
-		strcpy(currentMesh.name, meshHeader.name);
-
-		currentMesh.numVerts   = meshHeader.numVerts;
-		currentMesh.numTexVerts = meshHeader.numVerts;
-		currentMesh.numFaces   = meshHeader.numFaces;
-
-		currentMesh.pVerts    = new math::Vector3f [currentMesh.numVerts * meshHeader.numFrames];
-		currentMesh.pNormals  = new math::Vector3f[currentMesh.numVerts * meshHeader.numFrames];
-		currentMesh.pTexVerts = new math::Vector3f [currentMesh.numVerts];
-		currentMesh.pFaces    = new tFace [currentMesh.numFaces];
-
-		currentMesh.drawVertArray = new math::Vector3f[currentMesh.numFaces*3];
-		currentMesh.drawNormArray = new math::Vector3f[currentMesh.numFaces*3];
-
-		for (i=0; i < currentMesh.numVerts * meshHeader.numFrames; i++)
-		{
-			currentMesh.pVerts[i].x =  mp_Vertices[i].coord[0] * MD3_SCALE_FACTOR;
-			currentMesh.pVerts[i].y =  mp_Vertices[i].coord[1] * MD3_SCALE_FACTOR;
-			currentMesh.pVerts[i].z =  mp_Vertices[i].coord[2] * MD3_SCALE_FACTOR;
-
-			// Decodificamos la normal, que vienen expresadas como coordenadas polares
-			math::Vector3f normal;
-			normal.FromPolarAngles(mp_Vertices[i].normal[0], mp_Vertices[i].normal[1]);
-
-			currentMesh.pNormals[i].x = normal.x;
-			currentMesh.pNormals[i].y = normal.y;
-			currentMesh.pNormals[i].z = normal.z;
-		}
-
-		for (i=0; i < currentMesh.numTexVerts; i++)
-		{
-			currentMesh.pTexVerts[i].x =  mp_TexCoords[i].uv[0];
-			currentMesh.pTexVerts[i].y = -mp_TexCoords[i].uv[1];
-		}
-
-		for(i=0; i < currentMesh.numFaces; i++)
-		{
-			currentMesh.pFaces[i].indices[0] = mp_Triangles[i].indices[2];
-			currentMesh.pFaces[i].indices[1] = mp_Triangles[i].indices[1];
-			currentMesh.pFaces[i].indices[2] = mp_Triangles[i].indices[0];
-		}
-
-		pModel->meshes.push_back(currentMesh);
-	}
-
-	CMesh* CMD3Loader::Adapt(const tMd3MeshHeader& meshHeader, const float scale)
-	{
-		CMesh* mesh = new CMesh("name");
-		//mesh->Initialize(meshHeader.numVerts, meshHeader.numFaces);
-		
-		// VERTEX / NORMAL
-		const unsigned int vertexElementsCount = meshHeader.numVerts * 3;
-		TFloatArray vertexArray (vertexElementsCount);
-		TFloatArray normalArray (vertexElementsCount);
-		
-		unsigned int i = 0;
-		for (i = 0; i < vertexElementsCount; i += 3)
-		{
-			vertexArray[i] = mp_Vertices[i].coord[0] * MD3_SCALE_FACTOR;
-			vertexArray[i+1] = mp_Vertices[i].coord[1] * MD3_SCALE_FACTOR;
-			vertexArray[i+2] = mp_Vertices[i].coord[2] * MD3_SCALE_FACTOR;
-			
-			// We need to decode the normal because it comes expressed as polar coordinates
-			math::Vector3f normal;
-			normal.FromPolarAngles(mp_Vertices[i].normal[0], mp_Vertices[i].normal[1]);
-			
-			normalArray[i] = normal.x;
-			normalArray[i+1] = normal.y;
-			normalArray[i+2] = normal.z;
-		}
-		
-		// UV
-		const unsigned int uvElementsCount = meshHeader.numVerts * 2;
-		TFloatArray uv0Array (uvElementsCount);
-		
-		for (i = 0; i < uvElementsCount; i += 2)
-		{
-			uv0Array[i] =  mp_TexCoords[i].uv[0];
-			uv0Array[i+1] = mp_TexCoords[i].uv[1];
-		}
-		
-		// INDICES
-		const unsigned int indicesCount = meshHeader.numFaces * 3;
-		TUShortArray indices(indicesCount);
-		
-		for (i = 0; i < indicesCount; i += 3)
-		{
-			indices[i] = mp_Triangles[i].indices[2];
-			indices[i+1] = mp_Triangles[i].indices[1];
-			indices[i+2] = mp_Triangles[i].indices[0];
-		}
-		return mesh;
 	}
 	
-	void CMD3Loader::CleanUp()
+	TTransformList CMD3Loader::FindTags(const CTransform* md3Transform)
 	{
-		fclose(m_FilePointer);
+		TTransformList tagList;
+		const TTransformList& childrenList = md3Transform->Children();
+		for(auto* child : childrenList)
+		{
+			if(IsInString(child->GameObject()->Name(), "tag_"))
+			{
+				tagList.push_back(child);
+			}
+		}
+		return tagList;
 	}
 }

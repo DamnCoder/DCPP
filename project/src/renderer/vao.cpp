@@ -14,7 +14,7 @@ namespace dc
 {
 	CVAO CVAO::Create(CMesh* mesh, const TVertexPropertyMap& vertexPropertyMap)
 	{
-		printf("Generating VAO for %s\n", mesh->Name());
+		printf("Generating VAO for %s\n", mesh->Name().c_str());
 		GLuint identifier;
 		glGenVertexArrays(1, &identifier);
 		

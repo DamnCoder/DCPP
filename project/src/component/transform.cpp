@@ -27,11 +27,26 @@ namespace dc
 		return worldMatrix;
 	}
 	
+	const bool CTransform::HasChild(CTransform* transform) const
+	{
+		for (const auto* child : m_children)
+		{
+			if (child == transform)
+				return true;
+		}
+		return false;
+	}
+	
 	void CTransform::Parent(CTransform* parent)
 	{
-		assert(parent != 0);
+		assert(parent && "[CTransform::Parent] You're adding a NULL pointer");
+		
 		mp_parent = parent;
-		mp_parent->AddChild(this);
+		
+		if(!mp_parent->HasChild(this))
+		{
+			mp_parent->Add(this);
+		}
 		
 		if (!parent->Root())
 		{
@@ -48,7 +63,7 @@ namespace dc
 		m_matrix.Identify();
 		mp_root = 0;
 		mp_parent = 0;
-		ml_childs.clear();
+		m_children.clear();
 	}
 	
 	math::Vector3f CTransform::TransformPosition(const math::Vector3f& point)
@@ -56,10 +71,19 @@ namespace dc
 		return m_matrix.TransformPosition(point);
 	}
 	
-	void CTransform::AddChild(CTransform* child)
+	void CTransform::Add(CTransform* child)
 	{
-		assert(child != 0);
-		ml_childs.push_back(child);
+		assert(child && "[CTransform::Add] You're adding a NULL pointer");
+		m_children.push_back(child);
+		child->Parent(this);
+	}
+	
+	void CTransform::Remove(CTransform* child)
+	{
+		assert(child && "[CTransform::Remove] You're removing a NULL pointer");
+		m_children.erase(std::find(Begin(), End(), child));
+		
+		delete child;
 	}
 	
 	void CTransform::Translate(const math::Vector3f& position)

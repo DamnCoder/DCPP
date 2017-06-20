@@ -110,7 +110,7 @@ namespace dc
 
 	public:
 		std::string 		name;
-		math::Vector3f 	origin;
+		math::Vector3f		origin;
 		math::Quaternionf	orient;
 	};
 

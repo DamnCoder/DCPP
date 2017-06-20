@@ -66,28 +66,39 @@ namespace dc
 	
 	enum EPixelFormat
 	{
-		RGB = GL_RGB,
-		BGR = GL_BGR,
-		RGBA = GL_RGBA,
-		BGRA = GL_BGRA
+		RGB				= GL_RGB,
+		BGR				= GL_BGR,
+		RGBA			= GL_RGBA,
+		BGRA			= GL_BGRA
 	};
 	
 	enum EWrap
 	{
-		REPEAT = GL_REPEAT,
+		REPEAT			= GL_REPEAT,
 		MIRRORED_REPEAT = GL_MIRRORED_REPEAT,
-		CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE,
+		CLAMP_TO_EDGE	= GL_CLAMP_TO_EDGE,
 		CLAMP_TO_BORDER = GL_CLAMP_TO_BORDER
 	};
 	
 	enum EFiltering
 	{
-		NEAREST = GL_NEAREST,
-		LINEAR = GL_LINEAR,
-		NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
-		NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
-		LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
-		LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
+		NEAREST					= GL_NEAREST,
+		LINEAR					= GL_LINEAR,
+		NEAREST_MIPMAP_NEAREST	= GL_NEAREST_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR	= GL_NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_NEAREST	= GL_LINEAR_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_LINEAR	= GL_LINEAR_MIPMAP_LINEAR
+	};
+	
+	enum EBlendMode
+	{
+		ADD,
+		MULT,
+		ALPHA,
+		NORMAL,
+		LIGHTMAP,
+		INV_BACK,
+		INV,
 	};
 	
 	inline void DrawElements(const ETopology& topology, const unsigned int indexCount)
@@ -119,6 +130,62 @@ namespace dc
 	inline void ClearDepth()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+	
+	inline void Enable(int mode)
+	{
+		glEnable((GLenum)mode);
+	}
+	
+	inline void Disable(int mode)
+	{
+		glDisable((GLenum)mode);
+	}
+	
+	inline void EnableBlending(const EBlendMode& mode)
+	{
+		GLenum sfactor;
+		GLenum dfactor;
+		
+		switch (mode)
+		{
+			case EBlendMode::ADD:
+				sfactor = GL_ONE;
+				dfactor = GL_ONE;
+				break;
+			case EBlendMode::ALPHA:
+				sfactor = GL_SRC_ALPHA;
+				dfactor = GL_ONE;
+				break;
+			case EBlendMode::NORMAL:
+				sfactor = GL_SRC_ALPHA;
+				dfactor = GL_ONE_MINUS_SRC_ALPHA;
+				break;
+			case EBlendMode::MULT:
+				sfactor = GL_ZERO;
+				dfactor = GL_SRC_COLOR;
+				break;
+			case EBlendMode::LIGHTMAP:
+				sfactor = GL_SRC_COLOR;
+				dfactor = GL_DST_COLOR;
+				break;
+			case EBlendMode::INV_BACK:
+				sfactor = GL_ONE_MINUS_DST_COLOR;
+				dfactor = GL_ZERO;
+				break;
+			case EBlendMode::INV:
+				sfactor = GL_ONE_MINUS_SRC_COLOR;
+				dfactor = GL_ZERO;
+				break;
+		}
+		
+		glEnable(GL_BLEND);
+		glBlendFunc(sfactor, dfactor);
+	}
+	
+	inline void DisableBlending()
+	{
+		glDisable(GL_BLEND);
 	}
 }
 

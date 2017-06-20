@@ -28,11 +28,11 @@ class CTexture
 	// Constant / Enums / Typedefs internal usage
 	// ===========================================================
 public:
-	static void Activate(const CTexture& texture);
-	static void Deactivate();
+	static void Bind(const CTexture* texture);
+	static void Unbind();
 	
 	static const unsigned int Create();
-	static void Destroy(const CTexture& texture);
+	static void Destroy(const CTexture* texture);
 	
 	// ===========================================================
 	// Static fields / methods
@@ -87,6 +87,9 @@ public:
 	// ===========================================================
 	// Methods
 	// ===========================================================
+public:
+	void Activate();
+	void Deactivate();
 
 	// ===========================================================
 	// Fields

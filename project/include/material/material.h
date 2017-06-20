@@ -9,7 +9,9 @@
 #ifndef material_h
 #define material_h
 
+#include <string>
 #include <map>
+#include <vector>
 
 #include "property.h"
 
@@ -25,7 +27,8 @@ namespace dc
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
 	private:
-		using TPropertiesMap = std::map<const char*, IProperty*>;
+		using TPropertiesMap = std::map<std::string, IProperty*>;
+		using TPropertiesList = std::vector<IProperty*>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -39,20 +42,20 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char*				Name() const { return m_name; }
+		const std::string&		Name() const { return m_name; }
 		
 		template<typename PT>
-		CMaterialProperty<PT>*	GetTypedProperty(const char* name);
+		CMaterialProperty<PT>*	GetTypedProperty(const std::string& name);
 		
-		IProperty*				GetProperty(const char* name);
+		IProperty*				GetProperty(const std::string& name);
 		
-		const bool				Exists(const char* name) const;
+		const bool				Exists(const std::string& name) const;
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
-		CMaterial(const char* name):
+		CMaterial(const std::string& name):
 			m_name(name)
 		{}
 		
@@ -71,17 +74,27 @@ namespace dc
 		void Deactivate() const;
 		
 		template<typename PT>
-		void AddProperty(const char* name, const PT& propertyType, void(*activationCallback)(const PT&), void(*deactivationCallback)(const PT&));
+		CMaterialProperty<PT>* AddProperty(const std::string& name, PT* propertyType);
+		
+		template<typename PT>
+		CMaterialProperty<PT>* AddProperty(const std::string& name);
+		
+		CMaterialProperty<CBlending>* AddProperty(const std::string& name, const EBlendMode& blending);
 		
 	private:
-		void AddIProperty(const char* name, IProperty* property);
+		void AddIProperty(const std::string& name, IProperty* property);
 
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	private:
-		const char*		m_name;
+		std::string		m_name;
+		
+		// map to make fast the get
 		TPropertiesMap	m_propertiesMap;
+		
+		// vector to make fast and ordered the iteration
+		TPropertiesList	m_propertiesList;
 	};
 	
 	// ===========================================================
@@ -92,7 +105,7 @@ namespace dc
 	// Template/Inline implementation
 	// ===========================================================
 	template<typename PT>
-	CMaterialProperty<PT>*	CMaterial::GetTypedProperty(const char* name)
+	CMaterialProperty<PT>*	CMaterial::GetTypedProperty(const std::string& name)
 	{
 		IProperty* property = GetProperty(name);
 		if(property)
@@ -104,13 +117,22 @@ namespace dc
 	
 	template<typename PT>
 	inline
-	void CMaterial::AddProperty(const char* name, const PT& propertyType, void(*activationCallback)(const PT&), void(*deactivationCallback)(const PT&))
+	CMaterialProperty<PT>* CMaterial::AddProperty(const std::string& name, PT* propertyType)
 	{
 		CMaterialProperty<PT>* property = new CMaterialProperty<PT> (propertyType);
-		property->ActivationSignal().Connect(activationCallback);
-		property->DeactivationSignal().Connect(deactivationCallback);
 		property->Enable(true);
 		AddIProperty(name, property);
+		return property;
+	}
+	
+	template<typename PT>
+	inline
+	CMaterialProperty<PT>* CMaterial::AddProperty(const std::string& name)
+	{
+		CMaterialProperty<PT>* property = new CMaterialProperty<PT> ();
+		property->Enable(false);
+		AddIProperty(name, property);
+		return property;
 	}
 }
 

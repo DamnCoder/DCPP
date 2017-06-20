@@ -9,8 +9,10 @@
 #ifndef __game_object__
 #define __game_object__
 
-#include "component.h"
+#include <string>
 
+#include "component.h"
+#include "transform.h"
 #include "renderer/renderlayermanager.h"
 
 namespace dc
@@ -37,11 +39,15 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const char*					Name()		const			{ return m_id; }
-		void						Name(const char* name)		{ m_id = name; }
+		const std::string&			Name()		const				{ return m_name; }
+		void						Name(const std::string& name)	{ m_name = name; }
 		
-		const char*					LayerName() const			{ return m_layer; }
-		void						LayerName(const char* name) { m_layer = name; }
+		const char*					LayerName() const				{ return mp_layer; }
+		void						LayerName(const char* name)		{ mp_layer = name; }
+		
+		CTransform*					Transform() const				{ return mp_transform; }
+		
+		const bool					HasChild(const std::string& name) const;
 		
 		const unsigned int			ComponentsNum(const char* compId) const;
 
@@ -66,15 +72,9 @@ namespace dc
 		// Constructors
 		// ===========================================================
     public:
-        CGameObject(const char* name):
-            m_id(name),
-			m_layer(CRenderLayerManager::DEFAULT_LAYER)
-        {}
-		
-		CGameObject(const char* name, const char* layerName):
-			m_id(name),
-			m_layer(layerName)
-		{}
+		CGameObject();
+		CGameObject(const char* name);
+		CGameObject(const char* name, const char* layerName);
 		
 		~CGameObject();
 		
@@ -105,14 +105,17 @@ namespace dc
 
 		template<typename ComponentType>
 		void RemoveComponent();
+		
+		CGameObject* FindChild(const std::string& name) const;
 
 		// ===========================================================
 		// Fields
 		// ===========================================================
     private:
         
-        const char*			m_id;
-		const char*			m_layer;
+		std::string			m_name;
+		const char*			mp_layer;
+		CTransform*			mp_transform;
 		TComponentListTable	m_componentTable;
     };
 	

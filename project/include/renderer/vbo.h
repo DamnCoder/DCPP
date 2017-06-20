@@ -84,14 +84,7 @@ namespace dc
 		// Methods for/from SuperClass/Interfaces
 		// ===========================================================
 	public:
-		void operator= (const CVBO<ArrayType>& vbo)
-		{
-			m_id = vbo.m_id;
-			m_typeSize = vbo.m_typeSize;
-			m_target = vbo.m_target;
-			m_usage = vbo.m_usage;
-			m_dataArray = vbo.m_dataArray;
-		}
+		void operator= (const CVBO<ArrayType>& vbo);
 		
 		// ===========================================================
 		// Methods
@@ -155,6 +148,17 @@ namespace dc
 	{
 		const GLuint identifier = (GLuint)vbo.Id();
 		glBindBuffer(vbo.Target(), identifier);
+	}
+	
+	template<typename ArrayType>
+	inline
+	void CVBO<ArrayType>::operator= (const CVBO<ArrayType>& vbo)
+	{
+		m_id = vbo.m_id;
+		m_typeSize = vbo.m_typeSize;
+		m_target = vbo.m_target;
+		m_usage = vbo.m_usage;
+		m_dataArray = vbo.m_dataArray;
 	}
 }
 

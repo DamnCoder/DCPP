@@ -51,7 +51,7 @@ namespace dc
 	
 	void CScene::Add(CGameObject* gameObject)
 	{
-		printf("[CScene::AddToScene] Adding %s\n", gameObject->Name());
+		printf("[CScene::AddToScene] Adding %s\n", gameObject->Name().c_str());
 		
 		// Check if the same Game Object is already in the scene, we can't have two instances of the same game object
 		assert(!Exists(gameObject) && "[CScene::AddToScene] You can't add more than one instance of a GameObject");
@@ -69,6 +69,15 @@ namespace dc
 				component->Initialize();
 			}
 		}
+		
+		// And now the children components
+		const TTransformList& childrenList = gameObject->Transform()->Children();
+		
+		for(auto* children : childrenList)
+		{
+			Add(children->GameObject());
+		}
+		
 	}
 	
 	void CScene::Remove(CGameObject* gameObject)

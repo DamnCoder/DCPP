@@ -20,6 +20,12 @@ namespace dc
 	// ===========================================================
 	// External Enums / Typedefs for global usage
 	// ===========================================================
+	
+	class CTransform;
+	
+	using TTransformList = std::vector<CTransform*>;
+	using TTransformIterator = TTransformList::iterator;
+	
 	/**
 	 * \class
 	 * \brief
@@ -34,10 +40,6 @@ namespace dc
 		// ===========================================================
 		RTTI_DECLARATIONS(CTransform, CComponent)
 		
-	public:
-		typedef std::vector<CTransform*>	TTransformList;
-		typedef TTransformList::iterator	TTransformIterator;
-		
 		// ===========================================================
 		// Static fields / methods
 		// ===========================================================
@@ -50,17 +52,22 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		// Getters
-		const math::Matrix4x4f&	LocalMatrix() const { return m_matrix; }
+		void					LocalMatrix(math::Matrix4x4f matrix)	{ m_matrix = matrix; }
+		const math::Matrix4x4f&	LocalMatrix() const						{ return m_matrix; }
+		
 		const math::Matrix4x4f	WorldMatrix() const;
 		
-		const TTransformList	Childs() const { return ml_childs; }
-		TTransformIterator		Begin() { return ml_childs.begin(); }
-		TTransformIterator		End() { return ml_childs.end(); }
+		const bool				HasChild(CTransform* transform) const;
+		const bool				HasChildren() const		{ return m_children.empty(); }
+		const unsigned int		ChildrenCount() const	{ return m_children.size(); }
+		const TTransformList	Children() const		{ return m_children; }
 		
-		CTransform*				Root() const { return mp_root; }
-		CTransform*				Parent() const { return mp_parent; }
+		TTransformIterator		Begin()	{ return m_children.begin(); }
+		TTransformIterator		End()	{ return m_children.end(); }
 		
+		CTransform*				Root() const	{ return mp_root; }
+		
+		CTransform*				Parent() const	{ return mp_parent; }
 		void					Parent(CTransform* parent);
 		
 		math::Vector3f			LocalPos() const { return m_matrix.Translation(); }
@@ -89,7 +96,8 @@ namespace dc
 	public:
 		void Reset();
 		
-		void AddChild(CTransform* child);
+		void Add(CTransform* child);
+		void Remove(CTransform* child);
 		
 		void Translate(const math::Vector3f& position);
 		void Rotate(const math::Vector3f& rotation);
@@ -107,7 +115,7 @@ namespace dc
 		CTransform*			mp_parent;  // Transform parent
 
 		math::Matrix4x4f	m_matrix;   // Local
-		TTransformList		ml_childs;
+		TTransformList		m_children;
     };
 	// ===========================================================
 	// Class typedefs

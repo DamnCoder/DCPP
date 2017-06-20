@@ -12,7 +12,6 @@
 #include <functional>
 
 #include <math/dcmath.h>
-#include <signals/signal.h>
 
 #include "material/shader.h"
 #include "material/texture.h"
@@ -26,33 +25,20 @@ namespace dc
 	class IProperty
 	{
 	public:
-		IProperty() {}
+		const bool			Enabled() const					{ return m_enabled;}
+		void				Enable(const bool enable)		{ m_enabled = enable; }
+		
+	public:
+		IProperty(): m_enabled(false) {}
 		virtual ~IProperty() {}
 		
 	public:
 		virtual void Activate() const = 0;
 		virtual void Deactivate() const = 0;
+		
+	protected:
+		bool m_enabled;
 	};
-	
-	inline void Activate(const CShaderProgram& program)
-	{
-		program.Activate();
-	}
-	
-	inline void Deactivate(const CShaderProgram& program)
-	{
-		program.Deactivate();
-	}
-	
-	inline void Activate(const CTexture& texture)
-	{
-		CTexture::Activate(texture);
-	}
-	
-	inline void Deactivate(const CTexture& texture)
-	{
-		CTexture::Deactivate();
-	}
 	
 	/**
 	 * \class
@@ -67,10 +53,6 @@ namespace dc
 		// ===========================================================
 		// Constant / Enums / Typedefs internal usage
 		// ===========================================================
-	public:
-		using TPropertyCallback = void (*)(const T&);
-		
-		using TPropertySignal = CSignal<void(const T&)>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -84,23 +66,20 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		
-		const bool			Enabled() const					{ return m_enabled;}
-		void				Enable(const bool enable)		{ m_enabled = enable; }
-		
-		T&					Value()							{ return m_value; }
-		const T&			Value() const					{ return m_value; }
-		void				Value(const T& value)			{ m_value = value; }
-		
-		TPropertySignal&	ActivationSignal()				{ return m_activationCallback; }
-		TPropertySignal&	DeactivationSignal()			{ return m_deactivationCallback; }
+		T*		Value()			{ return m_value; }
+		void	Value(T* value)	{ m_value = value; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
-		CMaterialProperty(const T& property):
-			m_enabled(false),
+		CMaterialProperty():
+			IProperty(),
+			m_value(0)
+		{}
+		
+		CMaterialProperty(T* property):
+			IProperty(),
 			m_value(property)
 		{}
 		
@@ -114,43 +93,88 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void Activate() const override
-		{
-			if(Enabled() && !m_activationCallback.IsEmpty())
-			{
-				m_activationCallback(m_value);
-			}
-		}
-		
-		void Deactivate() const override
-		{
-			if(Enabled() && !m_deactivationCallback.IsEmpty())
-			{
-				m_deactivationCallback(m_value);
-			}
-		}
+		void Activate() const override;
+		void Deactivate() const override;
 		
 		// ===========================================================
 		// Fields
 		// ===========================================================
 	
 	protected:
-		
-		bool			m_enabled;
-		
-		T				m_value;
-		
-		TPropertySignal	m_activationCallback;
-		TPropertySignal	m_deactivationCallback;
+		T*	m_value;
 	};
 	
 	// ===========================================================
 	// Class typedefs
 	// ===========================================================
-	
+
 	// ===========================================================
 	// Template/Inline implementation
 	// ===========================================================
+	
+	template<typename T>
+	void CMaterialProperty<T>::Activate() const
+	{
+		if(Enabled())
+		{
+			m_value->Activate();
+		}
+	}
+	
+	template<typename T>
+	void CMaterialProperty<T>::Deactivate() const
+	{
+		if(Enabled())
+		{
+			m_value->Deactivate();
+		}
+	}
+	
+	// ===========================================================
+	// Other classes
+	// ===========================================================
+	
+	class CPropertyEnabler
+	{
+	public:
+		CPropertyEnabler(const int property): m_property(property)
+		{}
+		
+	public:
+		void Activate()
+		{
+			Enable(m_property);
+		}
+		
+		void Deactivate()
+		{
+			Disable(m_property);
+		}
+		
+	private:
+		int m_property;
+	};
+	
+	class CBlending
+	{
+	public:
+		CBlending(const EBlendMode& mode) : m_mode (mode)
+		{}
+		
+	public:
+		void Activate()
+		{
+			EnableBlending(m_mode);
+		}
+		
+		void Deactivate()
+		{
+			DisableBlending();
+		}
+		
+	private:
+		EBlendMode	m_mode;
+	};
 }
 
 #endif /* property_h */

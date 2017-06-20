@@ -10,8 +10,10 @@
 #ifndef CPROXY_H
 #define CPROXY_H
 
+#include <assert.h>
 #include <map>
-#include <utility>
+#include <string>
+
 #include "help/utils.h"
 
 namespace dc
@@ -36,7 +38,7 @@ namespace dc
 		// ===========================================================
 	private:
 		using TProxyPair	= std::pair<int, T*>;
-		using TProxyMap		= std::map<const char*, TProxyPair, cmp_c_str>;
+		using TProxyMap		= std::map<std::string, TProxyPair>;
 		
 		// ===========================================================
 		// Static fields / methods
@@ -50,10 +52,10 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const bool	Exists(const char* key)	const { return m_proxy.find(key) != m_proxy.end(); }
+		const bool	Exists(const std::string& key)	const { return m_proxy.find(key) != m_proxy.end(); }
 		
-		const int	Count(const char* key)	const { return Find(key)->first; }
-		const int	Count()					const { return m_proxy.size(); }
+		const int	Count(const std::string& key)	const { return Find(key)->first; }
+		const int	Count()							const { return m_proxy.size(); }
 		
 		// ===========================================================
 		// Constructors
@@ -73,18 +75,17 @@ namespace dc
 		// ===========================================================
 		
     public:
-		void		Add(const char* key, T* element);
-		T&			GetRef(const char* key);
-		T*			GetPtr(const char* key);
+		void		Add(const std::string& key, T* element);
+		T*			Get(const std::string& key);
 		
         template<typename ST>
-		ST*			GetTyped(const char* key);
+		ST*			GetTyped(const std::string& key);
 		
-		void		Remove(const char* key);
+		void		Remove(const std::string& key);
 		void		Clear();
 		
     private:
-		TProxyPair& Find(const char* key) const;
+		TProxyPair& Find(const std::string& key) const;
 		void		DeleteProxyPair(TProxyPair& elementTuple);
 		
 		// ===========================================================
@@ -103,25 +104,18 @@ namespace dc
 	// ===========================================================
 	template<typename T>
 	inline
-	void CProxy<T>::Add(const char* key, T* element)
+	void CProxy<T>::Add(const std::string& key, T* element)
 	{
 		m_proxy[key] = TProxyPair(1, element);
-	}
-	
-	template<typename T>
-	inline
-	T& CProxy<T>::GetRef(const char* key)
-	{
-		return *GetPtr(key);
 	}
 
 	template<typename T>
 	inline
-	T* CProxy<T>::GetPtr(const char* key)
+	T* CProxy<T>::Get(const std::string& key)
 	{
 		typename TProxyMap::iterator it = m_proxy.find(key);
 		
-		assert(it != m_proxy.end());
+		assert(it != m_proxy.end() && "[CProxy<T>::Get] Key doesn't exist");
 		
 		TProxyPair& tuple = it->second;
 		
@@ -135,14 +129,14 @@ namespace dc
 	template<typename T>
 	template<typename ST>
 	inline
-	ST* CProxy<T>::GetTyped(const char* key)
+	ST* CProxy<T>::GetTyped(const std::string& key)
 	{
-		return static_cast<ST*>(GetPtr(key));
+		return static_cast<ST*>(Get(key));
 	}
 	
 	template<typename T>
 	inline
-	void CProxy<T>::Remove(const char* key)
+	void CProxy<T>::Remove(const std::string& key)
 	{
 		TProxyPair* elementTuple = Find(key);
 		
@@ -181,7 +175,7 @@ namespace dc
 	
 	template<typename T>
 	inline
-	typename CProxy<T>::TProxyPair& CProxy<T>::Find(const char* key) const
+	typename CProxy<T>::TProxyPair& CProxy<T>::Find(const std::string& key) const
 	{
 		typename TProxyMap::const_iterator it, end; it = m_proxy.find(key);
 		assert(it != m_proxy.end());

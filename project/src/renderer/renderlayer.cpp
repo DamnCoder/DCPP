@@ -9,6 +9,7 @@
 #include "renderlayer.h"
 
 #include <assert.h>
+#include <algorithm>
 
 #include "renderer.h"
 #include "component/gameobject.h"
@@ -54,6 +55,7 @@ namespace dc
 			for(CRendererComponent* renderComponent : renderBatch)
 			{
 				CGameObject* gameObject = renderComponent->GameObject();
+				printf("Rendering %s\n", gameObject->Name().c_str());
 				CTransform* transform = gameObject->GetComponent<CTransform>();
 				modelMatrix = transform->WorldMatrix();
 				
@@ -64,9 +66,9 @@ namespace dc
 				auto* shaderProperty = material->GetTypedProperty<CShaderProgram>("ShaderProgram");
 				if(shaderProperty && texture)
 				{
-					CShaderProgram& shaderProgram = shaderProperty->Value();
-					shaderProgram.PassMatrix4x4f("MVP", MVP);
-					shaderProgram.PassInteger("TextureSampler", 0);
+					CShaderProgram* shaderProgram = shaderProperty->Value();
+					shaderProgram->PassMatrix4x4f("MVP", MVP);
+					shaderProgram->PassInteger("TextureSampler", 0);
 				}
 				
 				const CVAO& vao = renderComponent->ModelComponent()->VAO(material);

@@ -45,9 +45,8 @@ namespace dc
 		// ===========================================================
 	public:
 		// Getters / Setters
-		CGameObject* GameObject() const { return mp_gameObject; }
-		
-		void GameObject(CGameObject* gameObject) { mp_gameObject = gameObject; }
+		CGameObject*	GameObject() const					{ return mp_gameObject; }
+		void			GameObject(CGameObject* gameObject)	{ mp_gameObject = gameObject; }
 
 		// ===========================================================
 		// Constructors

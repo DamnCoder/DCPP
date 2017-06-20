@@ -8,10 +8,16 @@
 #ifndef LOADMD3_H_
 #define LOADMD3_H_
 
+#include <pathie.hpp>
+
+#include "assets/assetmanager.h"
+
 #include "md3structs.h"
-#include "md3model.h"
+#include "md3skinloader.h"
 
 #include "containers/array.h"
+
+#include "component/transform.h"
 
 namespace dc
 {
@@ -25,44 +31,27 @@ namespace dc
 		const size_t TRIANGLE_SIZE = sizeof(unsigned int) * 3;
 		const size_t VERTEX_SIZE = sizeof(tMd3Vertex);
 
-	public:
-		CMD3Loader();
-		
-	public:
-		CGameObject* Load(const char* pathToModel);
-		
 	private:
 		const bool ValidateHeader(const tMd3Header& header) const;
 		const bool CheckMagicToken(const char* token) const;
 		
-		CArray<CMesh*> ReadMD3(const char* md3FilePath);
-		
-		CArray<CMesh*> ReadModel(FILE* filePtr, const tMd3Header& header);
-		CMesh* CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset);
-		void AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int numElements);
+	public:
+		CMD3Loader(CAssetManager& assetManager): m_assetManager(assetManager) {}
 		
 	public:
-		bool OldImportMD3(tModel *pModel, const char *strFileName, const float scale);
-		bool OldLoadSkin(tModel *pModel, tSkin* skin, const std::string& path, const std::string& name);
-
-	private:
-		void OldReadMD3Data(tModel *pModel, const float scale);
-		void Adapt(tModel *pModel, const tMd3MeshHeader& meshHeader, const float scale);
-		CMesh* Adapt(const tMd3MeshHeader& meshHeader, const float scale);
-		void CleanUp();
-		
-		
-
+		CGameObject*	Load(const Pathie::Path& pathToModel);
 		
 	private:
-		FILE*			m_FilePointer;
-
-		tMd3Header		m_Header;			// The header data
-		tMd3Shader*		mp_Skins;			// The skin name data (not used)
-		tMd3TexCoord*	mp_TexCoords;		// The texture coordinates
-		tMd3Face*		mp_Triangles;		// Face/Triangle data
-		tMd3Vertex*		mp_Vertices;		// Vertex/UV indices
-		tMd3Frame*		mp_Frames;			// This stores the bone data (not used)
+		CGameObject*	ReadMD3(const Pathie::Path& modelPath, const char* filename);
+		
+		CGameObject*	CreateMD3GO(FILE* filePtr, const tMd3Header& header, const TSkinMap& skinMap, const char* name);
+		CMesh*			CreateMesh(FILE* filePtr, const tMd3MeshHeader& meshHeader, const int meshOffset);
+		void			AdaptVertices(tMd3Vertex* md3VertexArray, TFloatArray* vertexArray, TFloatArray* normalArray, const unsigned int numElements);
+		TTransformList	FindTags(const CTransform* md3Transform);
+		void			Link(CGameObject* lower, CGameObject* upper);
+		
+	private:
+		CAssetManager m_assetManager;
 	};
 
 }

@@ -9,6 +9,7 @@
 #include "shader.h"
 
 #include "renderer/glwraps.h"
+#include "renderer/renderer.h"
 
 #include <assert.h>
 
@@ -78,6 +79,26 @@ namespace dc
 	//------------------------------------------------------------//
 	// CShaderProgram
 	//------------------------------------------------------------//
+	
+	CShaderProgram* CShaderProgram::Create(CShader* vertexShader, CShader* fragmentShader)
+	{
+		CShaderProgram* shaderProg = new CShaderProgram;
+		shaderProg->Create();
+		
+		shaderProg->Add(vertexShader);
+		shaderProg->Add(fragmentShader);
+		
+		shaderProg->Compile();
+		
+		shaderProg->AttachAll();
+		
+		shaderProg->Link(CRenderer::Instance().VertexProperties());
+		
+		shaderProg->CreateUniform("MVP");
+		shaderProg->CreateUniform("TextureSampler");
+		
+		return shaderProg;
+	}
 	
 	const bool CShaderProgram::CorrectlyLinked() const
 	{

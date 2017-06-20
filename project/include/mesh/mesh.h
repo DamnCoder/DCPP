@@ -6,6 +6,7 @@
 
 #include <math/dcmath.h>
 
+#include <string>
 #include <map>
 
 namespace dc
@@ -33,20 +34,10 @@ namespace dc
 	public:
 		const bool IsValid() const;
 		
-		const char* Name() const
-		{
-			return m_name;
-		}
+		const std::string& Name() const { return m_name; }
 		
-		const int IndexCount() const
-		{
-			return m_indexCount;
-		}
-		
-		void IndexCount(const unsigned int indexCount)
-		{
-			m_indexCount = indexCount;
-		}
+		const int	IndexCount() const { return m_indexCount; }
+		void		IndexCount(const unsigned int indexCount) { m_indexCount = indexCount; }
 		
 		const int VertexCount() const
 		{
@@ -58,34 +49,23 @@ namespace dc
 			m_vertexCount = vertexCount;
 		}
 		
-		const math::Vector3f& Center() const
-		{
-			return m_center;
-		}
+		const math::Vector3f& Center() const { return m_center; }
 
-		const math::Vector3f& Size() const
-		{
-			return m_size;
-		}
+		const math::Vector3f& Size() const { return m_size; }
 
-		TFloatArray& FloatDataArray(const char* id);
+		TFloatArray&	FloatDataArray(const char* id);
+		void			FloatDataArray(const char* id, TFloatArray& floatArray);
 		
-		void FloatDataArray(const char* id, TFloatArray& floatArray);
+		void			AddFloatDataArray(const char* id, TFloatArray& floatArray);
 		
-		void AddFloatDataArray(const char* id, TFloatArray& floatArray);
-		
-		TUIntArray& IndexArray() { return m_indexArray; }
-		
-		void IndexArray (const TUIntArray indexArray)
-		{
-			m_indexArray = indexArray;
-		}
+		TUIntArray&		IndexArray() { return m_indexArray; }
+		void			IndexArray (const TUIntArray indexArray) { m_indexArray = indexArray; }
 		
 		// ===========================================================
 		// Constructors
 		// ===========================================================
 	public:
-		CMesh(const char* name) :
+		CMesh(const std::string& name) :
 				m_name(name), m_indexCount(0), m_vertexCount(0), m_center(), m_size()
 		{}
 
@@ -117,7 +97,7 @@ namespace dc
 		// Fields
 		// ===========================================================
 	private:
-		const char*		m_name;
+		std::string		m_name;
 		
 		unsigned int	m_indexCount;
 		unsigned int	m_vertexCount;

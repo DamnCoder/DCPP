@@ -10,16 +10,17 @@
 namespace dc
 {
 	// ===========================================================
-	// External Enums / Typedefs for global usage
+	// Static methods
 	// ===========================================================
-	void CTexture::Activate(const CTexture& texture)
+	
+	void CTexture::Bind(const CTexture* texture)
 	{
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture.Id());
+		glBindTexture(GL_TEXTURE_2D, texture->Id());
 	}
 	
-	void CTexture::Deactivate()
+	void CTexture::Unbind()
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -31,48 +32,24 @@ namespace dc
 		return textureID;
 	}
 	
-	void CTexture::Destroy(const CTexture& texture)
+	void CTexture::Destroy(const CTexture* texture)
 	{
-		const GLuint identifier = (GLuint)texture.Id();
+		const GLuint identifier = (GLuint)texture->Id();
 		glDeleteTextures(1, &identifier);
 	}
-	// ===========================================================
-	// Constant / Enums / Typedefs internal usage
-	// ===========================================================
 	
-	// ===========================================================
-	// Static fields / methods
-	// ===========================================================
-
-	// ===========================================================
-	// Inner and Anonymous Classes
-	// ===========================================================
-
-	// ===========================================================
-	// Getter & Setter
-	// ===========================================================
-
-	// ===========================================================
-	// Constructors
-	// ===========================================================
-
-	// ===========================================================
-	// Methods for/from SuperClass/Interfaces
-	// ===========================================================
-
 	// ===========================================================
 	// Methods
 	// ===========================================================
-
-	// ===========================================================
-	// Fields
-	// ===========================================================
-
-	// ===========================================================
-	// Class typedefs
-	// ===========================================================
 	
-	// ===========================================================
-	// Template/Inline implementation
-	// ===========================================================
+	void CTexture::Activate()
+	{
+		Bind(this);
+	}
+	
+	void CTexture::Deactivate()
+	{
+		Unbind();
+	}
+
 }

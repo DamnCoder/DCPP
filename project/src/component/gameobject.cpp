@@ -12,13 +12,41 @@
 
 #include "help/deletehelp.h"
 
+#include "transform.h"
+
 namespace dc
 {
+	CGameObject::CGameObject():
+		m_name("GameObject"),
+		mp_layer(CRenderLayerManager::DEFAULT_LAYER)
+	{
+		mp_transform = AddComponent<CTransform>();
+	}
+	
+	CGameObject::CGameObject(const char* name):
+		m_name(name),
+		mp_layer(CRenderLayerManager::DEFAULT_LAYER)
+	{
+		mp_transform = AddComponent<CTransform>();
+	}
+	
+	CGameObject::CGameObject(const char* name, const char* layerName):
+		m_name(name),
+		mp_layer(layerName)
+	{
+		mp_transform = AddComponent<CTransform>();
+	}
+	
 	CGameObject::~CGameObject()
 	{
-		m_id = 0;
-		m_layer = 0;
+		mp_layer = 0;
+		mp_transform = 0;
 		SafeDelete(m_componentTable);
+	}
+	
+	const bool CGameObject::HasChild(const std::string& name) const
+	{
+		return FindChild(name) != 0;
 	}
 	
 	const unsigned int CGameObject::ComponentsNum(const char* compId) const
@@ -61,5 +89,30 @@ namespace dc
 			
 			delete component;
 		}
+	}
+	
+	CGameObject* CGameObject::FindChild(const std::string& name) const
+	{
+		assert(mp_transform && "[CGameObject::FindChild] The game object has no transform component");
+		
+		TTransformList childrenTransList = mp_transform->Children();
+		for(auto* childTrans : childrenTransList)
+		{
+			auto* childGO = childTrans->GameObject();
+			if(childGO->Name() == name)
+			{
+				return childGO;
+			}
+			else if(childGO->Transform()->HasChildren())
+			{
+				CGameObject* go = childGO->FindChild(name);
+				if(go)
+				{
+					return go;
+				}
+			}
+		}
+		
+		return 0;
 	}
 }

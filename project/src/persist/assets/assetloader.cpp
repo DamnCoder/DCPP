@@ -12,6 +12,7 @@
 #include <persist/texture/textureloader.h>
 #include <persist/shader/shaderloader.h>
 #include <persist/obj/objloader.h>
+#include <persist/md3/md3loader.h>
 
 #include <pathie.hpp>
 
@@ -97,6 +98,7 @@ namespace dc
 		ReadTextures(document, assetManager);
 		ReadShaders(document, assetManager);
 		ReadMeshes(document, assetManager);
+		ReadMD3(document, assetManager);
 		
 		fclose(fp);
 		free(buffer);
@@ -148,7 +150,7 @@ namespace dc
 		const char* ASSETS_KEY = "assets";
 		
 		assert(document.IsObject());
-		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadShaders] No textures defined in asset_config");
 		
 		CShaderLoader loader;
 		
@@ -193,7 +195,7 @@ namespace dc
 		const char* ASSETS_KEY = "assets";
 		
 		assert(document.IsObject());
-		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadTextures] No textures defined in asset_config");
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadMeshes] No textures defined in asset_config");
 
 		auto& assetGroupObj = document[ASSET_GROUP_KEY];
 		
@@ -227,5 +229,30 @@ namespace dc
 		}
 		
 		printf("All meshes loaded\n");
+	}
+	
+	void CAssetLoader::ReadMD3(rapidjson::Document& document, CAssetManager& assetManager)
+	{
+		const char* ASSET_GROUP_KEY = "md3";
+		
+		assert(document.IsObject());
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadMD3] No md3 defined in asset_config");
+		
+		auto& assetGroupObj = document[ASSET_GROUP_KEY];
+		
+		for(auto& modelEntry : assetGroupObj.GetObject())
+		{
+			auto modelObj = modelEntry.value.GetObject();
+			for(auto& assetEntry : modelObj)
+			{
+				Pathie::Path assetPath (assetEntry.value.GetString());
+				if(assetPath.size())
+				{
+					CMD3Loader loader(assetManager);
+					CGameObject* md3GO = loader.Load(assetPath);
+					assetManager.GameObjectManager().Add(md3GO->Name(), md3GO);
+				}
+			}
+		}
 	}
 }

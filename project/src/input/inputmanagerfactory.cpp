@@ -5,7 +5,6 @@
  *      Author: jorge
  */
 
-#include "input/sdlkeyinputmanager.h"
 #include "input/inputmanagerfactory.h"
 
 namespace dc
