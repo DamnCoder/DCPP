@@ -156,7 +156,7 @@ namespace dc
 		{
 			assert(IsInside(index));
 			mp_data[index] = value;
-			m_currentSize = std::max(m_currentSize, index);
+			m_currentSize = std::max(m_currentSize, index + 1);
 		}
 		
 		void Set(const unsigned int index, const T* data, const unsigned int dataLength)
