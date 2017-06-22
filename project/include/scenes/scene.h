@@ -1,6 +1,6 @@
 //
 //  scene.h
-//  DCPPTest
+//  DCPP
 //
 //  Created by Jorge López on 20/1/17.
 //
@@ -17,6 +17,17 @@
 
 namespace dc
 {
+	/**
+	 * \class CScene
+	 * \brief
+	 * \author Jorge López González
+	 *
+	 * Holds all the game objects that participate in a scene.
+	 * When a game object is added, the life cycle of its components
+	 * is as follows:
+	 * - When you added it calls Initialize for all components, but it's not added yet to the scene
+	 * - In PrepareUpdate is added to the scene and calls Awake for all components
+	 */
 	class CScene
 	{
 		// ===========================================================
@@ -65,9 +76,8 @@ namespace dc
 		// Methods
 		// ===========================================================
 	public:
-		void Update();
-		
 		void PrepareUpdate();
+		void Update();
 		void FinishUpdate();
 		
 		void Add(CGameObject* gameObject);

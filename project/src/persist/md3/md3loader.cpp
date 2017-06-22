@@ -73,7 +73,7 @@ namespace dc
 		CGameObject* upper = ReadMD3(pathToModel, "upper.md3");
 		CGameObject* head = ReadMD3(pathToModel, "head.md3");
 		
-		lower->Transform()->Rotate(math::Vector3f(90.f, 0.f, 0.f));
+		lower->Transform()->Rotation(math::Vector3f(-90.f, 0.f, 0.f));
 		
 		rootTransform->Add(lower->Transform());
 		Link(lower, upper);
@@ -151,6 +151,7 @@ namespace dc
 			CTransform* tagTrans = tagGO->Transform();
 			
 			math::Matrix4x4f m;
+			m.Identify();
 			m.m11 = tag.axis[0][0]; m.m12 = tag.axis[0][1]; m.m13 = tag.axis[0][2];
 			m.m21 = tag.axis[1][0]; m.m22 = tag.axis[1][1]; m.m23 = tag.axis[1][2];
 			m.m31 = tag.axis[2][0]; m.m32 = tag.axis[2][1]; m.m33 = tag.axis[2][2];
@@ -160,7 +161,6 @@ namespace dc
 			tagTrans->LocalMatrix(m);
 			
 			md3Transform->Add(tagTrans);
-			printf("Created tag %s in md3 %s\n", tagGO->Name().c_str(), name);
 		}
 		
 		//printf("Number of frames for animation: %d\n", header.numFrames);

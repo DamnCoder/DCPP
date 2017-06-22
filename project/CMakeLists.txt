@@ -71,7 +71,6 @@ SET(HEADERS
 	include/input/inputmanagerfactory.h
 	include/input/keyinputmanager.h
 	include/input/mouseinputmanager.h
-	include/input/sdlkeyinputmanager.h
 	include/material/material.h
 	include/material/materialmanager.h
 	include/material/property.h
@@ -128,9 +127,7 @@ SET(HEADERS
 #[PRJ_SOURCE_FILES]
 SET(SOURCES
 	src/app.cpp
-	src/assets/assetmanager.cpp
 	src/component/camera.cpp
-	src/component/component.cpp
 	src/component/gameobject.cpp
 	src/component/modelcomponent.cpp
 	src/component/renderercomponent.cpp
@@ -140,14 +137,11 @@ SET(SOURCES
 	src/input/inputmanagerfactory.cpp
 	src/input/keyinputmanager.cpp
 	src/input/mouseinputmanager.cpp
-	src/input/sdlkeyinputmanager.cpp
 	src/material/material.cpp
-	src/material/property.cpp
 	src/material/shader.cpp
 	src/material/texture.cpp
 	src/mesh/mesh.cpp
 	src/mesh/model.cpp
-	src/nodes/graphicnode.cpp
 	src/persist/meshloader.cpp
 	src/persist/assets/assetloader.cpp
 	src/persist/md3/animationloader.cpp
@@ -163,7 +157,6 @@ SET(SOURCES
 	src/renderer/renderlayer.cpp
 	src/renderer/renderlayermanager.cpp
 	src/renderer/vao.cpp
-	src/renderer/vbo.cpp
 	src/renderer/vertexproperty.cpp
 	src/scenes/scene.cpp
 	src/scenes/scenemanager.cpp

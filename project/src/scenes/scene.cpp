@@ -19,11 +19,6 @@ namespace dc
 		return it != end;
 	}
 	
-	void CScene::Update()
-	{
-		
-	}
-	
 	void CScene::PrepareUpdate()
 	{
 		if(m_newGOList.size() == 0)
@@ -34,6 +29,17 @@ namespace dc
 			AddToScene(gameObject);
 		}
 		m_newGOList.clear();
+	}
+	
+	void CScene::Update()
+	{
+		for(auto& componentListEntry : m_componentsMap)
+		{
+			for(auto* component : componentListEntry.second)
+			{
+				component->Update();
+			}
+		}
 	}
 
 	void CScene::FinishUpdate()
@@ -95,6 +101,14 @@ namespace dc
 				component->Sleep();
 			}
 		}
+		
+		// And now the children components
+		const TTransformList& childrenList = gameObject->Transform()->Children();
+		
+		for(auto* children : childrenList)
+		{
+			Remove(children->GameObject());
+		}
 	}
 
 	void CScene::AddToScene(CGameObject* gameObject)
@@ -137,6 +151,7 @@ namespace dc
 		{
 			componentList.push_back(component);
 			component->Awake();
+			component->Start();
 		}
 	}
 	
@@ -153,6 +168,7 @@ namespace dc
 		
 		for(CComponent* component : oldComponentList)
 		{
+			component->Finish();
 			component->Terminate();
 		}
 	}

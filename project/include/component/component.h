@@ -74,6 +74,7 @@ namespace dc
 		
 		virtual void Awake() {}
 		virtual void Start() {}
+		virtual void Update() {}
 		virtual void Finish() {}
 		virtual void Sleep() {}
 		

@@ -71,7 +71,7 @@ namespace dc
 					shaderProgram->PassInteger("TextureSampler", 0);
 				}
 				
-				printf("Rendering %s\n", renderComponent->ModelComponent()->Model()->Mesh(material)->Name().c_str());
+				//printf("Rendering %s\n", renderComponent->ModelComponent()->Model()->Mesh(material)->Name().c_str());
 				
 				const CVAO& vao = renderComponent->ModelComponent()->VAO(material);
 				CVAO::Activate(vao);

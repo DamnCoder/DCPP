@@ -140,14 +140,16 @@ namespace dc
 	
 	const EKeyState CKeyInputManager::UpdateKeyState(const Uint8 state, const EKeyState previousState)
 	{
+		/*
 		if(previousState == EKeyState::RELEASE && state == SDL_RELEASED)
 		{
+			printf("NONE\n");
 			return EKeyState::NONE;
 		}
-		
+		*/
 		if(state == SDL_PRESSED)
 		{
-			if (previousState == EKeyState::NONE)
+			if (previousState == EKeyState::NONE || previousState == EKeyState::RELEASE)
 			{
 				printf("PRESS\n");
 				return EKeyState::PRESS;
@@ -164,6 +166,7 @@ namespace dc
 			return EKeyState::RELEASE;
 		}
 		
+		printf("NONE\n");
 		return EKeyState::NONE;
 	}
 

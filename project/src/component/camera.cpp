@@ -41,6 +41,6 @@ namespace dc
 		
 		assert(transform && "The camera component needs its game object to have a transform");
 		
-		m_viewMatrix = math::Matrix4x4f::LookAt(worldMatrix.Translation(), worldMatrix.Translation() + worldMatrix.Forward(), worldMatrix.Up());
+		m_viewMatrix = math::Matrix4x4f::LookAt(worldMatrix.Position(), worldMatrix.Position() + worldMatrix.Forward(), worldMatrix.Up());
 	}
 }

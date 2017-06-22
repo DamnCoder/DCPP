@@ -34,14 +34,14 @@ class CTimeSubsystem : public IRunnableSubsystem
 	// ===========================================================
 	// Static fields / methods
 	// ===========================================================
-private:
-	
-	static CTimer ms_timer;
-	
+public:
 	static const CTimer& Timer()
 	{
 		return ms_timer;
 	}
+	
+private:
+	static CTimer ms_timer;
 
 	// ===========================================================
 	// Inner and Anonymous Classes
@@ -63,6 +63,7 @@ public:
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
+public:
 	void Initialize()		override;
 	void Terminate()		override;
 	
