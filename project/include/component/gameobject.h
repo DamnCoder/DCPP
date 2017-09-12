@@ -73,8 +73,8 @@ namespace dc
 		// ===========================================================
     public:
 		CGameObject();
-		CGameObject(const char* name);
-		CGameObject(const char* name, const char* layerName);
+		CGameObject(const std::string& name);
+		CGameObject(const std::string& name, const char* layerName);
 		
 		~CGameObject();
 		

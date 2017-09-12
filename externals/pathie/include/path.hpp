@@ -20,6 +20,7 @@
 
 #ifndef PATHIE_PATH_HPP
 #define PATHIE_PATH_HPP
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -29,15 +30,15 @@
 
 #include "pathie.hpp"
 
-namespace Pathie {
-
-  // Forward-declare, defined in pathie.cpp.
+namespace Pathie
+{
+	// Forward-declare, defined in pathie.cpp.
 #if defined(_WIN32)
-  std::string utf16_to_utf8(std::wstring);
-  std::wstring utf8_to_utf16(std::string);
+	std::string utf16_to_utf8(std::wstring);
+	std::wstring utf8_to_utf16(std::string);
 #elif defined(_PATHIE_UNIX)
-  std::string utf8_to_filename(const std::string& utf8);
-  std::string filename_to_utf8(const std::string& native_filename);
+	std::string utf8_to_filename(const std::string& utf8);
+	std::string filename_to_utf8(const std::string& native_filename);
 #endif
 
   /**
@@ -141,223 +142,231 @@ namespace Pathie {
    * As you can see, the argument, if given, always takes precedence over the
    * default set with set_global_dir_default().
    */
-  class Path
-  {
-  public:
-
-    /**
-     * Specifies the argument type for the `global_*_dir()` functions.
-     * `LOCALPATH_DEFAULT` means fall back to the default set with `set_global_dir_default()`,
-     * `LOCALPATH_NORMAL` means to use the normal FHS pathes, and `LOCALPATH_LOCAL` means to use
-     * the pathes the FHS specifies for local additions.
-     */
-    enum localpathtype {
-      LOCALPATH_DEFAULT = 1,
-      LOCALPATH_NORMAL,
-      LOCALPATH_LOCAL
-    };
-
-    /// Default constructor.
-    Path();
-    /// Copy constructor.
-    Path(const Path& path);
-    /// Construct a path from a string.
-    Path(std::string path);
-    /// Construct a path from components.
-    Path(const std::vector<Path>& components);
-
+	
+	class Path
+	{
+	public:
+		/**
+		 * Specifies the argument type for the `global_*_dir()` functions.
+		 * `LOCALPATH_DEFAULT` means fall back to the default set with `set_global_dir_default()`,
+		 * `LOCALPATH_NORMAL` means to use the normal FHS pathes, and `LOCALPATH_LOCAL` means to use
+		 * the pathes the FHS specifies for local additions.
+		 */
+		enum localpathtype
+		{
+			LOCALPATH_DEFAULT = 1,
+			LOCALPATH_LOCAL
+		};
+		
+		/// Default constructor.
+		Path();
+		/// Copy constructor.
+		Path(const Path& path);
+		/// Move constructor
+		Path(Path&& path);
+		/// Construct a path from a string.
+		Path(const std::string& path);
+		/// Construct a path from components.
+		Path(const std::vector<Path>& components);
+		
 #if defined(_PATHIE_UNIX)
-    static inline Path from_native(const std::string& native_filename)
-      { return Path(filename_to_utf8(native_filename)); }
+		static std::vector<Path> data_dirs();
+		static std::vector<Path> config_dirs();
+		
+		static inline Path from_native(const std::string& native_filename) { return Path(filename_to_utf8(native_filename)); }
+		
+		/// Return the path in the native format.
+		std::string native() const;
+		
+		/// C stat information.
+		struct stat* stat() const;
 #elif defined(_WIN32)
-    /** Convert a path that is in the native representation of
-     * the system into a Path instance. The argument will be
-     * transcoded from the system’s native encoding to UTF-8;
-     * on Windows, the argument is expected to be UTF-16LE therefore,
-     * while on UNIX, it is expected to be encoded in the environment’s
-     * locale. */
-    static inline Path from_native(const std::wstring& native_filename)
-      { return Path(utf16_to_utf8(native_filename)); }
+		/** Convert a path that is in the native representation of
+		* the system into a Path instance. The argument will be
+		* transcoded from the system’s native encoding to UTF-8;
+		* on Windows, the argument is expected to be UTF-16LE therefore,
+		* while on UNIX, it is expected to be encoded in the environment’s
+		* locale. */
+		static inline Path from_native(const std::wstring& native_filename) { return Path(utf16_to_utf8(native_filename)); }
+		
+		/// Return the path in the native format.
+		std::wstring native() const;
+		
+		/// C stat information.
+
+		struct _stat* stat() const;
 #else
 #error Unsupported system.
 #endif
 
-    /// Returns the current working directory.
-    static Path pwd();
-    /// Returns the path to the running executable.
-    static Path exe();
-    /// Returns the home directory.
-    static Path home();
+		/// Returns the current working directory.
+		static Path pwd();
+		
+		/// Returns the path to the running executable.
+		static Path exe();
+		
+		/// Returns the home directory.
+		static Path home();
 
-    static Path data_dir();        ///< Directory for permanent user data
-    static Path config_dir();      ///< Directory for permanent user configuration files
-    static Path cache_dir();       ///< Directory for cached user data
-    static Path runtime_dir();     ///< Directory for volatile information
-    static Path temp_dir();        ///< Directory for temporary data
-    static Path desktop_dir();     ///< User’s desktop directory
-    static Path documents_dir();   ///< User’s documents directory
-    static Path download_dir();    ///< User’s download directory
-    static Path music_dir();       ///< User’s music directory
-    static Path pictures_dir();    ///< User’s pictures directory
-    static Path publicshare_dir(); ///< User’s networking directory
-    static Path templates_dir();   ///< User’s document templates directory
-    static Path videos_dir();      ///< User’s video directory
-    static Path appentries_dir();  ///< User’s application starters directory
+		static Path data_dir();        ///< Directory for permanent user data
+		static Path config_dir();      ///< Directory for permanent user configuration files
+		static Path cache_dir();       ///< Directory for cached user data
+		static Path runtime_dir();     ///< Directory for volatile information
+		static Path temp_dir();        ///< Directory for temporary data
+		static Path desktop_dir();     ///< User’s desktop directory
+		static Path documents_dir();   ///< User’s documents directory
+		static Path download_dir();    ///< User’s download directory
+		static Path music_dir();       ///< User’s music directory
+		static Path pictures_dir();    ///< User’s pictures directory
+		static Path publicshare_dir(); ///< User’s networking directory
+		static Path templates_dir();   ///< User’s document templates directory
+		static Path videos_dir();      ///< User’s video directory
+		static Path appentries_dir();  ///< User’s application starters directory
 
-    static Path global_mutable_data_dir(localpathtype local = LOCALPATH_DEFAULT);   ///< Global directory for immutable permanent data
-    static Path global_immutable_data_dir(localpathtype local = LOCALPATH_DEFAULT); ///< Global directory for mutable permanent data
-    static Path global_config_dir(localpathtype local = LOCALPATH_DEFAULT);         ///< Global directory for configuration files
-    static Path global_cache_dir(localpathtype local = LOCALPATH_DEFAULT);          ///< Global directory for cached data
-    static Path global_runtime_dir(localpathtype local = LOCALPATH_DEFAULT);        ///< Global directory for volatile information
-    static Path global_appentries_dir(localpathtype local = LOCALPATH_DEFAULT);     ///< Global application starters directory
-    static Path global_programs_dir();                        ///< Global directory for selfcontained programs
+		static Path global_mutable_data_dir(localpathtype local = LOCALPATH_DEFAULT);   ///< Global directory for immutable permanent data
+		static Path global_immutable_data_dir(localpathtype local = LOCALPATH_DEFAULT); ///< Global directory for mutable permanent data
+		static Path global_config_dir(localpathtype local = LOCALPATH_DEFAULT);         ///< Global directory for configuration files
+		static Path global_cache_dir(localpathtype local = LOCALPATH_DEFAULT);          ///< Global directory for cached data
+		static Path global_runtime_dir(localpathtype local = LOCALPATH_DEFAULT);        ///< Global directory for volatile information
+		static Path global_appentries_dir(localpathtype local = LOCALPATH_DEFAULT);     ///< Global application starters directory
+		static Path global_programs_dir();                        ///< Global directory for selfcontained programs
+		
+		static Path mktmpdir(const std::string& name = "tmpd"); ///< Create a temporary directory
+		
+		static inline void set_global_dir_default(localpathtype localdefault){ c_localdefault = localdefault; } ///< Specify what do do for the `global_*_dir()` methods if no argument is passed to them.
+		static inline localpathtype get_global_dir_default(){ return c_localdefault; } ///< Returns what was set with set_global_dir_default().
 
-    static Path mktmpdir(const std::string& name = "tmpd"); ///< Create a temporary directory
+		/// Shell-like glob.
+		static std::vector<Path> glob(const std::string& pattern, int flags = 0);
+		
+		/// Traverse directory recursively.
+		void find(std::function<bool (const Path& entry)> func) const;
 
-    static inline void set_global_dir_default(localpathtype localdefault){ c_localdefault = localdefault; } ///< Specify what do do for the `global_*_dir()` methods if no argument is passed to them.
-    static inline localpathtype get_global_dir_default(){ return c_localdefault; } ///< Returns what was set with set_global_dir_default().
+		/// Return the path as a raw std::string.
+		std::string&	strRef();
+		std::string		str() const;
+		const char*		c_str() const;
+		
+		/// Assign the given string to the underlying path.
+		void assign(std::string str);
 
-#ifdef _PATHIE_UNIX
-    static std::vector<Path> data_dirs();
-    static std::vector<Path> config_dirs();
-#endif
+		void swap(Path& path) throw();
 
-    /// Shell-like glob.
-    static std::vector<Path> glob(const std::string& pattern, int flags = 0);
-    /// Traverse directory recursively.
-    void find(std::function<bool (const Path& entry)> func) const;
+		/// Number of components in the path string.
+		size_t component_count() const;
+		
+		/// Burst path into components.
+		std::vector<Path> burst(bool descend = false) const;
+		
+		/// Shell-like globbing.
+		std::vector<Path> dglob(const std::string& pattern, int flags = 0) const;
+		
+		/// Glob pattern check without filesystem access.
+		bool fnmatch(const std::string& pattern, int flags = 0) const;
 
-    /// Return the path as a raw std::string.
-	std::string& strRef();
-    std::string str() const;
-	const char* c_str() const;
-    /// Assign the given string to the underlying path.
-    void assign(std::string str);
+		Path& operator=(const Path& path);
+		Path& operator=(const std::string& str);
+		/// Access single component in the path.
+		Path operator[](size_t index) const;
+		bool operator==(const Path& path) const;
+		bool operator!=(const Path& path) const;
+		bool operator<(const Path& path) const;
+		bool operator>(const Path& path) const;
+		bool operator<=(const Path& path) const;
+		bool operator>=(const Path& path) const;
+
+
+		Path	operator/(Path path) const;
+		Path	operator/(std::string path) const;
+		
+		Path	join(Path path) const;
+		Path	join(const std::string& path) const;
+		
+		Path	sub_ext(std::string new_extension) const;
+		
+		void	append(const std::string& folder);
+		void	prepend(const std::string& text);
+		
+		Path	merge(const Path& path) const;
+		Path	findcommon(const Path& path) const;
+
+		/// Platform-independant C fopen().
+		FILE* fopen(const char* mode);
+		/// Update modification and access time to now.
+		void touch();
+
+		bool is_absolute() const; ///< Checks if a path is relative.
+		bool is_relative() const; ///< Checks if a path is absolute.
+		bool is_root() const;     ///< Checks if a path is the file system root.
+
+		/// Remove all . and .. occurences.
+		Path prune() const;
+		/// Creates an absolute path for this path.
+		Path absolute(const Path& base = Path::pwd()) const;
+		/// Creates a relative path from an absolute one.
+		Path relative(Path base) const;
+		/// Expands all shortcuts plus create an absolute path for this path.
+		Path expand() const;
+		/// Get the one real path for this path.
+		Path real() const;
+
+		Path parent() const;
+		Path root() const;
+		Path basename() const;
+		Path dirname() const;
+		std::string extension() const;
+		void split(Path& dirname, Path& basename) const;
+
+
+		/// File size.
+		long size() const;
+		std::chrono::system_clock::time_point atime() const;
+		std::chrono::system_clock::time_point mtime() const;
+		std::chrono::system_clock::time_point ctime() const;
+
+		/// Low-level entry iterator.
+		long each_entry(std::function<void (const std::string& entry)> func) const;
+		/// List of entries.
+		std::vector<Path> entries() const;
+		/// List of children.
+		std::vector<Path> children() const;
+
+		bool exists() const;
+		bool is_directory() const;
+		bool is_file() const;
+		bool is_symlink() const;
+
+		Path readlink() const;
+		/// Create a symbolic link.
+		void make_symlink(const Path& target) const;
+		void mkdir() const;
+		void rmdir() const;
+		void unlink() const;
+		void remove() const;
+		/// "mkdir -p"-like functionality.
+		void mktree() const;
+		/// "rm -r"-link functionality.
+		void rmtree() const;
+		/// Change file names.
+		void rename(Path& newname) const;
+	private:
+		static std::string make_tempname(const std::string& namepart);
+		// Remove double // and trailing /, replace \ with /.
+		void sanitize();
 
 #if defined(_PATHIE_UNIX)
-    std::string native() const;
+		static Path					get_xdg_dir(const std::string& envvarname, const std::string& defaultpath);
+		static std::vector<Path>	get_xdg_dirlist(const std::string& envvarname, const std::string& defaultlist);
+		static std::string			get_xdg_userdir_setting(const std::string& setting);
+		static std::string			get_home(std::string username);
 #elif defined(_WIN32)
-    /// Return the path in the native format.
-    std::wstring native() const;
-#else
-#error Unsupported system.
+		bool		is_ntfs_symlink(const wchar_t* path) const;
+		wchar_t*	read_ntfs_symlink(const wchar_t* path) const;
 #endif
-
-    void swap(Path& path) throw();
-
-    /// Number of components in the path string.
-    size_t component_count() const;
-    /// Burst path into components.
-    std::vector<Path> burst(bool descend = false) const;
-    /// Shell-like globbing.
-    std::vector<Path> dglob(const std::string& pattern, int flags = 0) const;
-    /// Glob pattern check without filesystem access.
-    bool fnmatch(const std::string& pattern, int flags = 0) const;
-
-    Path& operator=(const Path& path);
-    Path& operator=(const std::string& str);
-    /// Access single component in the path.
-    Path operator[](size_t index) const;
-    bool operator==(const Path& path) const;
-    bool operator!=(const Path& path) const;
-    bool operator<(const Path& path) const;
-    bool operator>(const Path& path) const;
-    bool operator<=(const Path& path) const;
-    bool operator>=(const Path& path) const;
-
-    Path operator/(Path path) const;
-    Path operator/(std::string path) const;
-    Path join(Path path) const;
-    Path join(const std::string& path) const;
-    Path sub_ext(std::string new_extension) const;
-	void append(const std::string& folder);
-	void prepend(const std::string& text);
-
-    /// Platform-independant C fopen().
-    FILE* fopen(const char* mode);
-    /// Update modification and access time to now.
-    void touch();
-
-    bool is_absolute() const; ///< Checks if a path is relative.
-    bool is_relative() const; ///< Checks if a path is absolute.
-    bool is_root() const;     ///< Checks if a path is the file system root.
-
-    /// Remove all . and .. occurences.
-    Path prune() const;
-    /// Creates an absolute path for this path.
-    Path absolute(const Path& base = Path::pwd()) const;
-    /// Creates a relative path from an absolute one.
-    Path relative(Path base) const;
-    /// Expands all shortcuts plus create an absolute path for this path.
-    Path expand() const;
-    /// Get the one real path for this path.
-    Path real() const;
-
-    Path parent() const;
-    Path root() const;
-    Path basename() const;
-    Path dirname() const;
-    std::string extension() const;
-    void split(Path& dirname, Path& basename) const;
-
-    /// C stat information.
-#if defined(_PATHIE_UNIX)
-    struct stat* stat() const;
-#elif defined(_WIN32)
-    struct _stat* stat() const;
-#else
-#error Unsupported system.
-#endif
-
-    /// File size.
-    long size() const;
-    std::chrono::system_clock::time_point atime() const;
-    std::chrono::system_clock::time_point mtime() const;
-    std::chrono::system_clock::time_point ctime() const;
-
-    /// Low-level entry iterator.
-    long each_entry(std::function<void (const std::string& entry)> func) const;
-    /// List of entries.
-    std::vector<Path> entries() const;
-    /// List of children.
-    std::vector<Path> children() const;
-
-    bool exists() const;
-    bool is_directory() const;
-    bool is_file() const;
-    bool is_symlink() const;
-
-    Path readlink() const;
-    /// Create a symbolic link.
-    void make_symlink(const Path& target) const;
-    void mkdir() const;
-    void rmdir() const;
-    void unlink() const;
-    void remove() const;
-    /// "mkdir -p"-like functionality.
-    void mktree() const;
-    /// "rm -r"-link functionality.
-    void rmtree() const;
-    /// Change file names.
-    void rename(Path& newname) const;
 
   private:
-    static std::string make_tempname(const std::string& namepart);
-    // Remove double // and trailing /, replace \ with /.
-    void sanitize();
-
-#if defined(_PATHIE_UNIX)
-    static Path get_xdg_dir(const std::string& envvarname, const std::string& defaultpath);
-    static std::vector<Path> get_xdg_dirlist(const std::string& envvarname, const std::string& defaultlist);
-    static std::string get_xdg_userdir_setting(const std::string& setting);
-    static std::string get_home(std::string username);
-#elif defined(_WIN32)
-    bool is_ntfs_symlink(const wchar_t* path) const;
-    wchar_t* read_ntfs_symlink(const wchar_t* path) const;
-#endif
-
-    static localpathtype c_localdefault;
-    std::string m_path;
+		static localpathtype c_localdefault;
+		std::string m_path;
   };
 
 }

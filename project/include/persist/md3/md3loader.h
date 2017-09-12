@@ -40,6 +40,7 @@ namespace dc
 		
 	public:
 		CGameObject*	Load(const Pathie::Path& pathToModel);
+		CGameObject*	Load(const Pathie::Path& pathToModel, const std::string& filename);
 		
 	private:
 		CGameObject*	ReadMD3(const Pathie::Path& modelPath, const char* filename);

@@ -13,8 +13,7 @@
 #include <persist/shader/shaderloader.h>
 #include <persist/obj/objloader.h>
 #include <persist/md3/md3loader.h>
-
-#include <pathie.hpp>
+#include <persist/md5/md5loader.h>
 
 namespace dc
 {
@@ -92,13 +91,14 @@ namespace dc
 			printf("Error parsing!\n");
 		}
 
-		m_rootPath = "./" + std::string(document["folder"].GetString());
-		
+		m_rootPath = document["folder"].GetString();
+		assetManager.AssetsPath(m_rootPath);
 		
 		ReadTextures(document, assetManager);
 		ReadShaders(document, assetManager);
 		ReadMeshes(document, assetManager);
 		ReadMD3(document, assetManager);
+		ReadMD5(document, assetManager);
 		
 		fclose(fp);
 		free(buffer);
@@ -119,10 +119,9 @@ namespace dc
 		
 		const std::string folder = assetGroupObj[FOLDER_KEY].GetString();
 		
-		Pathie::Path assetPath(m_rootPath);
-		assetPath.append(folder);
+		Pathie::Path assetPath(m_rootPath.join(folder));
 		
-		printf("Current dir %s\n", assetPath.c_str());
+		printf("[CAssetLoader::ReadTextures] Current dir %s\n", assetPath.c_str());
 		
 		auto& assetsObj = assetGroupObj[ASSETS_KEY];
 		for(auto& assetsEntry : assetsObj.GetObject())
@@ -130,17 +129,14 @@ namespace dc
 			const char* fileName = assetsEntry.name.GetString();
 			const char* fileType = assetsEntry.value.GetString();
 			
-			Pathie::Path filePath(assetPath);
-			filePath.append(fileName);
+			Pathie::Path filePath(assetPath.join(fileName));
 			
-			printf("file: %s, type: %s\n", filePath.c_str(), fileType);
+			printf("[CAssetLoader::ReadTextures] file: %s, type: %s\n", filePath.c_str(), fileType);
 			
 			CTexture* texture = loader.Load(filePath.c_str());
 			
 			assetManager.TextureManager().Add(fileName, texture);
 		}
-		
-		printf("All textures loaded\n");
 	}
 	
 	void CAssetLoader::ReadShaders(Document& document, CAssetManager& assetManager)
@@ -154,14 +150,14 @@ namespace dc
 		
 		CShaderLoader loader;
 		
-		auto& textureObject = document[ASSET_GROUP_KEY];
+		auto& assetGroupObj = document[ASSET_GROUP_KEY];
 		
-		const std::string folder = textureObject[FOLDER_KEY].GetString();
-		printf("Folder for textures %s\n", folder.c_str());
+		const std::string folder = assetGroupObj[FOLDER_KEY].GetString();
+		Pathie::Path assetPath(m_rootPath.join(folder));
 		
-		const std::string textureFolder = m_rootPath+"/"+folder+"/";
+		printf("[CAssetLoader::ReadShaders] Current dir %s\n", assetPath.c_str());
 		
-		auto& assetsObj = textureObject[ASSETS_KEY];
+		auto& assetsObj = assetGroupObj[ASSETS_KEY];
 		for(auto& assetsEntry : assetsObj.GetObject())
 		{
 			const char* fileName = assetsEntry.name.GetString();
@@ -177,15 +173,13 @@ namespace dc
 				shaderType = EShaderType::FRAGMENT_SHADER;
 			}
 			
-			const std::string filePath = textureFolder + fileName;
+			Pathie::Path filePath(assetPath.join(fileName));
 			CShader* shader = loader.Load(filePath.c_str(), shaderType);
 			
-			printf("file: %s, type: %s\n", filePath.c_str(), fileType);
+			printf("[CAssetLoader::ReadShaders] file: %s, type: %s\n", filePath.c_str(), fileType);
 			
 			assetManager.ShaderManager().Add(fileName, shader);
 		}
-		
-		printf("All shaders loaded\n");
 	}
 	
 	void CAssetLoader::ReadMeshes(rapidjson::Document& document, CAssetManager& assetManager)
@@ -201,34 +195,30 @@ namespace dc
 		
 		const std::string folder = assetGroupObj[FOLDER_KEY].GetString();
 		
-		Pathie::Path assetPath(m_rootPath);
-		assetPath.append(folder);
+		Pathie::Path assetPath(m_rootPath.join(folder));
 		
-		printf("Current dir %s\n", assetPath.c_str());
+		printf("[CAssetLoader::ReadMeshes] Current dir %s\n", assetPath.c_str());
 		
+		CObjLoader loader;
 		auto& assetsObj = assetGroupObj[ASSETS_KEY];
 		for(auto& assetsEntry : assetsObj.GetObject())
 		{
 			const char* fileName = assetsEntry.name.GetString();
 			const char* fileType = assetsEntry.value.GetString();
 			
-			Pathie::Path filePath(assetPath);
-			filePath.append(fileName);
+			Pathie::Path filePath(assetPath.join(fileName));
 			
 			CMesh* mesh = 0;
 			if(strcmp(fileType, "OBJ") == 0)
 			{
-				CObjLoader loader;
 				CArray<CMesh*> meshArray = loader.Load(filePath.c_str());
 				mesh = meshArray[0];
 			}
 			
-			printf("file: %s, type: %s\n", filePath.c_str(), fileType);
+			printf("[CAssetLoader::ReadMeshes] file: %s, type: %s\n", filePath.c_str(), fileType);
 			
 			assetManager.MeshManager().Add(fileName, mesh);
 		}
-		
-		printf("All meshes loaded\n");
 	}
 	
 	void CAssetLoader::ReadMD3(rapidjson::Document& document, CAssetManager& assetManager)
@@ -249,8 +239,34 @@ namespace dc
 				if(assetPath.size())
 				{
 					CMD3Loader loader(assetManager);
-					CGameObject* md3GO = loader.Load(assetPath);
-					assetManager.GameObjectManager().Add(md3GO->Name(), md3GO);
+					CGameObject* modelGO = loader.Load(assetPath);
+					assetManager.GameObjectManager().Add(modelGO->Name(), modelGO);
+				}
+			}
+		}
+	}
+	
+	void CAssetLoader::ReadMD5(rapidjson::Document& document, CAssetManager& assetManager)
+	{
+		const char* ASSET_GROUP_KEY = "md5";
+		
+		assert(document.IsObject());
+		assert(document.HasMember(ASSET_GROUP_KEY) && "[CAssetLoader::ReadMD5] No md5 defined in asset_config");
+		
+		auto& assetGroupObj = document[ASSET_GROUP_KEY];
+		
+		for(auto& modelEntry : assetGroupObj.GetObject())
+		{
+			auto modelObj = modelEntry.value.GetObject();
+			for(auto& assetEntry : modelObj)
+			{
+				Pathie::Path assetPath (assetEntry.value.GetString());
+				if(assetPath.size())
+				{
+					CMD5Loader loader(assetManager);
+					loader.ScaleFactor(1.f/16.f);
+					CGameObject* modelGO = loader.Load(assetPath);
+					assetManager.GameObjectManager().Add(modelGO->Name(), modelGO);
 				}
 			}
 		}

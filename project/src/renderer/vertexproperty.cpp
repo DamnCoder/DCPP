@@ -19,6 +19,7 @@ namespace dc
 	const unsigned int CVertexProperty::NORMAL_SIZE = 3;
 	const unsigned int CVertexProperty::UV_SIZE = 2;
 	const unsigned int CVertexProperty::COLOR_SIZE = 4;
+	const unsigned int CVertexProperty::INDEX_SIZE = 3;
 	
 	void CVertexProperty::Activate(const CVertexProperty& vertexProperty)
 	{

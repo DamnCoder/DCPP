@@ -12,6 +12,8 @@
 #include <map>
 #include <pathie.hpp>
 
+#include <dir/directory.h>
+
 #include "md3structs.h"
 #include "assets/assetmanager.h"
 

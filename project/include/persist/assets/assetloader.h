@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include <pathie.hpp>
+
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
 
@@ -75,12 +77,14 @@ private:
 	
 	void ReadMD3(rapidjson::Document& document, CAssetManager& assetManager);
 	
+	void ReadMD5(rapidjson::Document& document, CAssetManager& assetManager);
+	
 	// ===========================================================
 	// Fields
 	// ===========================================================
 	
 private:
-	std::string m_rootPath;
+	Pathie::Path m_rootPath;
 };
 
 	// ===========================================================

@@ -32,34 +32,27 @@ namespace dc
 		// Getter & Setter
 		// ===========================================================
 	public:
-		const bool IsValid() const;
+		const bool				IsValid() const;
 		
-		const std::string& Name() const { return m_name; }
+		const std::string&		Name() const { return m_name; }
 		
-		const int	IndexCount() const { return m_indexCount; }
-		void		IndexCount(const unsigned int indexCount) { m_indexCount = indexCount; }
+		const int				IndexCount() const { return m_indexCount; }
+		void					IndexCount(const unsigned int indexCount) { m_indexCount = indexCount; }
 		
-		const int VertexCount() const
-		{
-			return m_vertexCount;
-		}
+		const int				VertexCount() const { return m_vertexCount; }
 		
-		void VertexCount(const unsigned int vertexCount)
-		{
-			m_vertexCount = vertexCount;
-		}
+		void					VertexCount(const unsigned int vertexCount) { m_vertexCount = vertexCount; }
 		
-		const math::Vector3f& Center() const { return m_center; }
+		const math::Vector3f&	Center() const { return m_center; }
+		const math::Vector3f&	Size() const { return m_size; }
 
-		const math::Vector3f& Size() const { return m_size; }
-
-		TFloatArray&	FloatDataArray(const char* id);
-		void			FloatDataArray(const char* id, TFloatArray& floatArray);
+		TFloatArray&			FloatDataArray(const char* id);
+		void					FloatDataArray(const char* id, TFloatArray& floatArray);
 		
-		void			AddFloatDataArray(const char* id, TFloatArray& floatArray);
+		void					AddFloatDataArray(const char* id, TFloatArray& floatArray);
 		
-		TUIntArray&		IndexArray() { return m_indexArray; }
-		void			IndexArray (const TUIntArray indexArray) { m_indexArray = indexArray; }
+		TUIntArray&				IndexArray() { return m_indexArray; }
+		void					IndexArray (const TUIntArray indexArray) { m_indexArray = indexArray; }
 		
 		// ===========================================================
 		// Constructors

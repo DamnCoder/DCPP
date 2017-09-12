@@ -93,6 +93,17 @@ namespace dc
 			Append(copy.mp_data, copy.m_currentSize);
 		}
 		
+		// move constructor
+		CArray (CArray<T>&& other):
+			m_maxSize(other.m_maxSize),
+			m_currentSize(other.m_currentSize),
+			mp_data(other.mp_data)
+		{
+			other.m_maxSize = 0;
+			other.m_currentSize = 0;
+			other.mp_data = 0;
+		}
+		
 		~CArray()
 		{
 			m_currentSize = 0;

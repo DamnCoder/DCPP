@@ -103,6 +103,12 @@ Path::Path(const Path& path)
   m_path = path.m_path;
 }
 
+Path::Path(Path&& path):
+	m_path(path.m_path)
+{
+	path.m_path = "";
+}
+
 /**
  * This constructs a path from a given std::string.
  *
@@ -110,7 +116,7 @@ Path::Path(const Path& path)
  *
  * \returns a new instance of class Path.
  */
-Path::Path(std::string path)
+Path::Path(const std::string& path)
 {
   m_path = path;
   sanitize();
@@ -3395,8 +3401,8 @@ Path Path::join(Path path) const
  */
 Path Path::join(const std::string& str) const
 {
-  Path path(m_path + "/" + str);
-  return path;
+	Path path(m_path + "/" + str);
+	return path;
 }
 
 void Path::append(const std::string& folder)
@@ -3411,6 +3417,66 @@ void Path::prepend(const std::string &text)
 	sanitize();
 }
 
+Path Path::merge(const Path& path) const
+{
+	Path root = prune();
+	Path children = path.prune();
+	
+	std::vector<Path> rootComponentList = root.burst();
+	std::vector<Path> componentList = children.burst();
+	
+	Path commonComponent = root.findcommon(children);
+	
+	Path mergedPath;
+	for (const auto& component : rootComponentList)
+	{
+		if(component == commonComponent)
+		{
+			break;
+		}
+		printf("%s\n", component.c_str());
+		if(component.str() != ".")
+		{
+			mergedPath.append(component.str());
+		}
+	}
+	
+	bool found = false;
+	for (const auto& component : componentList)
+	{
+		if(component == commonComponent)
+		{
+			found = true;
+		}
+		
+		if(found)
+		{
+			printf("%s\n", component.c_str());
+			mergedPath.append(component.str());
+		}
+	}
+	return mergedPath;
+}
+
+Path Path::findcommon(const Path& path) const
+{
+	std::vector<Path> rootComponentList = burst();
+	std::vector<Path> childrenList = path.burst();
+	
+	for (const auto& rootComponent : rootComponentList)
+	{
+		for (const auto& childComponent : childrenList)
+		{
+			if(rootComponent == childComponent && childComponent.str() != ".")
+			{
+				return rootComponent;
+			}
+		}
+	}
+	
+	return Path();
+}
+
 /**
  * Replaces the current extension with the given new extension
  * and returns the result. If the referenced path doesn’t have
@@ -3423,18 +3489,21 @@ void Path::prepend(const std::string &text)
  */
 Path Path::sub_ext(std::string new_extension) const
 {
-  // If the point is missing, add it to the beginning.
-  if (new_extension.find(".") == string::npos)
-    new_extension.insert(0, ".");
-
-  std::string old_extension = extension();
-  if (old_extension.empty()) {
-    return Path(m_path + new_extension);
-  }
-  else {
-    size_t pos = m_path.find(old_extension);
-    return Path(m_path.substr(0, pos) + new_extension);
-  }
+	// If the point is missing, add it to the beginning.
+	if (new_extension.find(".") == string::npos)
+		new_extension.insert(0, ".");
+	
+	std::string old_extension = extension();
+	
+	if (old_extension.empty())
+	{
+		return Path(m_path + new_extension);
+	}
+	else
+	{
+		size_t pos = m_path.find(old_extension);
+		return Path(m_path.substr(0, pos) + new_extension);
+	}
 }
 
 ///@}

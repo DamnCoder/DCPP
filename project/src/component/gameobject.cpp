@@ -23,14 +23,14 @@ namespace dc
 		mp_transform = AddComponent<CTransform>();
 	}
 	
-	CGameObject::CGameObject(const char* name):
+	CGameObject::CGameObject(const std::string& name):
 		m_name(name),
 		mp_layer(CRenderLayerManager::DEFAULT_LAYER)
 	{
 		mp_transform = AddComponent<CTransform>();
 	}
 	
-	CGameObject::CGameObject(const char* name, const char* layerName):
+	CGameObject::CGameObject(const std::string& name, const char* layerName):
 		m_name(name),
 		mp_layer(layerName)
 	{

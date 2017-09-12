@@ -10,7 +10,7 @@
 
 #include <unordered_map>
 
-//#include "structures/proxy.h"
+#include <pathie.hpp>
 
 #include "material/materialmanager.h"
 #include "material/shadermanager.h"
@@ -51,6 +51,10 @@ class CAssetManager
 	// Getter & Setter
 	// ===========================================================
 public:
+	const Pathie::Path&		RootPath() const							{ return std::move(Pathie::Path::exe()); }
+	const Pathie::Path&		AssetsPath() const							{ return m_assetsPath; }
+	void					AssetsPath(const Pathie::Path& assetsPath)	{ m_assetsPath = assetsPath; }
+	
 	TMeshManager&			MeshManager()		{ return m_meshManager; }
 	TTextureManager&		TextureManager()	{ return m_textureManager; }
 	TShaderManager&			ShaderManager()		{ return m_shaderManager; }
@@ -79,6 +83,8 @@ public:
 	// Fields
 	// ===========================================================
 private:
+	Pathie::Path			m_assetsPath;
+	
 	TMeshManager			m_meshManager;
 	TTextureManager			m_textureManager;
 	TShaderManager			m_shaderManager;

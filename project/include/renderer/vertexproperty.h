@@ -34,6 +34,7 @@ namespace dc
 		static const unsigned int NORMAL_SIZE;
 		static const unsigned int UV_SIZE;
 		static const unsigned int COLOR_SIZE;
+		static const unsigned int INDEX_SIZE;
 		
 		// ===========================================================
 		// Static fields / methods

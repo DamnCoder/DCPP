@@ -6,10 +6,8 @@
  */
 
 #include "md3loader.h"
-//#include "gui/TextureManager.h"
 
 #include <cmath>
-#include <dirent.h>
 
 #include "component/gameobject.h"
 #include "component/modelcomponent.h"
@@ -52,7 +50,7 @@ namespace dc
 	{
 		if(pathToModel.size() == 0)
 		{
-			printf("[CMD3Loader::Load] File not found: %s!\n", pathToModel.c_str());
+			printf("[CMD3Loader::Load] Wrong path, length is 0!\n");
 			return 0;
 		}
 		
@@ -63,11 +61,11 @@ namespace dc
 			return 0;
 		}
 		
-		const char* modelName = pathToModel.basename().c_str();
-		printf("The model name is %s\n", modelName);
+		const std::string modelName = pathToModel.basename().strRef();
+		printf("The model name is %s\n", modelName.c_str());
 		
-		CGameObject* md3MultipartModel = new CGameObject(modelName);
-		CTransform* rootTransform = md3MultipartModel->Transform();
+		CGameObject* modelGO = new CGameObject(modelName);
+		CTransform* rootTransform = modelGO->Transform();
 		
 		CGameObject* lower = ReadMD3(pathToModel, "lower.md3");
 		CGameObject* upper = ReadMD3(pathToModel, "upper.md3");
@@ -79,7 +77,38 @@ namespace dc
 		Link(lower, upper);
 		Link(upper, head);
 		
-		return md3MultipartModel;
+		return modelGO;
+	}
+	
+	CGameObject* CMD3Loader::Load(const Pathie::Path& pathToModel, const std::string& filename)
+	{
+		if(pathToModel.size() == 0)
+		{
+			printf("[CMD3Loader::Load] Wrong path, length is 0!\n");
+			return 0;
+		}
+		
+		if(filename.size() == 0)
+		{
+			printf("[CMD3Loader::Load] Wrong file name, length is 0!\n");
+			return 0;
+		}
+		
+		// We need the path to all the files, not the file
+		if(pathToModel.is_file())
+		{
+			printf("[CMD3Loader::Load] The path can't point to a file\n");
+			return 0;
+		}
+		
+		const std::string modelName = pathToModel.basename().strRef();
+		printf("The model name is %s\n", modelName.c_str());
+		
+		CGameObject* modelGO = ReadMD3(pathToModel, filename.c_str());
+		modelGO->Name(modelName);
+		modelGO->Transform()->Rotation(math::Vector3f(-90.f, 0.f, 0.f));
+
+		return modelGO;
 	}
 	
 	CGameObject* CMD3Loader::ReadMD3(const Pathie::Path& modelPath, const char* filename)
@@ -93,7 +122,7 @@ namespace dc
 		
 		if(!filePtr)
 		{
-			printf("[CMD3Loader::Load] File not found: %s!\n", md3FilePath);
+			printf("[CMD3Loader::ReadMD3] File not found: %s!\n", md3FilePath);
 			return 0;
 		}
 		
@@ -102,7 +131,7 @@ namespace dc
 		
 		if(!ValidateHeader(header))
 		{
-			printf("[CMD3Loader::Load] Invalid MD3 file %s\n", md3FilePath);
+			printf("[CMD3Loader::ReadMD3] Invalid MD3 file %s\n", md3FilePath);
 			return 0;
 		}
 		
@@ -219,14 +248,14 @@ namespace dc
 		CMesh* mesh = new CMesh(meshHeader.name);
 		
 		// Initialize structures to hold the information of the mesh
-		float uvArray[meshHeader.numVerts * 2];
-		unsigned int iArray[meshHeader.numFaces * 3];
+		float uvArray[meshHeader.numVerts * CVertexProperty::UV_SIZE];
+		unsigned int iArray[meshHeader.numFaces * CVertexProperty::INDEX_SIZE];
 		
-		TFloatArray vertexArray(meshHeader.numVerts * 3);
-		TFloatArray normalArray(meshHeader.numVerts * 3);
-		TFloatArray uvCoordArray(meshHeader.numVerts * 2);
-		TFloatArray colorArray(meshHeader.numVerts * 4);
-		TUIntArray	indexArray(meshHeader.numFaces * 3);
+		TFloatArray vertexArray(meshHeader.numVerts * CVertexProperty::VERTEX_SIZE);
+		TFloatArray normalArray(meshHeader.numVerts * CVertexProperty::NORMAL_SIZE);
+		TFloatArray uvCoordArray(meshHeader.numVerts * CVertexProperty::UV_SIZE);
+		TFloatArray colorArray(meshHeader.numVerts * CVertexProperty::COLOR_SIZE);
+		TUIntArray	indexArray(meshHeader.numVerts * CVertexProperty::INDEX_SIZE);
 		
 		// Materials
 		tMd3Shader skinArray[meshHeader.numShaders];
@@ -241,7 +270,7 @@ namespace dc
 		// Indices
 		fseek(filePtr, meshOffset + meshHeader.ofsFaces, SEEK_SET);
 		fread(iArray, MD3_TRIANGLE_SIZE, meshHeader.numFaces, filePtr);
-		indexArray.Append(iArray, meshHeader.numFaces * 3);
+		indexArray.Append(iArray, meshHeader.numFaces * CVertexProperty::INDEX_SIZE);
 		
 		// UVs
 		fseek(filePtr, meshOffset + meshHeader.ofsUV, SEEK_SET);

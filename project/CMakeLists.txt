@@ -43,6 +43,7 @@ INCLUDE_DIRECTORIES(include/types)
 INCLUDE_DIRECTORIES(include/window)
 INCLUDE_DIRECTORIES(include/persist/assets)
 INCLUDE_DIRECTORIES(include/persist/md3)
+INCLUDE_DIRECTORIES(include/persist/md5)
 INCLUDE_DIRECTORIES(include/persist/obj)
 INCLUDE_DIRECTORIES(include/persist/shader)
 INCLUDE_DIRECTORIES(include/persist/texture)
@@ -90,6 +91,7 @@ SET(HEADERS
 	include/persist/md3/md3model.h
 	include/persist/md3/md3skinloader.h
 	include/persist/md3/md3structs.h
+	include/persist/md5/md5loader.h
 	include/persist/obj/objloader.h
 	include/persist/shader/shaderloader.h
 	include/persist/texture/textureloader.h
@@ -132,6 +134,7 @@ SET(SOURCES
 	src/component/modelcomponent.cpp
 	src/component/renderercomponent.cpp
 	src/component/transform.cpp
+	src/dir/directory.cpp
 	src/help/filemanager.cpp
 	src/help/timer.cpp
 	src/input/inputmanagerfactory.cpp
@@ -148,6 +151,7 @@ SET(SOURCES
 	src/persist/md3/md3loader.cpp
 	src/persist/md3/md3model.cpp
 	src/persist/md3/md3skinloader.cpp
+	src/persist/md5/md5loader.cpp
 	src/persist/obj/objloader.cpp
 	src/persist/shader/shaderloader.cpp
 	src/persist/texture/textureloader.cpp

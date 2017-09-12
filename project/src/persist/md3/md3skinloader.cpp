@@ -115,7 +115,7 @@ namespace dc
 			//printf("[CSkinLoader::ReadSkin] Path to texture: %s\n", texturePath.c_str());
 			//printf("[CSkinLoader::ReadSkin] File name: %s\n", filename.c_str());
 			
-			if(!textureManager.Exists(filename.c_str()))
+			if(!textureManager.Exists(filename))
 			{
 				CTexture* texture = textureLoader.Load(path.c_str());
 				textureManager.Add(filename.c_str(), texture);
